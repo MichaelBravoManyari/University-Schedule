@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/start_day_of_week"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@+id/second_day_of_week"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:gravity="center"
+        tools:text="Lun" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/second_day_of_week"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@+id/third_day_of_week"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/start_day_of_week"
+        app:layout_constraintTop_toTopOf="parent"
+        android:gravity="center"
+        tools:text="Mar" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/third_day_of_week"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@+id/fourth_day_of_week"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/second_day_of_week"
+        app:layout_constraintTop_toTopOf="parent"
+        android:gravity="center"
+        tools:text="Mié" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/fourth_day_of_week"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@+id/fifth_day_of_week"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/third_day_of_week"
+        app:layout_constraintTop_toTopOf="parent"
+        android:gravity="center"
+        tools:text="Jue" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/fifth_day_of_week"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@+id/sixth_day_of_week"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/fourth_day_of_week"
+        app:layout_constraintTop_toTopOf="parent"
+        android:gravity="center"
+        tools:text="Vie" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/sixth_day_of_week"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@+id/seventh_day_of_week"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/fifth_day_of_week"
+        app:layout_constraintTop_toTopOf="parent"
+        android:gravity="center"
+        tools:text="Sab" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/seventh_day_of_week"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/sixth_day_of_week"
+        app:layout_constraintTop_toTopOf="parent"
+        android:gravity="center"
+        tools:text="Dom" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
