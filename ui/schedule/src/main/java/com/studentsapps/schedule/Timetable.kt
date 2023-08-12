@@ -2,11 +2,12 @@ package com.studentsapps.schedule
 
 import android.content.Context
 import android.util.AttributeSet
-import android.widget.LinearLayout
+import android.view.LayoutInflater
+import androidx.constraintlayout.widget.ConstraintLayout
 
-class Timetable(context: Context, attrs: AttributeSet) : LinearLayout(context, attrs) {
+internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(context, attrs) {
 
-    private fun createView() {
-
+    init {
+        LayoutInflater.from(context).inflate(R.layout.timetable, this, true)
     }
 }
