@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -15,7 +15,7 @@
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Lun" />
+        tools:text="@string/monday_abbr" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/second_day_of_week"
@@ -25,7 +25,7 @@
         app:layout_constraintEnd_toStartOf="@+id/third_day_of_week"
         app:layout_constraintStart_toEndOf="@+id/start_day_of_week"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Mar" />
+        tools:text="@string/tuesday_abbr" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/third_day_of_week"
@@ -35,7 +35,7 @@
         app:layout_constraintEnd_toStartOf="@+id/fourth_day_of_week"
         app:layout_constraintStart_toEndOf="@+id/second_day_of_week"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Mié" />
+        tools:text="@string/wednesday_abbr" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/fourth_day_of_week"
@@ -45,7 +45,7 @@
         app:layout_constraintEnd_toStartOf="@+id/fifth_day_of_week"
         app:layout_constraintStart_toEndOf="@+id/third_day_of_week"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Jue" />
+        tools:text="@string/thursday_abbr" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/fifth_day_of_week"
@@ -55,7 +55,7 @@
         app:layout_constraintEnd_toStartOf="@+id/sixth_day_of_week"
         app:layout_constraintStart_toEndOf="@+id/fourth_day_of_week"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Vie" />
+        tools:text="@string/friday_abbr" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/sixth_day_of_week"
@@ -65,7 +65,7 @@
         app:layout_constraintEnd_toStartOf="@+id/seventh_day_of_week"
         app:layout_constraintStart_toEndOf="@+id/fifth_day_of_week"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Sab" />
+        tools:text="@string/saturday_abbr" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/seventh_day_of_week"
@@ -75,7 +75,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/sixth_day_of_week"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Dom" />
+        tools:text="@string/sunday_abbr" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/first_day"
@@ -163,13 +163,13 @@
 
     <ScrollView
         android:id="@+id/timetable_scrollable_container"
-        android:contentDescription="horario cuadriculado"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/days_of_week"
+        android:contentDescription="@string/gridded_timetable_scrollable_container"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/days_of_week">
 
         <RelativeLayout
             android:id="@+id/schedule_container_and_grid"
@@ -177,12 +177,12 @@
             android:layout_height="wrap_content">
 
             <ImageView
-                android:id="@+id/grid_drawing_container"
-                android:contentDescription="grid"
+                android:id="@+id/grid_time_drawing_container"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/drawing_container_for_grid_and_time" />
 
         </RelativeLayout>
     </ScrollView>
 
-</merge>
+</androidx.constraintlayout.widget.ConstraintLayout>

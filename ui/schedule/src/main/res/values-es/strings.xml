@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="monday_abbr">L</string>
+    <string name="tuesday_abbr">Ma</string>
+    <string name="wednesday_abbr">Mi</string>
+    <string name="thursday_abbr">J</string>
+    <string name="friday_abbr">V</string>
+    <string name="saturday_abbr">S</string>
+    <string name="sunday_abbr">D</string>
+    <string name="gridded_timetable_scrollable_container">Contenedor scrollable de horario cuadriculado</string>
+    <string name="drawing_container_for_grid_and_time">Contenedor de dibujos para rejilla y hora</string>
+</resources>
