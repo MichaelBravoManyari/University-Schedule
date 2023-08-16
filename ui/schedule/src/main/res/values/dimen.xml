@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="timetable_grid_cell_height">80dp</dimen>
+    <dimen name="timetable_hours_text_size">10sp</dimen>
+    <dimen name="timetable_hours_cell_width">35dp</dimen>
+</resources>

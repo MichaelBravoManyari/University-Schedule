@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="Timetable">
+        <attr name="grid_stroke_color" format="color" />
+        <attr name="half_hour_grid_stroke_color" format="color" />
+        <attr name="hours_text_color" format="color" />
+        <attr name="typeface" format="reference" />
+        <attr name="is_12_hours_format" format="boolean" />
+    </declare-styleable>
+</resources>

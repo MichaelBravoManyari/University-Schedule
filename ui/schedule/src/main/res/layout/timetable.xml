@@ -177,7 +177,7 @@
             android:layout_height="wrap_content">
 
             <ImageView
-                android:id="@+id/grid_time_drawing_container"
+                android:id="@+id/hour_drawing_container_and_grid"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/drawing_container_for_grid_and_time" />

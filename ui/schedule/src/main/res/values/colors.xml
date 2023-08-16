@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="timetable_current_day_color">#1a83a8</color>
+    <color name="timetable_default_grid_stroke_color">#F1EFF4</color>
+    <color name="timetable_default_half_hour_grid_stroke_color">#F9F7FB</color>
+    <color name="timetable_default_hours_text_color">#747476</color>
 </resources>
