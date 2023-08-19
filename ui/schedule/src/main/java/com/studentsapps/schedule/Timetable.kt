@@ -7,14 +7,15 @@ import android.graphics.Paint
 import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.widget.ImageView
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
 import androidx.annotation.Dimension
+import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import com.studentsapps.schedule.databinding.TimetableBinding
 
 internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(context, attrs) {
 
@@ -22,16 +23,20 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
     private var halfHourGridStrokeColor = 0
     private var hoursTextColor = 0
     private lateinit var typeface: Typeface
+    private lateinit var binding: TimetableBinding
     private var is12HoursFormat = true
     private var gridCellWidth = 0
+    private var isMondayFirstDayOfWeek = true
 
     init {
         inflateView()
         getAttrs(attrs)
+        setTypefaceDaysOfWeek()
+        showDaysOfWeek()
     }
 
     private fun inflateView() {
-        LayoutInflater.from(context).inflate(R.layout.timetable, this, true)
+        binding = TimetableBinding.inflate(LayoutInflater.from(context), this)
     }
 
     private fun getAttrs(attrs: AttributeSet) {
@@ -58,11 +63,60 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
                 is12HoursFormat =
                     getBoolean(R.styleable.Timetable_is_12_hours_format, is12HoursFormat)
 
-
+                isMondayFirstDayOfWeek = getBoolean(
+                    R.styleable.Timetable_is_monday_first_day_of_week, isMondayFirstDayOfWeek
+                )
             } finally {
                 recycle()
             }
         }
+    }
+
+    private fun showDaysOfWeek() {
+        if (isMondayFirstDayOfWeek)
+            showDaysOfWeekStartingMonday()
+        else
+            showDaysOfWeekStartingSunday()
+    }
+
+    private fun setTypefaceDaysOfWeek() {
+        binding.apply {
+            startDayOfWeek.typeface = typeface
+            secondDayOfWeek.typeface = typeface
+            thirdDayOfWeek.typeface = typeface
+            fourthDayOfWeek.typeface = typeface
+            fifthDayOfWeek.typeface = typeface
+            sixthDayOfWeek.typeface = typeface
+            seventhDayOfWeek.typeface = typeface
+        }
+    }
+
+    private fun showDaysOfWeekStartingMonday() {
+        binding.apply {
+            startDayOfWeek.text = getStringById(R.string.monday_abbr)
+            secondDayOfWeek.text = getStringById(R.string.tuesday_abbr)
+            thirdDayOfWeek.text = getStringById(R.string.wednesday_abbr)
+            fourthDayOfWeek.text = getStringById(R.string.thursday_abbr)
+            fifthDayOfWeek.text = getStringById(R.string.friday_abbr)
+            sixthDayOfWeek.text = getStringById(R.string.saturday_abbr)
+            seventhDayOfWeek.text = getStringById(R.string.sunday_abbr)
+        }
+    }
+
+    private fun showDaysOfWeekStartingSunday() {
+        binding.apply {
+            startDayOfWeek.text = getStringById(R.string.sunday_abbr)
+            secondDayOfWeek.text = getStringById(R.string.monday_abbr)
+            thirdDayOfWeek.text = getStringById(R.string.tuesday_abbr)
+            fourthDayOfWeek.text = getStringById(R.string.wednesday_abbr)
+            fifthDayOfWeek.text = getStringById(R.string.thursday_abbr)
+            sixthDayOfWeek.text = getStringById(R.string.friday_abbr)
+            seventhDayOfWeek.text = getStringById(R.string.saturday_abbr)
+        }
+    }
+
+    private fun getStringById(@StringRes stringId: Int): String {
+        return resources.getString(stringId)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -75,9 +129,43 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
     }
 
     private fun setBitmapToHourDrawingGridContainer(bitmapHoursGrid: Bitmap) {
-        findViewById<ImageView>(R.id.hour_drawing_container_and_grid).apply {
+        binding.hourDrawingContainerAndGrid.apply {
             setImageBitmap(bitmapHoursGrid)
         }
+    }
+
+    private fun createBitmapGridAndHours(width: Int, hoursCellWidth: Int): Bitmap {
+        val gridCellHeight = getDimensionPixelSizeById(R.dimen.timetable_grid_cell_height)
+        val bitmap =
+            Bitmap.createBitmap(width, ROWS_NUMBER * gridCellHeight, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        drawGrid(canvas, hoursCellWidth, gridCellHeight)
+        drawHoursText(canvas, gridCellHeight, hoursCellWidth)
+        return bitmap
+    }
+
+    private fun drawGrid(canvas: Canvas, hoursCellWidth: Int, gridCellHeight: Int) {
+        val gridPaint = createPaintForGridLines(gridStrokeColor)
+        val paintHalfHourLine = createPaintForGridLines(halfHourGridStrokeColor)
+        drawVerticalGridLines(canvas, hoursCellWidth, gridPaint)
+        drawHorizontalGridLines(
+            canvas, hoursCellWidth, gridCellHeight, gridPaint, paintHalfHourLine
+        )
+    }
+
+    private fun drawHoursText(canvas: Canvas, gridCellHeight: Int, hoursCellWidth: Int) {
+        val hoursTextSize = getDimensionById(R.dimen.timetable_hours_text_size)
+        val hourTextPaint = createPaintForHoursText(hoursTextColor, hoursTextSize, typeface)
+        val hourTextHeight = hourTextPaint.descent() - hourTextPaint.ascent()
+        val xAxis = hoursCellWidth / 2f
+        if (is12HoursFormat) drawHoursText12HourFormat(
+            canvas,
+            xAxis,
+            gridCellHeight,
+            hourTextHeight,
+            hourTextPaint
+        )
+        else drawHoursText24HourFormat(canvas, xAxis, gridCellHeight, hourTextHeight, hourTextPaint)
     }
 
     private fun getColorById(@ColorRes colorId: Int): Int {
@@ -109,9 +197,7 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
     }
 
     private fun createPaintForHoursText(
-        @ColorInt textColor: Int,
-        @Dimension textSize: Float,
-        typeface: Typeface
+        @ColorInt textColor: Int, @Dimension textSize: Float, typeface: Typeface
     ): Paint {
         return Paint().apply {
             color = textColor
@@ -121,60 +207,101 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
         }
     }
 
-    private fun createBitmapGridAndHours(width: Int, hoursCellWidth: Int): Bitmap {
-        val gridCellHeight = getDimensionPixelSizeById(R.dimen.timetable_grid_cell_height)
-        val hoursTextSize = getDimensionById(R.dimen.timetable_hours_text_size)
-        val bitmap =
-            Bitmap.createBitmap(width, ROWS_NUMBER * gridCellHeight, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-        val gridPaint = createPaintForGridLines(gridStrokeColor)
-        val paintHalfHourLine = createPaintForGridLines(halfHourGridStrokeColor)
-        val hourTextPaint = createPaintForHoursText(hoursTextColor, hoursTextSize, typeface)
-        val hourTextHeight = hourTextPaint.descent() - hourTextPaint.ascent()
-        val dayHours = if (is12HoursFormat) hoursIn12HourFormat else hoursIn24HourFormat
-
-        // Dibujar lineas verticales
-        for (i in 2 until COLUMNS_NUMBER) {
-            val x = (i - 1) * gridCellWidth + hoursCellWidth
-            canvas.drawLine(x.toFloat(), 0f, x.toFloat(), canvas.height.toFloat(), gridPaint)
+    private fun drawHorizontalGridLines(
+        canvas: Canvas,
+        hoursCellWidth: Int,
+        gridCellHeight: Int,
+        gridPaint: Paint,
+        paintHalfHourLine: Paint
+    ) {
+        for (lineNumber in 1..NUM_HORIZONTAL_GRID_LINES) {
+            val xAxisStart = hoursCellWidth.toFloat()
+            val yAxis = calculateHorizontalGridLineYAxis(lineNumber, gridCellHeight)
+            val xAxisStop = canvas.width.toFloat()
+            val paint = if (isHorizontalLineHourMarker(lineNumber)) gridPaint else paintHalfHourLine
+            drawLine(canvas, xAxisStart, yAxis, xAxisStop, yAxis, paint)
         }
+    }
 
-        // Dibujar lineas horizontales
-        for (i in 1 until ROWS_NUMBER * 2) {
-            val y = (i * gridCellHeight) / 2
-            canvas.drawLine(
-                hoursCellWidth.toFloat(),
-                y.toFloat(),
-                canvas.width.toFloat(),
-                y.toFloat(),
-                if (i % 2 != 0) paintHalfHourLine else gridPaint
-            )
+    // The horizontal lines of the grid can mark the hours and half hours.
+    private fun isHorizontalLineHourMarker(lineNumber: Int): Boolean {
+        return lineNumber % 2 == 0
+    }
+
+    private fun calculateHorizontalGridLineYAxis(lineNumber: Int, gridCellHeight: Int): Float {
+        return (lineNumber * gridCellHeight) / 2f
+    }
+
+    private fun drawVerticalGridLines(canvas: Canvas, hoursCellWidth: Int, gridPaint: Paint) {
+        for (lineNumber in 1..NUM_VERTICAL_GRID_LINES) {
+            val xAxis = calculateVerticalGridLineXAxis(hoursCellWidth, lineNumber)
+            val yAxisStart = 0f
+            val yAxisStop = canvas.height.toFloat()
+            drawLine(canvas, xAxis, yAxisStart, xAxis, yAxisStop, gridPaint)
         }
+    }
 
-        // Dibujar texto de horas
-        for ((index, hour) in dayHours.withIndex()) {
+    private fun calculateVerticalGridLineXAxis(hoursCellWidth: Int, lineNumber: Int): Float {
+        return hoursCellWidth + (lineNumber * gridCellWidth).toFloat()
+    }
+
+    private fun drawLine(
+        canvas: Canvas,
+        xAxisStart: Float,
+        yAxisStart: Float,
+        xAxisStop: Float,
+        yAxisStop: Float,
+        paint: Paint
+    ) {
+        canvas.drawLine(xAxisStart, yAxisStart, xAxisStop, yAxisStop, paint)
+    }
+
+    private fun drawText(canvas: Canvas, text: String, xAxis: Float, yAxis: Float, paint: Paint) {
+        canvas.drawText(text, xAxis, yAxis, paint)
+    }
+
+    private fun calculateYAxisOfHoursText24HourFormat(
+        gridCellHeight: Int, hourPosition: Int, hourTextHeight: Float
+    ): Float {
+        return (gridCellHeight * (hourPosition + 1)) + (hourTextHeight / 3)
+    }
+
+    private fun calculateYAxisOfHoursText12HourFormat(
+        gridCellHeight: Int, hourPosition: Int, hourTextHeight: Float, textIndex: Int
+    ): Float {
+        return (gridCellHeight * (hourPosition + 1)) + (hourTextHeight * textIndex)
+    }
+
+    private fun drawHoursText24HourFormat(
+        canvas: Canvas,
+        textXAxisPosition: Float,
+        gridCellHeight: Int,
+        hourTextHeight: Float,
+        paint: Paint
+    ) {
+        for ((hourPosition, hour) in hoursIn24HourFormat.withIndex()) {
+            val yAxis =
+                calculateYAxisOfHoursText24HourFormat(gridCellHeight, hourPosition, hourTextHeight)
+            drawText(canvas, hour, textXAxisPosition, yAxis, paint)
+        }
+    }
+
+    private fun drawHoursText12HourFormat(
+        canvas: Canvas,
+        textXAxisPosition: Float,
+        gridCellHeight: Int,
+        hourTextHeight: Float,
+        paint: Paint
+    ) {
+        for ((hourPosition, hour) in hoursIn12HourFormat.withIndex()) {
             val hourTextSplit = hour.split(" ")
-            val y = (gridCellHeight * (index + 1)).toFloat()
-            if (is12HoursFormat) {
-                hourTextSplit.forEachIndexed { textIndex, text ->
-                    canvas.drawText(
-                        text,
-                        hoursCellWidth / 2f,
-                        y + (hourTextHeight * textIndex),
-                        hourTextPaint
-                    )
-                }
-            } else {
-                canvas.drawText(
-                    hour,
-                    hoursCellWidth / 2f,
-                    y + (hourTextHeight / 3),
-                    hourTextPaint
+            hourTextSplit.forEachIndexed { textIndex, text ->
+                val yAxis = calculateYAxisOfHoursText12HourFormat(
+                    gridCellHeight, hourPosition, hourTextHeight, textIndex
                 )
+                drawText(canvas, text, textXAxisPosition, yAxis, paint)
             }
         }
-
-        return bitmap
     }
 
     companion object {
@@ -182,6 +309,8 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
         private const val COLUMNS_HOURS_NUMBER = 1
         private const val ROWS_NUMBER = 24
         private const val GRID_LINES_STROKE_WIDTH = 3F
+        private const val NUM_VERTICAL_GRID_LINES = 6
+        private const val NUM_HORIZONTAL_GRID_LINES = 48
 
         private val hoursIn12HourFormat = listOf(
             "1 am",
