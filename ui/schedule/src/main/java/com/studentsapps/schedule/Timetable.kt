@@ -7,6 +7,7 @@ import android.graphics.Paint
 import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
@@ -22,7 +23,7 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
     private var gridStrokeColor = 0
     private var halfHourGridStrokeColor = 0
     private var hoursTextColor = 0
-    private lateinit var typeface: Typeface
+    private lateinit var daysOfWeekFont: Typeface
     private lateinit var binding: TimetableBinding
     private var is12HoursFormat = true
     private var gridCellWidth = 0
@@ -32,6 +33,7 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
         inflateView()
         getAttrs(attrs)
         setTypefaceDaysOfWeek()
+        setDaysOfWeekTextSize()
         showDaysOfWeek()
     }
 
@@ -57,8 +59,9 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
                     getColorById(R.color.timetable_default_hours_text_color)
                 )
 
-                val fontId = getResourceId(R.styleable.Timetable_typeface, R.font.roboto_medium)
-                typeface = ResourcesCompat.getFont(context, fontId)!!
+                val fontId =
+                    getResourceId(R.styleable.Timetable_days_of_week_font, R.font.roboto_medium)
+                daysOfWeekFont = ResourcesCompat.getFont(context, fontId)!!
 
                 is12HoursFormat =
                     getBoolean(R.styleable.Timetable_is_12_hours_format, is12HoursFormat)
@@ -72,47 +75,64 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
         }
     }
 
+    private fun setDaysOfWeekTextSize() {
+        val daysOfWeekTextSize = getDimensionById(R.dimen.timetable_days_of_week_text_size)
+        getDayOfWeekViews().forEach { textView ->
+            textView.textSize = daysOfWeekTextSize
+        }
+    }
+
     private fun showDaysOfWeek() {
-        if (isMondayFirstDayOfWeek)
-            showDaysOfWeekStartingMonday()
-        else
-            showDaysOfWeekStartingSunday()
+        val daysOfWekOrder = getDaysOfWeekOrder()
+        setDaysOfWeekText(daysOfWekOrder)
+    }
+
+    private fun setDaysOfWeekText(daysOfWeekOrder: List<Int>) {
+        getDayOfWeekViews().forEachIndexed { index, textView ->
+            textView.text = getStringById(daysOfWeekOrder[index])
+        }
+    }
+
+    private fun getDaysOfWeekOrder(): List<Int> {
+        return if (isMondayFirstDayOfWeek) {
+            listOf(
+                R.string.monday_abbr,
+                R.string.tuesday_abbr,
+                R.string.wednesday_abbr,
+                R.string.thursday_abbr,
+                R.string.friday_abbr,
+                R.string.saturday_abbr,
+                R.string.sunday_abbr
+            )
+        } else {
+            listOf(
+                R.string.sunday_abbr,
+                R.string.monday_abbr,
+                R.string.tuesday_abbr,
+                R.string.wednesday_abbr,
+                R.string.thursday_abbr,
+                R.string.friday_abbr,
+                R.string.saturday_abbr
+            )
+        }
     }
 
     private fun setTypefaceDaysOfWeek() {
-        binding.apply {
-            startDayOfWeek.typeface = typeface
-            secondDayOfWeek.typeface = typeface
-            thirdDayOfWeek.typeface = typeface
-            fourthDayOfWeek.typeface = typeface
-            fifthDayOfWeek.typeface = typeface
-            sixthDayOfWeek.typeface = typeface
-            seventhDayOfWeek.typeface = typeface
+        getDayOfWeekViews().forEach { view ->
+            view.typeface = daysOfWeekFont
         }
     }
 
-    private fun showDaysOfWeekStartingMonday() {
-        binding.apply {
-            startDayOfWeek.text = getStringById(R.string.monday_abbr)
-            secondDayOfWeek.text = getStringById(R.string.tuesday_abbr)
-            thirdDayOfWeek.text = getStringById(R.string.wednesday_abbr)
-            fourthDayOfWeek.text = getStringById(R.string.thursday_abbr)
-            fifthDayOfWeek.text = getStringById(R.string.friday_abbr)
-            sixthDayOfWeek.text = getStringById(R.string.saturday_abbr)
-            seventhDayOfWeek.text = getStringById(R.string.sunday_abbr)
-        }
-    }
-
-    private fun showDaysOfWeekStartingSunday() {
-        binding.apply {
-            startDayOfWeek.text = getStringById(R.string.sunday_abbr)
-            secondDayOfWeek.text = getStringById(R.string.monday_abbr)
-            thirdDayOfWeek.text = getStringById(R.string.tuesday_abbr)
-            fourthDayOfWeek.text = getStringById(R.string.wednesday_abbr)
-            fifthDayOfWeek.text = getStringById(R.string.thursday_abbr)
-            sixthDayOfWeek.text = getStringById(R.string.friday_abbr)
-            seventhDayOfWeek.text = getStringById(R.string.saturday_abbr)
-        }
+    private fun getDayOfWeekViews(): List<TextView> {
+        return listOf(
+            binding.startDayOfWeek,
+            binding.secondDayOfWeek,
+            binding.thirdDayOfWeek,
+            binding.fourthDayOfWeek,
+            binding.fifthDayOfWeek,
+            binding.sixthDayOfWeek,
+            binding.seventhDayOfWeek
+        )
     }
 
     private fun getStringById(@StringRes stringId: Int): String {
@@ -155,7 +175,7 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
 
     private fun drawHoursText(canvas: Canvas, gridCellHeight: Int, hoursCellWidth: Int) {
         val hoursTextSize = getDimensionById(R.dimen.timetable_hours_text_size)
-        val hourTextPaint = createPaintForHoursText(hoursTextColor, hoursTextSize, typeface)
+        val hourTextPaint = createPaintForHoursText(hoursTextColor, hoursTextSize, daysOfWeekFont)
         val hourTextHeight = hourTextPaint.descent() - hourTextPaint.ascent()
         val xAxis = hoursCellWidth / 2f
         if (is12HoursFormat) drawHoursText12HourFormat(
