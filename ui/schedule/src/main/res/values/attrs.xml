@@ -5,6 +5,7 @@
         <attr name="half_hour_grid_stroke_color" format="color" />
         <attr name="hours_text_color" format="color" />
         <attr name="days_of_week_font" format="reference" />
+        <attr name="days_of_month_font" format="reference" />
         <attr name="is_12_hours_format" format="boolean" />
         <attr name="is_monday_first_day_of_week" format="boolean" />
     </declare-styleable>

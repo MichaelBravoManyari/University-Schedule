@@ -23,6 +23,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
 import org.robolectric.annotation.Config
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @RunWith(AndroidJUnit4::class)
 class TimetableTest {
@@ -31,14 +34,14 @@ class TimetableTest {
     @Config(qualifiers = "en")
     fun showDaysOfWeek_enDefaultStartingDay() {
         createTimetable(null)
-        verifyDayOfWeekTexts("M", "T", "W", "T", "F", "S", "S")
+        verifyDaysOfWeekTexts("M", "T", "W", "T", "F", "S", "S")
     }
 
     @Test
     @Config(qualifiers = "es")
     fun showDaysOfWeek_esDefaultStartingDay() {
         createTimetable(null)
-        verifyDayOfWeekTexts("L", "Ma", "Mi", "J", "V", "S", "D")
+        verifyDaysOfWeekTexts("L", "Ma", "Mi", "J", "V", "S", "D")
     }
 
     @Test
@@ -47,7 +50,7 @@ class TimetableTest {
         val isMondayFirstOfWeek = true
         val attr = createAttributeSet(isMondayFirstOfWeek)
         createTimetable(attr)
-        verifyDayOfWeekTexts("M", "T", "W", "T", "F", "S", "S")
+        verifyDaysOfWeekTexts("M", "T", "W", "T", "F", "S", "S")
     }
 
     @Test
@@ -56,7 +59,7 @@ class TimetableTest {
         val isMondayFirstOfWeek = true
         val attr = createAttributeSet(isMondayFirstOfWeek)
         createTimetable(attr)
-        verifyDayOfWeekTexts("L", "Ma", "Mi", "J", "V", "S", "D")
+        verifyDaysOfWeekTexts("L", "Ma", "Mi", "J", "V", "S", "D")
     }
 
     @Test
@@ -65,7 +68,7 @@ class TimetableTest {
         val isMondayFirstOfWeek = false
         val attr = createAttributeSet(isMondayFirstOfWeek)
         createTimetable(attr)
-        verifyDayOfWeekTexts("S", "M", "T", "W", "T", "F", "S")
+        verifyDaysOfWeekTexts("S", "M", "T", "W", "T", "F", "S")
     }
 
     @Test
@@ -74,14 +77,14 @@ class TimetableTest {
         val isMondayFirstOfWeek = false
         val attr = createAttributeSet(isMondayFirstOfWeek)
         createTimetable(attr)
-        verifyDayOfWeekTexts("D", "L", "Ma", "Mi", "J", "V", "S")
+        verifyDaysOfWeekTexts("D", "L", "Ma", "Mi", "J", "V", "S")
     }
 
     @Test
     fun setTypefaceDaysOfWeek_defaultTypeface() {
         createTimetable(null)
-        val typeface = createTypeface(R.font.roboto_medium)
-        verifyTypeface(typeface)
+        val expectedTypeface = createTypeface(R.font.roboto_medium)
+        verifyTypeface(expectedTypeface)
     }
 
     @Test
@@ -93,12 +96,28 @@ class TimetableTest {
     }
 
     @Test
-    fun verifyDaysOfWeekTextSize_correctSize() {
+    fun setTextSizeDaysOfWeek_correctSize() {
         val daysOfWeekIds = getDaysOfWeekViewsIds()
         createTimetable(null)
-        for (viewId in daysOfWeekIds) {
-            onView(withId(viewId)).check(matches(withTextSize(4f)))
-        }
+        verifyDaysOfWeekTextSize(daysOfWeekIds)
+    }
+
+    // Mal formulado
+    @Test
+    fun showDaysOfMonthCurrentWeek_defaultStartingMonday() {
+        val expectedDaysOfMonthCurrentWeek = getDaysOfMonthCurrentWeek()
+        val daysOfMonthViewsIds = getDaysOfMonthViewsIds()
+        createTimetable(null)
+        verifyDaysOfMonthCurrentWeek(daysOfMonthViewsIds, expectedDaysOfMonthCurrentWeek)
+    }
+
+    @Test
+    fun showDaysOfMonthCurrentWeek_startingSunday() {
+        val expectedDaysOfMonthCurrentWeek = getDaysOfMonthCurrentWeek(false)
+        val daysOfMonthViewsIds = getDaysOfMonthViewsIds()
+        val attr = createAttributeSet(false)
+        createTimetable(attr)
+        verifyDaysOfMonthCurrentWeek(daysOfMonthViewsIds, expectedDaysOfMonthCurrentWeek)
     }
 
     private fun createTimetable(attr: AttributeSet?) {
@@ -119,20 +138,37 @@ class TimetableTest {
         return ResourcesCompat.getFont(context, fontId)!!
     }
 
-    private fun verifyDayOfWeekTexts(vararg dayTexts: String) {
+    private fun verifyDaysOfWeekTextSize(daysOfWeekIds: List<Int>, expectedTextSize: Float = 4f) {
+        for (viewId in daysOfWeekIds) {
+            onView(withId(viewId)).check(matches(withTextSize(expectedTextSize)))
+        }
+    }
+
+    private fun verifyDaysOfWeekTexts(vararg expectedDayTexts: String) {
         val dayOfWeekIds = getDaysOfWeekViewsIds()
 
         dayOfWeekIds.forEachIndexed { index, viewId ->
             onView(withId(viewId))
-                .check(matches(withText(dayTexts[index])))
+                .check(matches(withText(expectedDayTexts[index])))
                 .check(matches(isDisplayed()))
         }
     }
 
-    private fun verifyTypeface(typeface: Typeface) {
+    private fun verifyDaysOfMonthCurrentWeek(
+        daysOfMonthViewsIds: List<Int>,
+        daysOfMonthCurrentWeek: List<String>
+    ) {
+        daysOfMonthViewsIds.forEachIndexed { index, viewId ->
+            onView(withId(viewId))
+                .check(matches(withText(daysOfMonthCurrentWeek[index])))
+                .check(matches(isDisplayed()))
+        }
+    }
+
+    private fun verifyTypeface(expectedTypeface: Typeface) {
         val dayOfWeekIds = getDaysOfWeekViewsIds()
         for (viewId in dayOfWeekIds) {
-            onView(withId(viewId)).check(matches(withTypeface(typeface)))
+            onView(withId(viewId)).check(matches(withTypeface(expectedTypeface)))
         }
     }
 
@@ -144,25 +180,12 @@ class TimetableTest {
         )
     }
 
-    private fun withTypeface(typeface: Typeface): Matcher<View> {
-        return TypefaceMatcher(typeface)
-    }
-
-    private fun withTextSize(expectedTextSize: Float): Matcher<View> {
-        return TextSizeMatcher(expectedTextSize)
-    }
-
-    private fun texts(expectedTextSize: Float): Matcher<View> {
-        return object : BoundedMatcher<View, TextView>(TextView::class.java){
-            override fun describeTo(description: Description?) {
-                TODO("Not yet implemented")
-            }
-
-            override fun matchesSafely(item: TextView?): Boolean {
-                TODO("Not yet implemented")
-            }
-
-        }
+    private fun getDaysOfMonthViewsIds(): List<Int> {
+        return listOf(
+            R.id.first_day, R.id.second_day, R.id.third_day,
+            R.id.fourth_day, R.id.fifth_day, R.id.sixth_day,
+            R.id.seventh_day
+        )
     }
 
     private fun createAttributeSet(isMondayFirstOfWeek: Boolean): AttributeSet {
@@ -176,29 +199,42 @@ class TimetableTest {
         attr.addAttribute(R.attr.days_of_week_font, typeface.toString())
         return attr.build()
     }
-}
 
-class TypefaceMatcher(private val expectedTypeface: Typeface) :
-    BoundedMatcher<View, TextView>(TextView::class.java) {
-    override fun describeTo(description: Description?) {
-        description?.appendText("with typeface: ")
-        description?.appendValue(expectedTypeface)
+    private fun withTypeface(expectedTypeface: Typeface): Matcher<View> {
+        return object : BoundedMatcher<View, TextView>(TextView::class.java) {
+            override fun describeTo(description: Description?) {
+                description?.appendText("with typeface: ")
+                description?.appendValue(expectedTypeface)
+            }
+
+            override fun matchesSafely(item: TextView?): Boolean {
+                return item?.typeface == expectedTypeface
+            }
+
+        }
     }
 
-    override fun matchesSafely(item: TextView?): Boolean {
-        return item?.typeface == expectedTypeface
-    }
-}
+    private fun withTextSize(expectedTextSize: Float): Matcher<View> {
+        return object : BoundedMatcher<View, TextView>(TextView::class.java) {
+            override fun describeTo(description: Description?) {
+                description?.appendText("with textSize: ")
+                description?.appendValue(expectedTextSize)
+            }
 
-class TextSizeMatcher(private val expectedTextSize: Float) :
-    BoundedMatcher<View, TextView>(TextView::class.java) {
-    override fun describeTo(description: Description?) {
-        description?.appendText("with textSize: ")
-        description?.appendValue(expectedTextSize)
-    }
+            override fun matchesSafely(item: TextView?): Boolean {
+                return item?.textSize == expectedTextSize
+            }
 
-    override fun matchesSafely(item: TextView?): Boolean {
-        return item?.textSize == expectedTextSize
+        }
     }
 
+    private fun getDaysOfMonthCurrentWeek(isMondayFirstDayOfWeek: Boolean = true): List<String> {
+        val formatter = DateTimeFormatter.ofPattern("d")
+        val date: LocalDate = LocalDate.now()
+        val startOfWeek =
+            if (isMondayFirstDayOfWeek) date.with(DayOfWeek.MONDAY) else date.with(DayOfWeek.MONDAY)
+                .minusDays(1)
+
+        return (0 until 7).map { startOfWeek.plusDays(it.toLong()).format(formatter).toString() }
+    }
 }

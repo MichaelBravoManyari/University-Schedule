@@ -17,6 +17,9 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import com.studentsapps.schedule.databinding.TimetableBinding
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(context, attrs) {
 
@@ -24,6 +27,7 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
     private var halfHourGridStrokeColor = 0
     private var hoursTextColor = 0
     private lateinit var daysOfWeekFont: Typeface
+    private lateinit var daysOfMonthFont: Typeface
     private lateinit var binding: TimetableBinding
     private var is12HoursFormat = true
     private var gridCellWidth = 0
@@ -35,6 +39,7 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
         setTypefaceDaysOfWeek()
         setDaysOfWeekTextSize()
         showDaysOfWeek()
+        showDaysOfMonthCurrentWeek()
     }
 
     private fun inflateView() {
@@ -59,9 +64,13 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
                     getColorById(R.color.timetable_default_hours_text_color)
                 )
 
-                val fontId =
+                val daysOfWeekFontId =
                     getResourceId(R.styleable.Timetable_days_of_week_font, R.font.roboto_medium)
-                daysOfWeekFont = ResourcesCompat.getFont(context, fontId)!!
+                daysOfWeekFont = ResourcesCompat.getFont(context, daysOfWeekFontId)!!
+
+                val daysOfMonthFontId =
+                    getResourceId(R.styleable.Timetable_days_of_month_font, R.font.roboto_regular)
+                daysOfMonthFont = ResourcesCompat.getFont(context, daysOfMonthFontId)!!
 
                 is12HoursFormat =
                     getBoolean(R.styleable.Timetable_is_12_hours_format, is12HoursFormat)
@@ -69,10 +78,26 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
                 isMondayFirstDayOfWeek = getBoolean(
                     R.styleable.Timetable_is_monday_first_day_of_week, isMondayFirstDayOfWeek
                 )
+
             } finally {
                 recycle()
             }
         }
+    }
+
+    private fun showDaysOfMonthCurrentWeek() {
+        val daysOfMonthCurrentWeek = getDaysOfMonthCurrentWeek()
+        val daysOfMonthViews = getDaysOfMonthViews()
+        setDaysOfMonthText(daysOfMonthCurrentWeek, daysOfMonthViews)
+    }
+
+    private fun getDaysOfMonthCurrentWeek(): List<String> {
+        val formatter = DateTimeFormatter.ofPattern("d")
+        val date: LocalDate = LocalDate.now()
+        val startOfWeek =
+            if (isMondayFirstDayOfWeek) date.with(DayOfWeek.MONDAY) else date.with(DayOfWeek.MONDAY)
+                .minusDays(1)
+        return (0 until 7).map { startOfWeek.plusDays(it.toLong()).format(formatter).toString() }
     }
 
     private fun setDaysOfWeekTextSize() {
@@ -90,6 +115,15 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
     private fun setDaysOfWeekText(daysOfWeekOrder: List<Int>) {
         getDayOfWeekViews().forEachIndexed { index, textView ->
             textView.text = getStringById(daysOfWeekOrder[index])
+        }
+    }
+
+    private fun setDaysOfMonthText(
+        daysOfMonthCurrentWeek: List<String>,
+        daysOfMonthViews: List<TextView>
+    ) {
+        daysOfMonthViews.forEachIndexed { index, view ->
+            view.text = daysOfMonthCurrentWeek[index]
         }
     }
 
@@ -124,15 +158,31 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
     }
 
     private fun getDayOfWeekViews(): List<TextView> {
-        return listOf(
-            binding.startDayOfWeek,
-            binding.secondDayOfWeek,
-            binding.thirdDayOfWeek,
-            binding.fourthDayOfWeek,
-            binding.fifthDayOfWeek,
-            binding.sixthDayOfWeek,
-            binding.seventhDayOfWeek
-        )
+        return with(binding) {
+            listOf(
+                startDayOfWeek,
+                secondDayOfWeek,
+                thirdDayOfWeek,
+                fourthDayOfWeek,
+                fifthDayOfWeek,
+                sixthDayOfWeek,
+                seventhDayOfWeek
+            )
+        }
+    }
+
+    private fun getDaysOfMonthViews(): List<TextView> {
+        return with(binding) {
+            listOf(
+                firstDay,
+                secondDay,
+                thirdDay,
+                fourthDay,
+                fifthDay,
+                sixthDay,
+                seventhDay
+            )
+        }
     }
 
     private fun getStringById(@StringRes stringId: Int): String {
