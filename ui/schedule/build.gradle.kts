@@ -1,11 +1,11 @@
 plugins {
-    id("com.android.library")
-    id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.com.android.library)
+    alias(libs.plugins.org.jetbrains.kotlin.android)
 }
 
 android {
     namespace = "com.studentsapps.schedule"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         minSdk = 24
@@ -43,23 +43,23 @@ android {
 
 dependencies {
 
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation("com.google.android.material:material:1.9.0")
+    implementation(libs.material)
 
     // Local test
-    testImplementation("junit:junit:4.13.2")
-    testImplementation("org.robolectric:robolectric:4.10.3")
-    testImplementation("org.hamcrest:hamcrest:2.2")
-    testImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    testImplementation("androidx.test.ext:junit-ktx:1.1.5")
+    testImplementation(libs.junit)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.hamcrest)
+    testImplementation(libs.espresso.core)
+    testImplementation(libs.androidx.test.ext.junit)
 
     // Instrumented Test
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    testImplementation(libs.espresso.core)
+    testImplementation(libs.androidx.test.ext.junit)
 
 
     // Testing fragments
-    debugImplementation("androidx.fragment:fragment-testing:1.6.1")
+    debugImplementation(libs.fragment.testing)
 }
