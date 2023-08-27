@@ -3,8 +3,9 @@ package com.studentsapps.schedule
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import javax.inject.Inject
 
-class TimetableDateUtils {
+internal class TimetableDateUtils @Inject constructor() {
 
     fun getDaysOfMonthCurrentWeek(isMondayFirstDayOfWeek: Boolean): List<String> {
         val formatter = DateTimeFormatter.ofPattern("d")

@@ -17,10 +17,10 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import com.studentsapps.schedule.databinding.TimetableBinding
-import java.time.DayOfWeek
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(context, attrs) {
 
     private var gridStrokeColor = 0
@@ -32,6 +32,9 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
     private var is12HoursFormat = true
     private var gridCellWidth = 0
     private var isMondayFirstDayOfWeek = true
+
+    @Inject
+    lateinit var dateUtils: TimetableDateUtils
 
     init {
         inflateView()
@@ -86,19 +89,19 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
     }
 
     private fun showDaysOfMonthCurrentWeek() {
-        val daysOfMonthCurrentWeek = getDaysOfMonthCurrentWeek()
+        val daysOfMonthCurrentWeek = dateUtils.getDaysOfMonthCurrentWeek(isMondayFirstDayOfWeek)
         val daysOfMonthViews = getDaysOfMonthViews()
         setDaysOfMonthText(daysOfMonthCurrentWeek, daysOfMonthViews)
     }
 
-    private fun getDaysOfMonthCurrentWeek(): List<String> {
+    /*private fun getDaysOfMonthCurrentWeek(): List<String> {
         val formatter = DateTimeFormatter.ofPattern("d")
         val date: LocalDate = LocalDate.now()
         val startOfWeek =
             if (isMondayFirstDayOfWeek) date.with(DayOfWeek.MONDAY) else date.with(DayOfWeek.MONDAY)
                 .minusDays(1)
         return (0 until 7).map { startOfWeek.plusDays(it.toLong()).format(formatter).toString() }
-    }
+    }*/
 
     private fun setDaysOfWeekTextSize() {
         val daysOfWeekTextSize = getDimensionById(R.dimen.timetable_days_of_week_text_size)

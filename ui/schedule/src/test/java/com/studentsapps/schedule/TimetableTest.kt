@@ -8,7 +8,6 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.annotation.FontRes
 import androidx.core.content.res.ResourcesCompat
-import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -17,8 +16,12 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
+import dagger.hilt.android.testing.HiltTestApplication
 import org.hamcrest.Description
 import org.hamcrest.Matcher
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
@@ -27,8 +30,13 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+@Config(application = HiltTestApplication::class, sdk = [33])
+@HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class TimetableTest {
+
+    @get:Rule
+    var hiltRule = HiltAndroidRule(this)
 
     @Test
     @Config(qualifiers = "en")
@@ -121,21 +129,21 @@ class TimetableTest {
     }
 
     private fun createTimetable(attr: AttributeSet?) {
-        launchFragmentInContainer<TestFragment>().onFragment { fragment ->
+        launchFragmentInHiltContainer<TestFragment> {
             val attributeSet = attr ?: Robolectric.buildAttributeSet().build()
-            val timetable = Timetable(fragment.requireContext(), attributeSet)
+            val timetable = Timetable(this.requireContext(), attributeSet)
             val layoutParams = FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT
             )
             timetable.layoutParams = layoutParams
-            fragment.binding.root.addView(timetable)
+            val testFragment = this as TestFragment
+            testFragment.binding.root.addView(timetable)
         }
     }
 
     private fun createTypeface(@FontRes fontId: Int): Typeface {
-        val context = ApplicationProvider.getApplicationContext<Application>()
-        return ResourcesCompat.getFont(context, fontId)!!
+        return ResourcesCompat.getFont(ApplicationProvider.getApplicationContext(), fontId)!!
     }
 
     private fun verifyDaysOfWeekTextSize(daysOfWeekIds: List<Int>, expectedTextSize: Float = 4f) {

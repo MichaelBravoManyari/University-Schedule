@@ -14,6 +14,8 @@ hamcrest = "2.2"
 fragment-testing = "1.6.1"
 kotlin = "1.9.0"
 org-jetbrains-kotlin-jvm = "1.8.0"
+hilt = "2.47"
+kotlinxCoroutines = "1.6.4"
 
 [libraries]
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
@@ -29,12 +31,18 @@ robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "
 hamcrest = { group = "org.hamcrest", name = "hamcrest", version.ref = "hamcrest" }
 fragment-testing = { group = "androidx.fragment", name = "fragment-testing", version.ref = "fragment-testing" }
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
+hilt-testing = { group = "com.google.dagger", name = "hilt-android-testing", version.ref = "hilt" }
+kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 com-android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "org-jetbrains-kotlin-android" }
 org-jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "org-jetbrains-kotlin-jvm" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 
 [bundles]
 

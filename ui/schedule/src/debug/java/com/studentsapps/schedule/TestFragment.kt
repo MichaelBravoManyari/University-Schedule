@@ -6,7 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.studentsapps.schedule.databinding.FragmentTestBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class TestFragment : Fragment() {
 
     private var _binding: FragmentTestBinding? = null
