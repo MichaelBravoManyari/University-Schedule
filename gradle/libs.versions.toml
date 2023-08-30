@@ -16,6 +16,7 @@ kotlin = "1.9.0"
 org-jetbrains-kotlin-jvm = "1.8.0"
 hilt = "2.47"
 kotlinxCoroutines = "1.6.4"
+mockk = "1.13.7"
 
 [libraries]
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
@@ -35,6 +36,7 @@ hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref
 hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
 hilt-testing = { group = "com.google.dagger", name = "hilt-android-testing", version.ref = "hilt" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
+mockk = {group = "io.mockk", name = "mockk", version.ref = "mockk"}
 
 
 [plugins]

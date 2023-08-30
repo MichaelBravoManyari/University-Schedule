@@ -1,6 +1,5 @@
 plugins {
     id("universityschedule.android.ui")
-    alias(libs.plugins.org.jetbrains.kotlin.android)
 }
 
 android {
@@ -23,6 +22,7 @@ dependencies {
     testImplementation(libs.hamcrest)
     testImplementation(libs.espresso.core)
     testImplementation(libs.androidx.test.ext.junit)
+    testImplementation(libs.mockk)
 
     // Instrumented Test
     testImplementation(libs.espresso.core)
@@ -31,4 +31,8 @@ dependencies {
 
     // Testing fragments
     debugImplementation(libs.fragment.testing)
+}
+
+kapt {
+    correctErrorTypes = true
 }

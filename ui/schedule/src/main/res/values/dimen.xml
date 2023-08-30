@@ -4,4 +4,5 @@
     <dimen name="timetable_hours_text_size">10sp</dimen>
     <dimen name="timetable_hours_cell_width">35dp</dimen>
     <dimen name="timetable_days_of_week_text_size">4sp</dimen>
+    <dimen name="timetable_days_of_month_text_size">6sp</dimen>
 </resources>

@@ -1,11 +1,11 @@
 <resources>
-    <string name="monday_abbr">M</string>
-    <string name="tuesday_abbr">T</string>
-    <string name="wednesday_abbr">W</string>
-    <string name="thursday_abbr">T</string>
-    <string name="friday_abbr">F</string>
-    <string name="saturday_abbr">S</string>
-    <string name="sunday_abbr">S</string>
+    <string name="monday_abbr">Mo</string>
+    <string name="tuesday_abbr">Tu</string>
+    <string name="wednesday_abbr">We</string>
+    <string name="thursday_abbr">Th</string>
+    <string name="friday_abbr">Fr</string>
+    <string name="saturday_abbr">Sa</string>
+    <string name="sunday_abbr">Su</string>
     <string name="gridded_timetable_scrollable_container">Gridded timetable scrollable container</string>
     <string name="drawing_container_for_grid_and_time">Drawing container for grid and time</string>
 </resources>

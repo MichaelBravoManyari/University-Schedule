@@ -37,12 +37,15 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
     lateinit var dateUtils: TimetableDateUtils
 
     init {
+        configureView(attrs)
+        configureDaysOfWeekViews()
+        configureDaysOfMonthViews()
+        showDaysOfMonthCurrentWeek()
+    }
+
+    private fun configureView(attrs: AttributeSet) {
         inflateView()
         getAttrs(attrs)
-        setTypefaceDaysOfWeek()
-        setDaysOfWeekTextSize()
-        showDaysOfWeek()
-        showDaysOfMonthCurrentWeek()
     }
 
     private fun inflateView() {
@@ -88,37 +91,32 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
         }
     }
 
+    private fun configureDaysOfWeekViews() {
+        val daysOfWeekTextSize = getDimensionById(R.dimen.timetable_days_of_week_text_size)
+        val daysOfWeekOrder = dateUtils.getDaysOfWeekOrder(isMondayFirstDayOfWeek)
+        getDayOfWeekViews().forEachIndexed { index, view ->
+            view.apply {
+                typeface = daysOfWeekFont
+                textSize = daysOfWeekTextSize
+                text = getStringById(daysOfWeekOrder[index])
+            }
+        }
+    }
+
+    private fun configureDaysOfMonthViews() {
+        val daysOfMonthTextSize = getDimensionById(R.dimen.timetable_days_of_month_text_size)
+        getDaysOfMonthViews().forEach {view ->
+            view.apply {
+                textSize = daysOfMonthTextSize
+                typeface = daysOfMonthFont
+            }
+        }
+    }
+
     private fun showDaysOfMonthCurrentWeek() {
         val daysOfMonthCurrentWeek = dateUtils.getDaysOfMonthCurrentWeek(isMondayFirstDayOfWeek)
         val daysOfMonthViews = getDaysOfMonthViews()
         setDaysOfMonthText(daysOfMonthCurrentWeek, daysOfMonthViews)
-    }
-
-    /*private fun getDaysOfMonthCurrentWeek(): List<String> {
-        val formatter = DateTimeFormatter.ofPattern("d")
-        val date: LocalDate = LocalDate.now()
-        val startOfWeek =
-            if (isMondayFirstDayOfWeek) date.with(DayOfWeek.MONDAY) else date.with(DayOfWeek.MONDAY)
-                .minusDays(1)
-        return (0 until 7).map { startOfWeek.plusDays(it.toLong()).format(formatter).toString() }
-    }*/
-
-    private fun setDaysOfWeekTextSize() {
-        val daysOfWeekTextSize = getDimensionById(R.dimen.timetable_days_of_week_text_size)
-        getDayOfWeekViews().forEach { textView ->
-            textView.textSize = daysOfWeekTextSize
-        }
-    }
-
-    private fun showDaysOfWeek() {
-        val daysOfWekOrder = getDaysOfWeekOrder()
-        setDaysOfWeekText(daysOfWekOrder)
-    }
-
-    private fun setDaysOfWeekText(daysOfWeekOrder: List<Int>) {
-        getDayOfWeekViews().forEachIndexed { index, textView ->
-            textView.text = getStringById(daysOfWeekOrder[index])
-        }
     }
 
     private fun setDaysOfMonthText(
@@ -127,36 +125,6 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
     ) {
         daysOfMonthViews.forEachIndexed { index, view ->
             view.text = daysOfMonthCurrentWeek[index]
-        }
-    }
-
-    private fun getDaysOfWeekOrder(): List<Int> {
-        return if (isMondayFirstDayOfWeek) {
-            listOf(
-                R.string.monday_abbr,
-                R.string.tuesday_abbr,
-                R.string.wednesday_abbr,
-                R.string.thursday_abbr,
-                R.string.friday_abbr,
-                R.string.saturday_abbr,
-                R.string.sunday_abbr
-            )
-        } else {
-            listOf(
-                R.string.sunday_abbr,
-                R.string.monday_abbr,
-                R.string.tuesday_abbr,
-                R.string.wednesday_abbr,
-                R.string.thursday_abbr,
-                R.string.friday_abbr,
-                R.string.saturday_abbr
-            )
-        }
-    }
-
-    private fun setTypefaceDaysOfWeek() {
-        getDayOfWeekViews().forEach { view ->
-            view.typeface = daysOfWeekFont
         }
     }
 

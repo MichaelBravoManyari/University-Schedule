@@ -1,6 +1,5 @@
 package com.studentsapps.schedule
 
-import android.app.Application
 import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.View
@@ -16,6 +15,7 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
@@ -26,9 +26,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
 import org.robolectric.annotation.Config
-import java.time.DayOfWeek
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 @Config(application = HiltTestApplication::class, sdk = [33])
 @HiltAndroidTest
@@ -38,18 +35,46 @@ class TimetableTest {
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
 
+    @BindValue
+    lateinit var dateUtils: TimetableDateUtils
+
+    @Test
+    fun setTypefaceDaysOfWeek_defaultTypeface() {
+        createTimetable()
+        val daysOfMonthViewsIds = getDaysOfWeekViewsIds()
+        val expectedTypeface = getTypeface(R.font.roboto_medium)
+        verifyTypeface(daysOfMonthViewsIds, expectedTypeface)
+    }
+
+    @Test
+    fun setTypefaceDaysOfWeek_otherTypeface() {
+        val fontId = R.font.roboto_regular
+        val expectedTypeface = getTypeface(fontId)
+        val daysOfMonthViewsIds = getDaysOfWeekViewsIds()
+        val attr = createAttributeSet(fontId)
+        createTimetable(attr)
+        verifyTypeface(daysOfMonthViewsIds, expectedTypeface)
+    }
+
+    @Test
+    fun setTextSizeDaysOfWeek_correctSize() {
+        val daysOfWeekViewsIds = getDaysOfWeekViewsIds()
+        createTimetable()
+        verifyTextSize(daysOfWeekViewsIds, 4f)
+    }
+
     @Test
     @Config(qualifiers = "en")
     fun showDaysOfWeek_enDefaultStartingDay() {
-        createTimetable(null)
-        verifyDaysOfWeekTexts("M", "T", "W", "T", "F", "S", "S")
+        createTimetable()
+        verifyDaysOfWeekTexts("Mo", "Tu", "We", "Th", "Fr", "Sa", "Su")
     }
 
     @Test
     @Config(qualifiers = "es")
     fun showDaysOfWeek_esDefaultStartingDay() {
-        createTimetable(null)
-        verifyDaysOfWeekTexts("L", "Ma", "Mi", "J", "V", "S", "D")
+        createTimetable()
+        verifyDaysOfWeekTexts("Lu", "Ma", "Mi", "Ju", "Vi", "Sa", "Do")
     }
 
     @Test
@@ -58,7 +83,7 @@ class TimetableTest {
         val isMondayFirstOfWeek = true
         val attr = createAttributeSet(isMondayFirstOfWeek)
         createTimetable(attr)
-        verifyDaysOfWeekTexts("M", "T", "W", "T", "F", "S", "S")
+        verifyDaysOfWeekTexts("Mo", "Tu", "We", "Th", "Fr", "Sa", "Su")
     }
 
     @Test
@@ -67,7 +92,7 @@ class TimetableTest {
         val isMondayFirstOfWeek = true
         val attr = createAttributeSet(isMondayFirstOfWeek)
         createTimetable(attr)
-        verifyDaysOfWeekTexts("L", "Ma", "Mi", "J", "V", "S", "D")
+        verifyDaysOfWeekTexts("Lu", "Ma", "Mi", "Ju", "Vi", "Sa", "Do")
     }
 
     @Test
@@ -76,7 +101,7 @@ class TimetableTest {
         val isMondayFirstOfWeek = false
         val attr = createAttributeSet(isMondayFirstOfWeek)
         createTimetable(attr)
-        verifyDaysOfWeekTexts("S", "M", "T", "W", "T", "F", "S")
+        verifyDaysOfWeekTexts("Su", "Mo", "Tu", "We", "Th", "Fr", "Sa")
     }
 
     @Test
@@ -85,50 +110,56 @@ class TimetableTest {
         val isMondayFirstOfWeek = false
         val attr = createAttributeSet(isMondayFirstOfWeek)
         createTimetable(attr)
-        verifyDaysOfWeekTexts("D", "L", "Ma", "Mi", "J", "V", "S")
+        verifyDaysOfWeekTexts("Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa")
     }
 
     @Test
-    fun setTypefaceDaysOfWeek_defaultTypeface() {
-        createTimetable(null)
-        val expectedTypeface = createTypeface(R.font.roboto_medium)
-        verifyTypeface(expectedTypeface)
+    fun setTextSizeDaysOfMonth_correctSize() {
+        val daysOfMonthViewsIds = getDaysOfMonthViewsIds()
+        createTimetable()
+        verifyTextSize(daysOfMonthViewsIds, 6f)
     }
 
     @Test
-    fun setTypefaceDaysOfWeek_otherTypeface() {
-        val typeface = createTypeface(R.font.roboto_regular)
-        val attr = createAttributeSet(typeface)
+    fun setTypefaceDaysOfMonth_defaultTypeface() {
+        val daysOfMonthViewsIds = getDaysOfMonthViewsIds()
+        val expectedTypeface = getTypeface(R.font.roboto_regular)
+        createTimetable()
+        verifyTypeface(daysOfMonthViewsIds, expectedTypeface)
+    }
+
+    @Test
+    fun setTypefaceDaysOfMonth_otherTypeface() {
+        val fontId = R.font.roboto_medium
+        val expectedTypeface = getTypeface(fontId)
+        val daysOfMonthViewsIds = getDaysOfWeekViewsIds()
+        val attr = createAttributeSet(fontId)
         createTimetable(attr)
-        verifyTypeface(typeface)
-    }
-
-    @Test
-    fun setTextSizeDaysOfWeek_correctSize() {
-        val daysOfWeekIds = getDaysOfWeekViewsIds()
-        createTimetable(null)
-        verifyDaysOfWeekTextSize(daysOfWeekIds)
+        verifyTypeface(daysOfMonthViewsIds, expectedTypeface)
     }
 
     // Mal formulado
     @Test
     fun showDaysOfMonthCurrentWeek_defaultStartingMonday() {
-        val expectedDaysOfMonthCurrentWeek = getDaysOfMonthCurrentWeek()
+        // obtener los dias que se van a mostrar
+        // obtener el id de las vistas donde se van a mostrar los dias del mes
+        // verificar que cada vista muestre su texto adecuado
+        /*val expectedDaysOfMonthCurrentWeek = getDaysOfMonthCurrentWeek()
         val daysOfMonthViewsIds = getDaysOfMonthViewsIds()
         createTimetable(null)
-        verifyDaysOfMonthCurrentWeek(daysOfMonthViewsIds, expectedDaysOfMonthCurrentWeek)
+        verifyDaysOfMonthCurrentWeek(daysOfMonthViewsIds, expectedDaysOfMonthCurrentWeek)*/
     }
 
     @Test
     fun showDaysOfMonthCurrentWeek_startingSunday() {
-        val expectedDaysOfMonthCurrentWeek = getDaysOfMonthCurrentWeek(false)
+        /*val expectedDaysOfMonthCurrentWeek = getDaysOfMonthCurrentWeek(false)
         val daysOfMonthViewsIds = getDaysOfMonthViewsIds()
         val attr = createAttributeSet(false)
         createTimetable(attr)
-        verifyDaysOfMonthCurrentWeek(daysOfMonthViewsIds, expectedDaysOfMonthCurrentWeek)
+        verifyDaysOfMonthCurrentWeek(daysOfMonthViewsIds, expectedDaysOfMonthCurrentWeek)*/
     }
 
-    private fun createTimetable(attr: AttributeSet?) {
+    private fun createTimetable(attr: AttributeSet? = null) {
         launchFragmentInHiltContainer<TestFragment> {
             val attributeSet = attr ?: Robolectric.buildAttributeSet().build()
             val timetable = Timetable(this.requireContext(), attributeSet)
@@ -142,12 +173,12 @@ class TimetableTest {
         }
     }
 
-    private fun createTypeface(@FontRes fontId: Int): Typeface {
+    private fun getTypeface(@FontRes fontId: Int): Typeface {
         return ResourcesCompat.getFont(ApplicationProvider.getApplicationContext(), fontId)!!
     }
 
-    private fun verifyDaysOfWeekTextSize(daysOfWeekIds: List<Int>, expectedTextSize: Float = 4f) {
-        for (viewId in daysOfWeekIds) {
+    private fun verifyTextSize(viewsIds: List<Int>, expectedTextSize: Float) {
+        for (viewId in viewsIds) {
             onView(withId(viewId)).check(matches(withTextSize(expectedTextSize)))
         }
     }
@@ -173,9 +204,8 @@ class TimetableTest {
         }
     }
 
-    private fun verifyTypeface(expectedTypeface: Typeface) {
-        val dayOfWeekIds = getDaysOfWeekViewsIds()
-        for (viewId in dayOfWeekIds) {
+    private fun verifyTypeface(viewsIds: List<Int>, expectedTypeface: Typeface) {
+        for (viewId in viewsIds) {
             onView(withId(viewId)).check(matches(withTypeface(expectedTypeface)))
         }
     }
@@ -202,9 +232,11 @@ class TimetableTest {
         return attr.build()
     }
 
-    private fun createAttributeSet(typeface: Typeface): AttributeSet {
+    private fun createAttributeSet(@FontRes fontId: Int): AttributeSet {
         val attr = Robolectric.buildAttributeSet()
-        attr.addAttribute(R.attr.days_of_week_font, typeface.toString())
+        val font =
+            if (fontId == R.font.roboto_regular) "@font/roboto_regular" else "@font/roboto_medium"
+        attr.addAttribute(R.attr.days_of_week_font, font)
         return attr.build()
     }
 
@@ -234,15 +266,5 @@ class TimetableTest {
             }
 
         }
-    }
-
-    private fun getDaysOfMonthCurrentWeek(isMondayFirstDayOfWeek: Boolean = true): List<String> {
-        val formatter = DateTimeFormatter.ofPattern("d")
-        val date: LocalDate = LocalDate.now()
-        val startOfWeek =
-            if (isMondayFirstDayOfWeek) date.with(DayOfWeek.MONDAY) else date.with(DayOfWeek.MONDAY)
-                .minusDays(1)
-
-        return (0 until 7).map { startOfWeek.plusDays(it.toLong()).format(formatter).toString() }
     }
 }

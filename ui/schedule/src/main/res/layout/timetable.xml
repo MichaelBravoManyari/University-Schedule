@@ -15,7 +15,7 @@
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="L" />
+        tools:text="Lu" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/second_day_of_week"
@@ -45,7 +45,7 @@
         app:layout_constraintEnd_toStartOf="@+id/fifth_day_of_week"
         app:layout_constraintStart_toEndOf="@+id/third_day_of_week"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="J" />
+        tools:text="Ju" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/fifth_day_of_week"
@@ -55,7 +55,7 @@
         app:layout_constraintEnd_toStartOf="@+id/sixth_day_of_week"
         app:layout_constraintStart_toEndOf="@+id/fourth_day_of_week"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="V" />
+        tools:text="Vi" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/sixth_day_of_week"
@@ -65,7 +65,7 @@
         app:layout_constraintEnd_toStartOf="@+id/seventh_day_of_week"
         app:layout_constraintStart_toEndOf="@+id/fifth_day_of_week"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="S" />
+        tools:text="Sa" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/seventh_day_of_week"
@@ -75,7 +75,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/sixth_day_of_week"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="D" />
+        tools:text="Do" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/first_day"
