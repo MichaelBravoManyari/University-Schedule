@@ -40,7 +40,6 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
         configureView(attrs)
         configureDaysOfWeekViews()
         configureDaysOfMonthViews()
-        showDaysOfMonthCurrentWeek()
     }
 
     private fun configureView(attrs: AttributeSet) {
@@ -93,42 +92,45 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
 
     private fun configureDaysOfWeekViews() {
         val daysOfWeekTextSize = getDimensionById(R.dimen.timetable_days_of_week_text_size)
-        val daysOfWeekOrder = dateUtils.getDaysOfWeekOrder(isMondayFirstDayOfWeek)
-        getDayOfWeekViews().forEachIndexed { index, view ->
-            view.apply {
-                typeface = daysOfWeekFont
-                textSize = daysOfWeekTextSize
-                text = getStringById(daysOfWeekOrder[index])
-            }
-        }
+        val daysOfWeekOrder = getDaysOfWeekOrder()
+        val daysOfWeekViews = getDaysOfWeekViews()
+        configureDaysViews(daysOfWeekViews, daysOfWeekTextSize, daysOfWeekFont, daysOfWeekOrder)
     }
 
     private fun configureDaysOfMonthViews() {
+        val daysOfMonthCurrentWeek = dateUtils.getDaysOfMonthCurrentWeek(isMondayFirstDayOfWeek)
         val daysOfMonthTextSize = getDimensionById(R.dimen.timetable_days_of_month_text_size)
-        getDaysOfMonthViews().forEach {view ->
+        val daysOfMonthViews = getDaysOfMonthViews()
+        configureDaysViews(
+            daysOfMonthViews,
+            daysOfMonthTextSize,
+            daysOfMonthFont,
+            daysOfMonthCurrentWeek
+        )
+    }
+
+    private fun configureDaysViews(
+        daysViews: List<TextView>,
+        @Dimension dayTextSize: Float,
+        dayTypeface: Typeface,
+        daysTexts: List<String>
+    ) {
+        daysViews.forEachIndexed { index, view ->
             view.apply {
-                textSize = daysOfMonthTextSize
-                typeface = daysOfMonthFont
+                textSize = dayTextSize
+                typeface = dayTypeface
+                text = daysTexts[index]
             }
         }
     }
 
-    private fun showDaysOfMonthCurrentWeek() {
-        val daysOfMonthCurrentWeek = dateUtils.getDaysOfMonthCurrentWeek(isMondayFirstDayOfWeek)
-        val daysOfMonthViews = getDaysOfMonthViews()
-        setDaysOfMonthText(daysOfMonthCurrentWeek, daysOfMonthViews)
-    }
-
-    private fun setDaysOfMonthText(
-        daysOfMonthCurrentWeek: List<String>,
-        daysOfMonthViews: List<TextView>
-    ) {
-        daysOfMonthViews.forEachIndexed { index, view ->
-            view.text = daysOfMonthCurrentWeek[index]
+    private fun getDaysOfWeekOrder(): List<String> {
+        return dateUtils.getDaysOfWeekOrder(isMondayFirstDayOfWeek).map { resourceId ->
+            getStringById(resourceId)
         }
     }
 
-    private fun getDayOfWeekViews(): List<TextView> {
+    private fun getDaysOfWeekViews(): List<TextView> {
         return with(binding) {
             listOf(
                 startDayOfWeek,

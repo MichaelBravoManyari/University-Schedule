@@ -22,8 +22,6 @@ import dagger.hilt.android.testing.HiltTestApplication
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import io.mockk.impl.annotations.RelaxedMockK
-import io.mockk.impl.annotations.SpyK
 import io.mockk.verify
 import org.hamcrest.Description
 import org.hamcrest.Matcher
@@ -49,26 +47,39 @@ class TimetableTest {
     @Before
     fun setup() {
         MockKAnnotations.init(this)
-        every { dateUtils.getDaysOfWeekOrder(any()) } returns daysOfWeek
-        every { dateUtils.getDaysOfMonthCurrentWeek(any()) } returns daysOfMonthCurrentWeek
+        mockTimetableDateUtils()
     }
 
     @Test
     fun setTypefaceDaysOfWeek_defaultTypeface() {
-        val daysOfMonthViewsIds = getDaysOfWeekViewsIds()
         val expectedTypeface = getTypeface(R.font.roboto_medium)
         createTimetable()
-        verifyTypeface(daysOfMonthViewsIds, expectedTypeface)
+        verifyDaysOfWeekTypeface(expectedTypeface)
+    }
+
+    @Test
+    fun setTypefaceDaysOfMonth_defaultTypeface() {
+        val expectedTypeface = getTypeface(R.font.roboto_regular)
+        createTimetable()
+        verifyDaysOfMonthTypeface(expectedTypeface)
     }
 
     @Test
     fun setTypefaceDaysOfWeek_otherTypeface() {
         val fontId = R.font.roboto_regular
         val expectedTypeface = getTypeface(fontId)
-        val daysOfMonthViewsIds = getDaysOfWeekViewsIds()
-        val attr = createAttributeSet(fontId)
+        val attr = createAttributeSet(fontId, true)
         createTimetable(attr)
-        verifyTypeface(daysOfMonthViewsIds, expectedTypeface)
+        verifyDaysOfWeekTypeface(expectedTypeface)
+    }
+
+    @Test
+    fun setTypefaceDaysOfMonth_otherTypeface() {
+        val fontId = R.font.roboto_medium
+        val expectedTypeface = getTypeface(fontId)
+        val attr = createAttributeSet(fontId, false)
+        createTimetable(attr)
+        verifyDaysOfMonthTypeface(expectedTypeface)
     }
 
     @Test
@@ -79,62 +90,6 @@ class TimetableTest {
     }
 
     @Test
-    @Config(qualifiers = "en")
-    fun showDaysOfWeek_enDefaultStartingDay() {
-        val isMondayFirstOfWeek = true
-        createTimetable()
-        verifyDaysOfWeekTexts("Mo", "Tu", "We", "Th", "Fr", "Sa", "Su")
-        verify { dateUtils.getDaysOfWeekOrder(isMondayFirstOfWeek) }
-    }
-
-    @Test
-    @Config(qualifiers = "es")
-    fun showDaysOfWeek_esDefaultStartingDay() {
-        val isMondayFirstOfWeek = true
-        createTimetable()
-        verifyDaysOfWeekTexts("Lu", "Ma", "Mi", "Ju", "Vi", "Sa", "Do")
-        verify { dateUtils.getDaysOfWeekOrder(isMondayFirstOfWeek) }
-    }
-
-    @Test
-    @Config(qualifiers = "en")
-    fun showDaysOfWeek_enStartingMonday() {
-        val isMondayFirstOfWeek = true
-        val attr = createAttributeSet(isMondayFirstOfWeek)
-        createTimetable(attr)
-        verifyDaysOfWeekTexts("Mo", "Tu", "We", "Th", "Fr", "Sa", "Su")
-        verify { dateUtils.getDaysOfWeekOrder(isMondayFirstOfWeek) }
-    }
-
-    @Test
-    @Config(qualifiers = "es")
-    fun showDaysOfWeek_esStartingMonday() {
-        val isMondayFirstOfWeek = true
-        val attr = createAttributeSet(isMondayFirstOfWeek)
-        createTimetable(attr)
-        verifyDaysOfWeekTexts("Lu", "Ma", "Mi", "Ju", "Vi", "Sa", "Do")
-        verify { dateUtils.getDaysOfWeekOrder(isMondayFirstOfWeek) }
-    }
-
-    @Test
-    @Config(qualifiers = "en")
-    fun showDaysOfWeek_enStartingSunday() {
-        val isMondayFirstOfWeek = false
-        val attr = createAttributeSet(isMondayFirstOfWeek)
-        createTimetable(attr)
-        verifyDaysOfWeekTexts("Su", "Mo", "Tu", "We", "Th", "Fr", "Sa")
-    }
-
-    @Test
-    @Config(qualifiers = "es")
-    fun showDaysOfWeek_esStartingSunday() {
-        val isMondayFirstOfWeek = false
-        val attr = createAttributeSet(isMondayFirstOfWeek)
-        createTimetable(attr)
-        verifyDaysOfWeekTexts("Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa")
-    }
-
-    @Test
     fun setTextSizeDaysOfMonth_correctSize() {
         val daysOfMonthViewsIds = getDaysOfMonthViewsIds()
         createTimetable()
@@ -142,64 +97,61 @@ class TimetableTest {
     }
 
     @Test
-    fun setTypefaceDaysOfMonth_defaultTypeface() {
-        val daysOfMonthViewsIds = getDaysOfMonthViewsIds()
-        val expectedTypeface = getTypeface(R.font.roboto_regular)
+    fun showDaysOfWeek_defaultStartingDay() {
+        val isMondayFirstOfWeek = true
         createTimetable()
-        verifyTypeface(daysOfMonthViewsIds, expectedTypeface)
+        verifyDaysOfWeekTexts("Mo", "Tu", "We", "Th", "Fr", "Sa", "Su")
+        verify { dateUtils.getDaysOfWeekOrder(isMondayFirstOfWeek) }
     }
 
-    @Test
-    fun setTypefaceDaysOfMonth_otherTypeface() {
-        val fontId = R.font.roboto_medium
-        val expectedTypeface = getTypeface(fontId)
-        val daysOfMonthViewsIds = getDaysOfWeekViewsIds()
-        val attr = createAttributeSet(fontId)
-        createTimetable(attr)
-        verifyTypeface(daysOfMonthViewsIds, expectedTypeface)
-    }
-
-    // Mal formulado
     @Test
     fun showDaysOfMonthCurrentWeek_defaultStartingMonday() {
-        val expectedDaysOfMonthCurrentWeek = listOf("1", "2", "3", "4", "5", "6", "7")
         val isMondayFirstOfWeek = true
-        val daysOfMonthViewsIds = getDaysOfMonthViewsIds()
-        describeGetDaysOfMonthCurrentWeekBehavior(
-            isMondayFirstOfWeek,
-            expectedDaysOfMonthCurrentWeek
-        )
         createTimetable()
-        verifyDaysOfMonthCurrentWeek(daysOfMonthViewsIds, expectedDaysOfMonthCurrentWeek)
+        verifyDaysOfMonthCurrentWeek(daysOfMonthCurrentWeekStartingMonday)
         verify {
             dateUtils.getDaysOfMonthCurrentWeek(isMondayFirstOfWeek)
         }
     }
 
-    private fun describeGetDaysOfMonthCurrentWeekBehavior(
-        isMondayFirstOfWeek: Boolean,
-        daysOfMonthCurrentWeek: List<String>
-    ) {
-        MockKAnnotations.init(this)
-        every { dateUtils.getDaysOfMonthCurrentWeek(isMondayFirstOfWeek) } returns daysOfMonthCurrentWeek
-        every { dateUtils.getDaysOfWeekOrder(any()) } returns listOf(
-            R.string.monday_abbr,
-            R.string.tuesday_abbr,
-            R.string.wednesday_abbr,
-            R.string.thursday_abbr,
-            R.string.friday_abbr,
-            R.string.saturday_abbr,
-            R.string.sunday_abbr
-        )
+    @Test
+    fun showDaysOfWeek_startingMonday() {
+        val isMondayFirstOfWeek = true
+        val attr = createAttributeSet(isMondayFirstOfWeek)
+        createTimetable(attr)
+        verifyDaysOfWeekTexts("Mo", "Tu", "We", "Th", "Fr", "Sa", "Su")
+        verify { dateUtils.getDaysOfWeekOrder(isMondayFirstOfWeek) }
+    }
+
+    @Test
+    fun showDaysOfMonthCurrentWeek_startingMonday() {
+        val isMondayFirstOfWeek = true
+        val attributeSet = createAttributeSet(isMondayFirstOfWeek)
+        createTimetable(attributeSet)
+        verifyDaysOfMonthCurrentWeek(daysOfMonthCurrentWeekStartingMonday)
+        verify {
+            dateUtils.getDaysOfMonthCurrentWeek(isMondayFirstOfWeek)
+        }
+    }
+
+    @Test
+    fun showDaysOfWeek_startingSunday() {
+        val isMondayFirstOfWeek = false
+        val attr = createAttributeSet(isMondayFirstOfWeek)
+        createTimetable(attr)
+        verifyDaysOfWeekTexts("Su", "Mo", "Tu", "We", "Th", "Fr", "Sa")
+        verify { dateUtils.getDaysOfWeekOrder(isMondayFirstOfWeek) }
     }
 
     @Test
     fun showDaysOfMonthCurrentWeek_startingSunday() {
-        /*val expectedDaysOfMonthCurrentWeek = getDaysOfMonthCurrentWeek(false)
-        val daysOfMonthViewsIds = getDaysOfMonthViewsIds()
-        val attr = createAttributeSet(false)
-        createTimetable(attr)
-        verifyDaysOfMonthCurrentWeek(daysOfMonthViewsIds, expectedDaysOfMonthCurrentWeek)*/
+        val isMondayFirstOfWeek = false
+        val attributeSet = createAttributeSet(isMondayFirstOfWeek)
+        createTimetable(attributeSet)
+        verifyDaysOfMonthCurrentWeek(daysOfMonthCurrentWeekStartingSunday)
+        verify {
+            dateUtils.getDaysOfMonthCurrentWeek(isMondayFirstOfWeek)
+        }
     }
 
     private fun createTimetable(attr: AttributeSet? = null) {
@@ -216,6 +168,11 @@ class TimetableTest {
         }
     }
 
+    private fun mockTimetableDateUtils() {
+        every { dateUtils.getDaysOfWeekOrder(any()) } answers { if (arg(0)) daysOfWeekStartingMonday else daysOfWeekStartingSunday }
+        every { dateUtils.getDaysOfMonthCurrentWeek(any()) } answers { if (arg(0)) daysOfMonthCurrentWeekStartingMonday else daysOfMonthCurrentWeekStartingSunday }
+    }
+
     private fun getTypeface(@FontRes fontId: Int): Typeface {
         return ResourcesCompat.getFont(ApplicationProvider.getApplicationContext(), fontId)!!
     }
@@ -223,6 +180,14 @@ class TimetableTest {
     private fun verifyTextSize(viewsIds: List<Int>, expectedTextSize: Float) {
         for (viewId in viewsIds) {
             onView(withId(viewId)).check(matches(withTextSize(expectedTextSize)))
+        }
+    }
+
+    private fun verifyDaysOfMonthCurrentWeek(daysOfMonthCurrentWeek: List<String>) {
+        getDaysOfMonthViewsIds().forEachIndexed { index, viewId ->
+            onView(withId(viewId))
+                .check(matches(withText(daysOfMonthCurrentWeek[index])))
+                .check(matches(isDisplayed()))
         }
     }
 
@@ -236,21 +201,20 @@ class TimetableTest {
         }
     }
 
-    private fun verifyDaysOfMonthCurrentWeek(
-        daysOfMonthViewsIds: List<Int>,
-        daysOfMonthCurrentWeek: List<String>
-    ) {
-        daysOfMonthViewsIds.forEachIndexed { index, viewId ->
-            onView(withId(viewId))
-                .check(matches(withText(daysOfMonthCurrentWeek[index])))
-                .check(matches(isDisplayed()))
+    private fun verifyDaysOfWeekTypeface(expectedTypeface: Typeface) {
+        getDaysOfWeekViewsIds().forEach { viewId ->
+            verifyTypeface(viewId, expectedTypeface)
         }
     }
 
-    private fun verifyTypeface(viewsIds: List<Int>, expectedTypeface: Typeface) {
-        for (viewId in viewsIds) {
-            onView(withId(viewId)).check(matches(withTypeface(expectedTypeface)))
+    private fun verifyDaysOfMonthTypeface(expectedTypeface: Typeface) {
+        getDaysOfMonthViewsIds().forEach { viewId ->
+            verifyTypeface(viewId, expectedTypeface)
         }
+    }
+
+    private fun verifyTypeface(viewId: Int, expectedTypeface: Typeface) {
+        onView(withId(viewId)).check(matches(withTypeface(expectedTypeface)))
     }
 
     private fun getDaysOfWeekViewsIds(): List<Int> {
@@ -275,12 +239,13 @@ class TimetableTest {
         return attr.build()
     }
 
-    private fun createAttributeSet(@FontRes fontId: Int): AttributeSet {
-        val attr = Robolectric.buildAttributeSet()
+    private fun createAttributeSet(@FontRes fontId: Int, isDayOfWeek: Boolean): AttributeSet {
+        val attrs = Robolectric.buildAttributeSet()
         val font =
             if (fontId == R.font.roboto_regular) "@font/roboto_regular" else "@font/roboto_medium"
-        attr.addAttribute(R.attr.days_of_week_font, font)
-        return attr.build()
+        val attr = if (isDayOfWeek) R.attr.days_of_week_font else R.attr.days_of_month_font
+        attrs.addAttribute(attr, font)
+        return attrs.build()
     }
 
     private fun withTypeface(expectedTypeface: Typeface): Matcher<View> {
@@ -312,16 +277,28 @@ class TimetableTest {
     }
 
     companion object {
-        val daysOfWeek = listOf(
-            R.string.monday_abbr,
-            R.string.tuesday_abbr,
-            R.string.wednesday_abbr,
-            R.string.thursday_abbr,
-            R.string.friday_abbr,
-            R.string.saturday_abbr,
-            R.string.sunday_abbr
+        val daysOfWeekStartingMonday = listOf(
+            R.string.monday_abbr_test,
+            R.string.tuesday_abbr_test,
+            R.string.wednesday_abbr_test,
+            R.string.thursday_abbr_test,
+            R.string.friday_abbr_test,
+            R.string.saturday_abbr_test,
+            R.string.sunday_abbr_test
         )
 
-        val daysOfMonthCurrentWeek = listOf("1", "2", "3", "4", "5", "6", "7")
+        val daysOfWeekStartingSunday = listOf(
+            R.string.sunday_abbr_test,
+            R.string.monday_abbr_test,
+            R.string.tuesday_abbr_test,
+            R.string.wednesday_abbr_test,
+            R.string.thursday_abbr_test,
+            R.string.friday_abbr_test,
+            R.string.saturday_abbr_test
+        )
+
+        val daysOfMonthCurrentWeekStartingMonday = listOf("2", "3", "4", "5", "6", "7", "8")
+
+        val daysOfMonthCurrentWeekStartingSunday = listOf("1", "2", "3", "4", "5", "6", "7")
     }
 }

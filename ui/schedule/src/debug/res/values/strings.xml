@@ -1,1 +1,9 @@
-<resources></resources>
+<resources>
+    <string name="monday_abbr_test" translatable="false">Mo</string>
+    <string name="tuesday_abbr_test" translatable="false">Tu</string>
+    <string name="wednesday_abbr_test" translatable="false">We</string>
+    <string name="thursday_abbr_test" translatable="false">Th</string>
+    <string name="friday_abbr_test" translatable="false">Fr</string>
+    <string name="saturday_abbr_test" translatable="false">Sa</string>
+    <string name="sunday_abbr_test" translatable="false">Su</string>
+</resources>
