@@ -7,9 +7,11 @@ import javax.inject.Inject
 
 class TimetableDateUtils @Inject constructor() {
 
-    fun getDaysOfMonthCurrentWeek(isMondayFirstDayOfWeek: Boolean): List<String> {
+    fun getDaysOfMonthOfWeek(
+        isMondayFirstDayOfWeek: Boolean,
+        date: LocalDate = LocalDate.now()
+    ): List<String> {
         val formatter = DateTimeFormatter.ofPattern("d")
-        val date: LocalDate = LocalDate.now()
         val startOfWeek =
             if (isMondayFirstDayOfWeek) date.with(DayOfWeek.MONDAY) else date.with(DayOfWeek.MONDAY)
                 .minusDays(1)

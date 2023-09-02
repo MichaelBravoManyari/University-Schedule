@@ -110,7 +110,7 @@ class TimetableTest {
         createTimetable()
         verifyDaysOfMonthCurrentWeek(daysOfMonthCurrentWeekStartingMonday)
         verify {
-            dateUtils.getDaysOfMonthCurrentWeek(isMondayFirstOfWeek)
+            dateUtils.getDaysOfMonthOfWeek(isMondayFirstOfWeek)
         }
     }
 
@@ -130,7 +130,7 @@ class TimetableTest {
         createTimetable(attributeSet)
         verifyDaysOfMonthCurrentWeek(daysOfMonthCurrentWeekStartingMonday)
         verify {
-            dateUtils.getDaysOfMonthCurrentWeek(isMondayFirstOfWeek)
+            dateUtils.getDaysOfMonthOfWeek(isMondayFirstOfWeek)
         }
     }
 
@@ -150,7 +150,7 @@ class TimetableTest {
         createTimetable(attributeSet)
         verifyDaysOfMonthCurrentWeek(daysOfMonthCurrentWeekStartingSunday)
         verify {
-            dateUtils.getDaysOfMonthCurrentWeek(isMondayFirstOfWeek)
+            dateUtils.getDaysOfMonthOfWeek(isMondayFirstOfWeek)
         }
     }
 
@@ -170,7 +170,7 @@ class TimetableTest {
 
     private fun mockTimetableDateUtils() {
         every { dateUtils.getDaysOfWeekOrder(any()) } answers { if (arg(0)) daysOfWeekStartingMonday else daysOfWeekStartingSunday }
-        every { dateUtils.getDaysOfMonthCurrentWeek(any()) } answers { if (arg(0)) daysOfMonthCurrentWeekStartingMonday else daysOfMonthCurrentWeekStartingSunday }
+        every { dateUtils.getDaysOfMonthOfWeek(any()) } answers { if (arg(0)) daysOfMonthCurrentWeekStartingMonday else daysOfMonthCurrentWeekStartingSunday }
     }
 
     private fun getTypeface(@FontRes fontId: Int): Typeface {

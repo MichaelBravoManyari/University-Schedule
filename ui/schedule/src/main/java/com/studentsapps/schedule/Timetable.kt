@@ -98,7 +98,7 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
     }
 
     private fun configureDaysOfMonthViews() {
-        val daysOfMonthCurrentWeek = dateUtils.getDaysOfMonthCurrentWeek(isMondayFirstDayOfWeek)
+        val daysOfMonthCurrentWeek = dateUtils.getDaysOfMonthOfWeek(isMondayFirstDayOfWeek)
         val daysOfMonthTextSize = getDimensionById(R.dimen.timetable_days_of_month_text_size)
         val daysOfMonthViews = getDaysOfMonthViews()
         configureDaysViews(
