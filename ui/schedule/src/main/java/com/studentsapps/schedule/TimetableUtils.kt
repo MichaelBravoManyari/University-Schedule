@@ -5,7 +5,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
-class TimetableDateUtils @Inject constructor() {
+class TimetableUtils @Inject constructor() {
 
     fun getDaysOfMonthOfWeek(
         isMondayFirstDayOfWeek: Boolean,
@@ -40,5 +40,23 @@ class TimetableDateUtils @Inject constructor() {
                 R.string.saturday_abbr
             )
         }
+    }
+
+    fun calculateRealRootViewWidth(width: Int, paddingLeft: Int, paddingRight: Int): Int {
+        if (width <= 0) throw IllegalArgumentException("The root view cannot be 0 width.")
+        return width - paddingLeft - paddingRight
+    }
+
+    fun calculateGridCellWidth(
+        rootViewWidth: Int,
+        hoursCellWidth: Int,
+        columnsNumber: Int,
+        columnsHourNumber: Int
+    ): Int {
+        return (rootViewWidth - hoursCellWidth) / (columnsNumber - columnsHourNumber)
+    }
+
+    fun calculateTimetableBitmapHeight(rowsNumber: Int, gridCellHeight: Int): Int {
+        return rowsNumber * gridCellHeight
     }
 }

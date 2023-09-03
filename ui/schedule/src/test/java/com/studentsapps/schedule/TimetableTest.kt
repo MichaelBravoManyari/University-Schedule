@@ -19,13 +19,11 @@ import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
-import io.mockk.MockKAnnotations
 import io.mockk.every
-import io.mockk.impl.annotations.MockK
+import io.mockk.spyk
 import io.mockk.verify
 import org.hamcrest.Description
 import org.hamcrest.Matcher
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -38,17 +36,10 @@ import org.robolectric.annotation.Config
 class TimetableTest {
 
     @get:Rule
-    var hiltRule = HiltAndroidRule(this)
+    val hiltRule = HiltAndroidRule(this)
 
     @BindValue
-    @MockK
-    lateinit var dateUtils: TimetableDateUtils
-
-    @Before
-    fun setup() {
-        MockKAnnotations.init(this)
-        mockTimetableDateUtils()
-    }
+    val utils = spyk<TimetableUtils>()
 
     @Test
     fun setTypefaceDaysOfWeek_defaultTypeface() {
@@ -98,59 +89,65 @@ class TimetableTest {
 
     @Test
     fun showDaysOfWeek_defaultStartingDay() {
+        mockUtilsGetDayOfWeekOrder()
         val isMondayFirstOfWeek = true
         createTimetable()
         verifyDaysOfWeekTexts("Mo", "Tu", "We", "Th", "Fr", "Sa", "Su")
-        verify { dateUtils.getDaysOfWeekOrder(isMondayFirstOfWeek) }
+        verify { utils.getDaysOfWeekOrder(isMondayFirstOfWeek) }
     }
 
     @Test
     fun showDaysOfMonthCurrentWeek_defaultStartingMonday() {
+        mockUtilGetDaysOfMonthOfWeek()
         val isMondayFirstOfWeek = true
         createTimetable()
-        verifyDaysOfMonthCurrentWeek(daysOfMonthCurrentWeekStartingMonday)
+        verifyDaysOfMonthCurrentWeek(fakeDaysOfMonthCurrentWeekStartingMonday)
         verify {
-            dateUtils.getDaysOfMonthOfWeek(isMondayFirstOfWeek)
+            utils.getDaysOfMonthOfWeek(isMondayFirstOfWeek)
         }
     }
 
     @Test
     fun showDaysOfWeek_startingMonday() {
+        mockUtilsGetDayOfWeekOrder()
         val isMondayFirstOfWeek = true
         val attr = createAttributeSet(isMondayFirstOfWeek)
         createTimetable(attr)
         verifyDaysOfWeekTexts("Mo", "Tu", "We", "Th", "Fr", "Sa", "Su")
-        verify { dateUtils.getDaysOfWeekOrder(isMondayFirstOfWeek) }
+        verify { utils.getDaysOfWeekOrder(isMondayFirstOfWeek) }
     }
 
     @Test
     fun showDaysOfMonthCurrentWeek_startingMonday() {
+        mockUtilGetDaysOfMonthOfWeek()
         val isMondayFirstOfWeek = true
         val attributeSet = createAttributeSet(isMondayFirstOfWeek)
         createTimetable(attributeSet)
-        verifyDaysOfMonthCurrentWeek(daysOfMonthCurrentWeekStartingMonday)
+        verifyDaysOfMonthCurrentWeek(fakeDaysOfMonthCurrentWeekStartingMonday)
         verify {
-            dateUtils.getDaysOfMonthOfWeek(isMondayFirstOfWeek)
+            utils.getDaysOfMonthOfWeek(isMondayFirstOfWeek)
         }
     }
 
     @Test
     fun showDaysOfWeek_startingSunday() {
+        mockUtilsGetDayOfWeekOrder()
         val isMondayFirstOfWeek = false
         val attr = createAttributeSet(isMondayFirstOfWeek)
         createTimetable(attr)
         verifyDaysOfWeekTexts("Su", "Mo", "Tu", "We", "Th", "Fr", "Sa")
-        verify { dateUtils.getDaysOfWeekOrder(isMondayFirstOfWeek) }
+        verify { utils.getDaysOfWeekOrder(isMondayFirstOfWeek) }
     }
 
     @Test
     fun showDaysOfMonthCurrentWeek_startingSunday() {
+        mockUtilGetDaysOfMonthOfWeek()
         val isMondayFirstOfWeek = false
         val attributeSet = createAttributeSet(isMondayFirstOfWeek)
         createTimetable(attributeSet)
-        verifyDaysOfMonthCurrentWeek(daysOfMonthCurrentWeekStartingSunday)
+        verifyDaysOfMonthCurrentWeek(fakeDaysOfMonthCurrentWeekStartingSunday)
         verify {
-            dateUtils.getDaysOfMonthOfWeek(isMondayFirstOfWeek)
+            utils.getDaysOfMonthOfWeek(isMondayFirstOfWeek)
         }
     }
 
@@ -168,9 +165,12 @@ class TimetableTest {
         }
     }
 
-    private fun mockTimetableDateUtils() {
-        every { dateUtils.getDaysOfWeekOrder(any()) } answers { if (arg(0)) daysOfWeekStartingMonday else daysOfWeekStartingSunday }
-        every { dateUtils.getDaysOfMonthOfWeek(any()) } answers { if (arg(0)) daysOfMonthCurrentWeekStartingMonday else daysOfMonthCurrentWeekStartingSunday }
+    private fun mockUtilGetDaysOfMonthOfWeek() {
+        every { utils.getDaysOfMonthOfWeek(any()) } answers { if (arg(0)) fakeDaysOfMonthCurrentWeekStartingMonday else fakeDaysOfMonthCurrentWeekStartingSunday }
+    }
+
+    private fun mockUtilsGetDayOfWeekOrder() {
+        every { utils.getDaysOfWeekOrder(any()) } answers { if (arg(0)) fakeDaysOfWeekStartingMonday else fakeDaysOfWeekStartingSunday }
     }
 
     private fun getTypeface(@FontRes fontId: Int): Typeface {
@@ -277,7 +277,7 @@ class TimetableTest {
     }
 
     companion object {
-        val daysOfWeekStartingMonday = listOf(
+        val fakeDaysOfWeekStartingMonday = listOf(
             R.string.monday_abbr_test,
             R.string.tuesday_abbr_test,
             R.string.wednesday_abbr_test,
@@ -287,7 +287,7 @@ class TimetableTest {
             R.string.sunday_abbr_test
         )
 
-        val daysOfWeekStartingSunday = listOf(
+        val fakeDaysOfWeekStartingSunday = listOf(
             R.string.sunday_abbr_test,
             R.string.monday_abbr_test,
             R.string.tuesday_abbr_test,
@@ -297,8 +297,8 @@ class TimetableTest {
             R.string.saturday_abbr_test
         )
 
-        val daysOfMonthCurrentWeekStartingMonday = listOf("2", "3", "4", "5", "6", "7", "8")
+        val fakeDaysOfMonthCurrentWeekStartingMonday = listOf("2", "3", "4", "5", "6", "7", "8")
 
-        val daysOfMonthCurrentWeekStartingSunday = listOf("1", "2", "3", "4", "5", "6", "7")
+        val fakeDaysOfMonthCurrentWeekStartingSunday = listOf("1", "2", "3", "4", "5", "6", "7")
     }
 }

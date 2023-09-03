@@ -34,7 +34,10 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
     private var isMondayFirstDayOfWeek = true
 
     @Inject
-    lateinit var dateUtils: TimetableDateUtils
+    lateinit var utils: TimetableUtils
+
+    @Inject
+    lateinit var timetableCanvasRender: TimetableCanvasRender
 
     init {
         configureView(attrs)
@@ -98,7 +101,7 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
     }
 
     private fun configureDaysOfMonthViews() {
-        val daysOfMonthCurrentWeek = dateUtils.getDaysOfMonthOfWeek(isMondayFirstDayOfWeek)
+        val daysOfMonthCurrentWeek = utils.getDaysOfMonthOfWeek(isMondayFirstDayOfWeek)
         val daysOfMonthTextSize = getDimensionById(R.dimen.timetable_days_of_month_text_size)
         val daysOfMonthViews = getDaysOfMonthViews()
         configureDaysViews(
@@ -125,7 +128,7 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
     }
 
     private fun getDaysOfWeekOrder(): List<String> {
-        return dateUtils.getDaysOfWeekOrder(isMondayFirstDayOfWeek).map { resourceId ->
+        return utils.getDaysOfWeekOrder(isMondayFirstDayOfWeek).map { resourceId ->
             getStringById(resourceId)
         }
     }
@@ -164,11 +167,21 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        val rootViewWidth = getRootViewWidth(widthMeasureSpec)
         val hoursCellWidth = getDimensionPixelSizeById(R.dimen.timetable_hours_cell_width)
-        gridCellWidth = calculateGridCellWidth(rootViewWidth, hoursCellWidth)
-        val bitmapHoursGrid = createBitmapGridAndHours(rootViewWidth, hoursCellWidth)
+        val realRootViewWidth = getRealRootViewWidth(widthMeasureSpec)
+        gridCellWidth = utils.calculateGridCellWidth(
+            realRootViewWidth,
+            hoursCellWidth,
+            COLUMNS_NUMBER,
+            COLUMNS_HOURS_NUMBER
+        )
+        val bitmapHoursGrid = createBitmapGridAndHours(realRootViewWidth, hoursCellWidth)
         setBitmapToHourDrawingGridContainer(bitmapHoursGrid)
+    }
+
+    private fun getRealRootViewWidth(widthMeasureSpec: Int): Int {
+        val rootViewWidth = MeasureSpec.getSize(widthMeasureSpec)
+        return utils.calculateRealRootViewWidth(rootViewWidth, paddingLeft, paddingRight)
     }
 
     private fun setBitmapToHourDrawingGridContainer(bitmapHoursGrid: Bitmap) {
@@ -177,14 +190,16 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
         }
     }
 
-    private fun createBitmapGridAndHours(width: Int, hoursCellWidth: Int): Bitmap {
+    private fun createBitmapGridAndHours(timetableBitmapWidth: Int, hoursCellWidth: Int): Bitmap {
         val gridCellHeight = getDimensionPixelSizeById(R.dimen.timetable_grid_cell_height)
-        val bitmap =
-            Bitmap.createBitmap(width, ROWS_NUMBER * gridCellHeight, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
+        val timetableBitmapHeight =
+            utils.calculateTimetableBitmapHeight(ROWS_NUMBER, gridCellHeight)
+        val timetableBitmap =
+            timetableCanvasRender.createTimetableBitmap(timetableBitmapWidth, timetableBitmapHeight)
+        val canvas = Canvas(timetableBitmap)
         drawGrid(canvas, hoursCellWidth, gridCellHeight)
         drawHoursText(canvas, gridCellHeight, hoursCellWidth)
-        return bitmap
+        return timetableBitmap
     }
 
     private fun drawGrid(canvas: Canvas, hoursCellWidth: Int, gridCellHeight: Int) {
@@ -221,14 +236,6 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
 
     private fun getDimensionById(@DimenRes dimenId: Int): Float {
         return resources.getDimension(dimenId)
-    }
-
-    private fun getRootViewWidth(widthMeasureSpec: Int): Int {
-        return MeasureSpec.getSize(widthMeasureSpec) - paddingLeft - paddingRight
-    }
-
-    private fun calculateGridCellWidth(rootViewWidth: Int, hoursCellWidth: Int): Int {
-        return (rootViewWidth - hoursCellWidth) / (COLUMNS_NUMBER - COLUMNS_HOURS_NUMBER)
     }
 
     private fun createPaintForGridLines(@ColorInt lineColor: Int): Paint {

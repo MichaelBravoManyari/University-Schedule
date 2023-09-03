@@ -25,3 +25,7 @@ dependencies {
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
 }
+
+kapt {
+    correctErrorTypes = true
+}
