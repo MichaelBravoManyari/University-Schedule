@@ -59,4 +59,19 @@ class TimetableUtils @Inject constructor() {
     fun calculateTimetableBitmapHeight(rowsNumber: Int, gridCellHeight: Int): Int {
         return rowsNumber * gridCellHeight
     }
+
+    fun getVerticalLinesCoordinates(
+        numLines: Int,
+        hoursCellWidth: Int,
+        gridCellWidth: Int,
+        heightLine: Float
+    ): FloatArray {
+        val coordinates = mutableListOf<Float>()
+        for (lineNumber in 1..numLines) {
+            val xAxis = hoursCellWidth + (lineNumber * gridCellWidth).toFloat()
+            val yAxisStart = 0f
+            coordinates.addAll(arrayOf(xAxis, yAxisStart, xAxis, heightLine))
+        }
+        return coordinates.toFloatArray()
+    }
 }

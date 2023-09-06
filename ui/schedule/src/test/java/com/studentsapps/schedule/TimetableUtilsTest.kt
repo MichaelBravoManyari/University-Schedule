@@ -112,4 +112,23 @@ class TimetableUtilsTest {
         val realTimetableBitmapHeight = utils.calculateTimetableBitmapHeight(8, 80)
         assertThat(realTimetableBitmapHeight, `is`(expectedTimetableBitmapHeight))
     }
+
+    @Test
+    fun getVerticalLinesCoordinates() {
+        val numLines = 6
+        val hourCellWidth = 20
+        val gridCellWidth = 50
+        val heightLine = 200f
+        val expectedVerticalLinesCoordinates = floatArrayOf(
+            70f, 0f, 70f, 200f,
+            120f, 0f, 120f, 200f,
+            170f, 0f, 170f, 200f,
+            220f, 0f, 220f, 200f,
+            270f, 0f, 270f, 200f,
+            320f, 0f, 320f, 200f
+        )
+        val realVerticalLinesCoordinates =
+            utils.getVerticalLinesCoordinates(numLines, hourCellWidth, gridCellWidth, heightLine)
+        assertThat(realVerticalLinesCoordinates, `is`(expectedVerticalLinesCoordinates))
+    }
 }

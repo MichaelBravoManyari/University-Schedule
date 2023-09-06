@@ -21,7 +21,6 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import io.mockk.every
 import io.mockk.spyk
-import io.mockk.verify
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.junit.Rule
@@ -90,21 +89,15 @@ class TimetableTest {
     @Test
     fun showDaysOfWeek_defaultStartingDay() {
         mockUtilsGetDayOfWeekOrder()
-        val isMondayFirstOfWeek = true
         createTimetable()
         verifyDaysOfWeekTexts("Mo", "Tu", "We", "Th", "Fr", "Sa", "Su")
-        verify { utils.getDaysOfWeekOrder(isMondayFirstOfWeek) }
     }
 
     @Test
     fun showDaysOfMonthCurrentWeek_defaultStartingMonday() {
         mockUtilGetDaysOfMonthOfWeek()
-        val isMondayFirstOfWeek = true
         createTimetable()
-        verifyDaysOfMonthCurrentWeek(fakeDaysOfMonthCurrentWeekStartingMonday)
-        verify {
-            utils.getDaysOfMonthOfWeek(isMondayFirstOfWeek)
-        }
+        verifyDaysOfMonthCurrentWeekTexts("2", "3", "4", "5", "6", "7", "8")
     }
 
     @Test
@@ -114,7 +107,6 @@ class TimetableTest {
         val attr = createAttributeSet(isMondayFirstOfWeek)
         createTimetable(attr)
         verifyDaysOfWeekTexts("Mo", "Tu", "We", "Th", "Fr", "Sa", "Su")
-        verify { utils.getDaysOfWeekOrder(isMondayFirstOfWeek) }
     }
 
     @Test
@@ -123,10 +115,7 @@ class TimetableTest {
         val isMondayFirstOfWeek = true
         val attributeSet = createAttributeSet(isMondayFirstOfWeek)
         createTimetable(attributeSet)
-        verifyDaysOfMonthCurrentWeek(fakeDaysOfMonthCurrentWeekStartingMonday)
-        verify {
-            utils.getDaysOfMonthOfWeek(isMondayFirstOfWeek)
-        }
+        verifyDaysOfMonthCurrentWeekTexts("2", "3", "4", "5", "6", "7", "8")
     }
 
     @Test
@@ -136,7 +125,6 @@ class TimetableTest {
         val attr = createAttributeSet(isMondayFirstOfWeek)
         createTimetable(attr)
         verifyDaysOfWeekTexts("Su", "Mo", "Tu", "We", "Th", "Fr", "Sa")
-        verify { utils.getDaysOfWeekOrder(isMondayFirstOfWeek) }
     }
 
     @Test
@@ -145,10 +133,7 @@ class TimetableTest {
         val isMondayFirstOfWeek = false
         val attributeSet = createAttributeSet(isMondayFirstOfWeek)
         createTimetable(attributeSet)
-        verifyDaysOfMonthCurrentWeek(fakeDaysOfMonthCurrentWeekStartingSunday)
-        verify {
-            utils.getDaysOfMonthOfWeek(isMondayFirstOfWeek)
-        }
+        verifyDaysOfMonthCurrentWeekTexts("1", "2", "3", "4", "5", "6", "7")
     }
 
     private fun createTimetable(attr: AttributeSet? = null) {
@@ -183,18 +168,17 @@ class TimetableTest {
         }
     }
 
-    private fun verifyDaysOfMonthCurrentWeek(daysOfMonthCurrentWeek: List<String>) {
-        getDaysOfMonthViewsIds().forEachIndexed { index, viewId ->
-            onView(withId(viewId))
-                .check(matches(withText(daysOfMonthCurrentWeek[index])))
-                .check(matches(isDisplayed()))
-        }
+    private fun verifyDaysOfMonthCurrentWeekTexts(vararg expectedDaysTexts: String) {
+        verifyTexts(getDaysOfMonthViewsIds(), expectedDaysTexts.toList())
     }
 
-    private fun verifyDaysOfWeekTexts(vararg expectedDayTexts: String) {
-        val dayOfWeekIds = getDaysOfWeekViewsIds()
+    private fun verifyDaysOfWeekTexts(vararg expectedDaysTexts: String) {
+        verifyTexts(getDaysOfWeekViewsIds(), expectedDaysTexts.toList())
+    }
 
-        dayOfWeekIds.forEachIndexed { index, viewId ->
+
+    private fun verifyTexts(daysViewsIds: List<Int>, expectedDayTexts: List<String>) {
+        daysViewsIds.forEachIndexed { index, viewId ->
             onView(withId(viewId))
                 .check(matches(withText(expectedDayTexts[index])))
                 .check(matches(isDisplayed()))
