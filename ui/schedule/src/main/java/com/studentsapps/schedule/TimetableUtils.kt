@@ -64,14 +64,49 @@ class TimetableUtils @Inject constructor() {
         numLines: Int,
         hoursCellWidth: Int,
         gridCellWidth: Int,
-        heightLine: Float
+        lineHeight: Float
     ): FloatArray {
         val coordinates = mutableListOf<Float>()
         for (lineNumber in 1..numLines) {
             val xAxis = hoursCellWidth + (lineNumber * gridCellWidth).toFloat()
             val yAxisStart = 0f
-            coordinates.addAll(arrayOf(xAxis, yAxisStart, xAxis, heightLine))
+            coordinates.addAll(arrayOf(xAxis, yAxisStart, xAxis, lineHeight))
         }
         return coordinates.toFloatArray()
+    }
+
+    fun getHorizontalHourLinesCoordinates(
+        numLines: Int,
+        hoursCellWidth: Int,
+        gridCellHeight: Int,
+        lineLength: Float
+    ): FloatArray {
+        val coordinates = mutableListOf<Float>()
+        for (lineNumber in 1..numLines) {
+            val yAxis = lineNumber * gridCellHeight
+            coordinates.addAll(
+                arrayOf(
+                    hoursCellWidth.toFloat(),
+                    yAxis.toFloat(),
+                    lineLength,
+                    yAxis.toFloat()
+                )
+            )
+        }
+        return coordinates.toFloatArray()
+    }
+
+    fun getHalfHourHorizontalLinesCoordinates(
+        numLines: Int,
+        hoursCellWidth: Int,
+        gridCellHeight: Int,
+        lineLength: Float
+    ): FloatArray {
+        val coordinator = mutableListOf<Float>()
+        for (lineNumber in 1..numLines) {
+            val yAxis = ((lineNumber - 1) * gridCellHeight) + (gridCellHeight / 2f)
+            coordinator.addAll(arrayOf(hoursCellWidth.toFloat(), yAxis, lineLength, yAxis))
+        }
+        return coordinator.toFloatArray()
     }
 }

@@ -114,11 +114,7 @@ class TimetableUtilsTest {
     }
 
     @Test
-    fun getVerticalLinesCoordinates() {
-        val numLines = 6
-        val hourCellWidth = 20
-        val gridCellWidth = 50
-        val heightLine = 200f
+    fun getVerticalLinesCoordinates_numLines6HourCellW20GridCellWidth50lineHeight200_coordinates() {
         val expectedVerticalLinesCoordinates = floatArrayOf(
             70f, 0f, 70f, 200f,
             120f, 0f, 120f, 200f,
@@ -128,7 +124,40 @@ class TimetableUtilsTest {
             320f, 0f, 320f, 200f
         )
         val realVerticalLinesCoordinates =
-            utils.getVerticalLinesCoordinates(numLines, hourCellWidth, gridCellWidth, heightLine)
+            utils.getVerticalLinesCoordinates(6, 20, 50, 200f)
         assertThat(realVerticalLinesCoordinates, `is`(expectedVerticalLinesCoordinates))
+    }
+
+    @Test
+    fun getHorizontalHourLinesCoordinates_numLines6HourCellW30GridCellH50LineLength300_coordinates() {
+        val expectedHorizontalHourLinesCoordinates = floatArrayOf(
+            30f, 50f, 300f, 50f,
+            30f, 100f, 300f, 100f,
+            30f, 150f, 300f, 150f,
+            30f, 200f, 300f, 200f,
+            30f, 250f, 300f, 250f,
+            30f, 300f, 300f, 300f,
+        )
+        val realHorizontalHourLinesCoordinates =
+            utils.getHorizontalHourLinesCoordinates(6, 30, 50, 300f)
+        assertThat(realHorizontalHourLinesCoordinates, `is`(expectedHorizontalHourLinesCoordinates))
+    }
+
+    @Test
+    fun getHalfHourHorizontalLinesCoordinates_numLines6HourCellW25GridCellH60LineLength300() {
+        val expectedHalfHourHorizontalLinesCoordinates = floatArrayOf(
+            25f, 30f, 300f, 30f,
+            25f, 90f, 300f, 90f,
+            25f, 150f, 300f, 150f,
+            25f, 210f, 300f, 210f,
+            25f, 270f, 300f, 270f,
+            25f, 330f, 300f, 330f,
+        )
+        val realHalfHourHorizontalLinesCoordinates =
+            utils.getHalfHourHorizontalLinesCoordinates(6, 25, 60, 300f)
+        assertThat(
+            realHalfHourHorizontalLinesCoordinates,
+            `is`(expectedHalfHourHorizontalLinesCoordinates)
+        )
     }
 }

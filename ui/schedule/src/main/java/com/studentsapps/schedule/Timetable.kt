@@ -189,7 +189,33 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
         val paintGrid = canvasRender.getPaintForGridLines(gridStrokeColor, GRID_LINES_STROKE_WIDTH)
         val paintHalfHourLine =
             canvasRender.getPaintForGridLines(halfHourGridStrokeColor, GRID_LINES_STROKE_WIDTH)
-        //canvasRender.drawGrid(canvas, paintGrid, paintHalfHourLine, )
+        val verticalLinesCoordinates = utils.getVerticalLinesCoordinates(
+            NUM_VERTICAL_GRID_LINES,
+            hoursCellWidth,
+            gridCellWidth,
+            timetableBitmapHeight.toFloat()
+        )
+        val horizontalHourLinesCoordinates = utils.getHorizontalHourLinesCoordinates(
+            NUM_HORIZONTAL_GRID_LINES,
+            hoursCellWidth,
+            gridCellHeight,
+            timetableBitmapWidth.toFloat()
+        )
+        val halfHourHorizontalLinesCoordinates = utils.getHalfHourHorizontalLinesCoordinates(
+            NUM_HORIZONTAL_GRID_LINES,
+            hoursCellWidth,
+            gridCellHeight,
+            timetableBitmapWidth.toFloat()
+        )
+        canvasRender.drawGrid(
+            canvas,
+            paintGrid,
+            paintHalfHourLine,
+            verticalLinesCoordinates,
+            horizontalHourLinesCoordinates,
+            halfHourHorizontalLinesCoordinates
+        )
+
         drawHoursText(canvas, gridCellHeight, hoursCellWidth)
         return timetableBitmap
     }
@@ -304,7 +330,7 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
     }
 
     private fun calculateVerticalGridLineXAxis(hoursCellWidth: Int, lineNumber: Int): Float {
-            return hoursCellWidth + (lineNumber * gridCellWidth).toFloat()
+        return hoursCellWidth + (lineNumber * gridCellWidth).toFloat()
     }
 
     private fun drawLine(
@@ -372,7 +398,7 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
         private const val ROWS_NUMBER = 24
         private const val GRID_LINES_STROKE_WIDTH = 3F
         private const val NUM_VERTICAL_GRID_LINES = 6
-        private const val NUM_HORIZONTAL_GRID_LINES = 48
+        private const val NUM_HORIZONTAL_GRID_LINES = 24
 
         private val hoursIn12HourFormat = listOf(
             "1 am",

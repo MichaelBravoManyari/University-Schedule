@@ -1,5 +1,7 @@
 package com.studentsapps.schedule
 
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.View
@@ -21,6 +23,7 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import io.mockk.every
 import io.mockk.spyk
+import io.mockk.verify
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.junit.Rule
@@ -36,6 +39,9 @@ class TimetableTest {
 
     @get:Rule
     val hiltRule = HiltAndroidRule(this)
+
+    @BindValue
+    val canvasRender = spyk<TimetableCanvasRender>()
 
     @BindValue
     val utils = spyk<TimetableUtils>()
@@ -134,6 +140,15 @@ class TimetableTest {
         val attributeSet = createAttributeSet(isMondayFirstOfWeek)
         createTimetable(attributeSet)
         verifyDaysOfMonthCurrentWeekTexts("1", "2", "3", "4", "5", "6", "7")
+    }
+
+    @Test
+    fun verifyGridIsDrawn() {
+        createTimetable()
+        onView(withId(R.id.hour_drawing_container_and_grid)).check(matches(isDisplayed()))
+        verify {
+            canvasRender.drawGrid(any(), any(), any(), any(), any(), any())
+        }
     }
 
     private fun createTimetable(attr: AttributeSet? = null) {
