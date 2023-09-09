@@ -27,6 +27,14 @@ class TimetableCanvasRender @Inject constructor() {
         }
     }
 
+    fun drawHoursText24HourFormat(canvas: Canvas, hoursText: List<String>, gridCellHeight: Int, hourTextPaint: Paint, xAxis: Float) {
+        val hourTextHeight = with(hourTextPaint) { descent() - ascent() }
+        hoursText.forEachIndexed { index, hourText ->
+            val yAxis = (gridCellHeight * (index + 1)) + (hourTextHeight / 3)
+            canvas.drawText(hourText, xAxis, yAxis, hourTextPaint)
+        }
+    }
+
     fun getPaintForGridLines(@ColorInt lineColor: Int, strokeWidth: Float): Paint {
         return Paint().apply {
             color = lineColor

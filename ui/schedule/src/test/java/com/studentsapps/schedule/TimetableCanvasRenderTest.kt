@@ -35,14 +35,14 @@ class TimetableCanvasRenderTest {
     }
 
     @Test
-    fun `createTimetableBitmap_0w-100h_returnBitmap`() {
+    fun `createTimetableBitmap_0w-100h_returnException`() {
         assertThrows(Exception::class.java) {
             canvasRender.createTimetableBitmap(0, -100)
         }
     }
 
     @Test
-    fun drawGrid() {
+    fun verifyDrawGrid() {
         val canvas = mockk<Canvas>(relaxed = true)
         val gridPaint = Paint()
         val paintHalfHourLine = Paint()
@@ -60,6 +60,23 @@ class TimetableCanvasRenderTest {
         verify { canvas.drawLines(verticalLinesCoordinates, gridPaint) }
         verify { canvas.drawLines(horizontalHourLinesCoordinates, gridPaint) }
         verify { canvas.drawLines(halfHourHorizontalLinesCoordinates, paintHalfHourLine) }
+    }
+
+    @Test
+    fun verifyDrawHoursText24HourFormat() {
+        val canvas = mockk<Canvas>(relaxed = true)
+        val hoursText = listOf("1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00")
+        val xAxis = 20f
+        val gridCellHeight = 50
+        val paint = Paint().apply {
+            textSize = 10f
+        }
+        val hourTextHeight = paint.descent() - paint.ascent()
+        canvasRender.drawHoursText24HourFormat(canvas, hoursText, gridCellHeight, paint, xAxis)
+        hoursText.forEachIndexed { index, hourText ->
+            val yAxis = (gridCellHeight * (index + 1)) + (hourTextHeight / 3)
+            verify { canvas.drawText(hourText, xAxis, yAxis, any()) }
+        }
     }
 
     @Test
