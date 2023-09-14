@@ -17,3 +17,4 @@ dependencyResolutionManagement {
 rootProject.name = "University Schedule"
 include(":app")
 include(":ui:schedule")
+include(":designsystem")

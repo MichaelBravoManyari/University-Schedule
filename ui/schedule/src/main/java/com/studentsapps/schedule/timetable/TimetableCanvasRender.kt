@@ -1,9 +1,11 @@
-package com.studentsapps.schedule
+package com.studentsapps.schedule.timetable
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.Typeface
 import androidx.annotation.ColorInt
+import androidx.annotation.Dimension
 import javax.inject.Inject
 
 class TimetableCanvasRender @Inject constructor() {
@@ -27,11 +29,34 @@ class TimetableCanvasRender @Inject constructor() {
         }
     }
 
-    fun drawHoursText24HourFormat(canvas: Canvas, hoursText: List<String>, gridCellHeight: Int, hourTextPaint: Paint, xAxis: Float) {
+    fun drawHoursText24HourFormat(
+        canvas: Canvas,
+        hoursText: List<String>,
+        gridCellHeight: Int,
+        hourTextPaint: Paint,
+        xAxis: Float
+    ) {
         val hourTextHeight = with(hourTextPaint) { descent() - ascent() }
         hoursText.forEachIndexed { index, hourText ->
             val yAxis = (gridCellHeight * (index + 1)) + (hourTextHeight / 3)
             canvas.drawText(hourText, xAxis, yAxis, hourTextPaint)
+        }
+    }
+
+    fun drawHoursText12HourFormat(
+        canvas: Canvas,
+        hoursText: List<String>,
+        gridCellHeight: Int,
+        hourTextPaint: Paint,
+        xAxis: Float
+    ) {
+        val hourTextHeight = with(hourTextPaint) { descent() - ascent() }
+        hoursText.forEachIndexed { hourPosition, hourText ->
+            val hourTextSplit = hourText.split(" ")
+            hourTextSplit.forEachIndexed { textIndex, text ->
+                val yAxis = (gridCellHeight * (hourPosition + 1)) + (hourTextHeight * textIndex)
+                canvas.drawText(text, xAxis, yAxis, hourTextPaint)
+            }
         }
     }
 
@@ -40,6 +65,19 @@ class TimetableCanvasRender @Inject constructor() {
             color = lineColor
             style = Paint.Style.STROKE
             this.strokeWidth = strokeWidth
+        }
+    }
+
+    fun getPaintForHoursText(
+        @ColorInt textColor: Int,
+        @Dimension textSize: Float,
+        typeface: Typeface
+    ): Paint {
+        return Paint().apply {
+            color = textColor
+            textAlign = Paint.Align.CENTER
+            this.textSize = textSize
+            this.typeface = typeface
         }
     }
 }

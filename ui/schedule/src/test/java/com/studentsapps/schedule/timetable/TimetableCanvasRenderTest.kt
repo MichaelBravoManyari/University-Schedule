@@ -1,12 +1,16 @@
-package com.studentsapps.schedule
+package com.studentsapps.schedule.timetable
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import androidx.core.content.res.ResourcesCompat
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.studentsapps.schedule.R
 import io.mockk.mockk
 import io.mockk.verify
+import io.mockk.verifySequence
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
@@ -57,9 +61,11 @@ class TimetableCanvasRenderTest {
             horizontalHourLinesCoordinates,
             halfHourHorizontalLinesCoordinates
         )
-        verify { canvas.drawLines(verticalLinesCoordinates, gridPaint) }
-        verify { canvas.drawLines(horizontalHourLinesCoordinates, gridPaint) }
-        verify { canvas.drawLines(halfHourHorizontalLinesCoordinates, paintHalfHourLine) }
+        verifySequence {
+            canvas.drawLines(verticalLinesCoordinates, gridPaint)
+            canvas.drawLines(horizontalHourLinesCoordinates, gridPaint)
+            canvas.drawLines(halfHourHorizontalLinesCoordinates, paintHalfHourLine)
+        }
     }
 
     @Test
@@ -75,7 +81,27 @@ class TimetableCanvasRenderTest {
         canvasRender.drawHoursText24HourFormat(canvas, hoursText, gridCellHeight, paint, xAxis)
         hoursText.forEachIndexed { index, hourText ->
             val yAxis = (gridCellHeight * (index + 1)) + (hourTextHeight / 3)
-            verify { canvas.drawText(hourText, xAxis, yAxis, any()) }
+            verify(exactly = 1) { canvas.drawText(hourText, xAxis, yAxis, any()) }
+        }
+    }
+
+    @Test
+    fun verifyDrawHoursText12HourFormat() {
+        val canvas = mockk<Canvas>(relaxed = true)
+        val hoursText = listOf("11 am", "12 pm", "1 pm", "2 pm", "3 pm", "4 pm", "5 pm", "6 pm")
+        val gridCellHeight = 50
+        val xAxis = 20f
+        val paint = Paint().apply {
+            textSize = 10f
+        }
+        val hourTextHeight = paint.descent() - paint.ascent()
+        canvasRender.drawHoursText12HourFormat(canvas, hoursText, gridCellHeight, paint, xAxis)
+        hoursText.forEachIndexed { hourPosition, hourText ->
+            val hourTextSplit = hourText.split(" ")
+            hourTextSplit.forEachIndexed { textIndex, text ->
+                val yAxis = (gridCellHeight * (hourPosition + 1)) + (hourTextHeight * textIndex)
+                verify(exactly = 1) { canvas.drawText(text, xAxis, yAxis, paint) }
+            }
         }
     }
 
@@ -87,5 +113,20 @@ class TimetableCanvasRenderTest {
         assertThat(realPaint.color, `is`(lineColor))
         assertThat(realPaint.style, `is`(Paint.Style.STROKE))
         assertThat(realPaint.strokeWidth, `is`(strokeWidth))
+    }
+
+    @Test
+    fun getPaintForHoursText() {
+        val textColor = Color.BLACK
+        val textSize = 10f
+        val typeface = ResourcesCompat.getFont(
+            ApplicationProvider.getApplicationContext(),
+            R.font.roboto_regular
+        )!!
+        val realPaint = canvasRender.getPaintForHoursText(textColor, textSize, typeface)
+        assertThat(realPaint.color, `is`(textColor))
+        assertThat(realPaint.textAlign, `is`(Paint.Align.CENTER))
+        assertThat(realPaint.textSize, `is`(textSize))
+        assertThat(realPaint.typeface, `is`(typeface))
     }
 }

@@ -1,5 +1,6 @@
-package com.studentsapps.schedule
+package com.studentsapps.schedule.timetable
 
+import com.studentsapps.schedule.R
 import org.hamcrest.CoreMatchers.`is`
 import org.junit.Test
 import org.hamcrest.MatcherAssert.assertThat

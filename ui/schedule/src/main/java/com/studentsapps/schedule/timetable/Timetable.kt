@@ -1,14 +1,13 @@
-package com.studentsapps.schedule
+package com.studentsapps.schedule.timetable
 
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.graphics.Paint
 import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.TextView
-import androidx.annotation.ColorInt
+import androidx.annotation.ArrayRes
 import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
 import androidx.annotation.Dimension
@@ -16,6 +15,7 @@ import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import com.studentsapps.schedule.R
 import com.studentsapps.schedule.databinding.TimetableBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -204,9 +204,10 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
         lineHeight: Float,
         lineLength: Float
     ) {
-        val paintGrid = canvasRender.getPaintForGridLines(gridStrokeColor, GRID_LINES_STROKE_WIDTH)
+        val lineWidth = getDimensionById(R.dimen.timetable_grid_lines_stroke_width)
+        val paintGrid = canvasRender.getPaintForGridLines(gridStrokeColor, lineWidth)
         val paintHalfHourLine =
-            canvasRender.getPaintForGridLines(halfHourGridStrokeColor, GRID_LINES_STROKE_WIDTH)
+            canvasRender.getPaintForGridLines(halfHourGridStrokeColor, lineWidth)
         val verticalLinesCoordinates = utils.getVerticalLinesCoordinates(
             NUM_VERTICAL_GRID_LINES,
             hoursCellWidth,
@@ -257,69 +258,37 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
 
     private fun drawHoursText(canvas: Canvas, gridCellHeight: Int, hoursCellWidth: Int) {
         val hoursTextSize = getDimensionById(R.dimen.timetable_hours_text_size)
-        val hourTextPaint = createPaintForHoursText(hoursTextColor, hoursTextSize, daysOfWeekFont)
-        val hourTextHeight = hourTextPaint.descent() - hourTextPaint.ascent()
+        val hourTextPaint =
+            canvasRender.getPaintForHoursText(hoursTextColor, hoursTextSize, daysOfWeekFont)
         val xAxis = hoursCellWidth / 2f
-        if (is12HoursFormat) drawHoursText12HourFormat(
-            canvas,
-            xAxis,
-            gridCellHeight,
-            hourTextHeight,
-            hourTextPaint
-        )
-        else drawHoursText24HourFormat(canvas, xAxis, gridCellHeight, hourTextHeight, hourTextPaint)
-    }
-
-    private fun drawText(canvas: Canvas, text: String, xAxis: Float, yAxis: Float, paint: Paint) {
-        canvas.drawText(text, xAxis, yAxis, paint)
-    }
-
-    private fun drawHoursText24HourFormat(
-        canvas: Canvas,
-        textXAxisPosition: Float,
-        gridCellHeight: Int,
-        hourTextHeight: Float,
-        paint: Paint
-    ) {
-        for ((hourPosition, hour) in hoursIn24HourFormat.withIndex()) {
-            val yAxis =
-                calculateYAxisOfHoursText24HourFormat(gridCellHeight, hourPosition, hourTextHeight)
-            drawText(canvas, hour, textXAxisPosition, yAxis, paint)
-        }
-    }
-
-    private fun drawHoursText12HourFormat(
-        canvas: Canvas,
-        textXAxisPosition: Float,
-        gridCellHeight: Int,
-        hourTextHeight: Float,
-        paint: Paint
-    ) {
-        for ((hourPosition, hour) in hoursIn12HourFormat.withIndex()) {
-            val hourTextSplit = hour.split(" ")
-            hourTextSplit.forEachIndexed { textIndex, text ->
-                val yAxis = calculateYAxisOfHoursText12HourFormat(
-                    gridCellHeight, hourPosition, hourTextHeight, textIndex
-                )
-                drawText(canvas, text, textXAxisPosition, yAxis, paint)
-            }
-        }
-    }
-
-    private fun calculateYAxisOfHoursText24HourFormat(
-        gridCellHeight: Int, hourPosition: Int, hourTextHeight: Float
-    ): Float {
-        return (gridCellHeight * (hourPosition + 1)) + (hourTextHeight / 3)
-    }
-
-    private fun calculateYAxisOfHoursText12HourFormat(
-        gridCellHeight: Int, hourPosition: Int, hourTextHeight: Float, textIndex: Int
-    ): Float {
-        return (gridCellHeight * (hourPosition + 1)) + (hourTextHeight * textIndex)
+        val hoursText =
+            if (is12HoursFormat) getStringArrayById(R.array.hours_in_12_hour_format).toList() else getStringArrayById(
+                R.array.hours_in_24_hour_format
+            ).toList()
+        if (is12HoursFormat)
+            canvasRender.drawHoursText12HourFormat(
+                canvas,
+                hoursText,
+                gridCellHeight,
+                hourTextPaint,
+                xAxis
+            )
+        else
+            canvasRender.drawHoursText24HourFormat(
+                canvas,
+                hoursText,
+                gridCellHeight,
+                hourTextPaint,
+                xAxis
+            )
     }
 
     private fun getColorById(@ColorRes colorId: Int): Int {
         return ContextCompat.getColor(context, colorId)
+    }
+
+    private fun getStringArrayById(@ArrayRes arrayId: Int): Array<String> {
+        return resources.getStringArray(arrayId)
     }
 
     private fun getDimensionPixelSizeById(@DimenRes dimenId: Int): Int {
@@ -330,75 +299,11 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
         return resources.getDimension(dimenId)
     }
 
-    private fun createPaintForHoursText(
-        @ColorInt textColor: Int, @Dimension textSize: Float, typeface: Typeface
-    ): Paint {
-        return Paint().apply {
-            color = textColor
-            textAlign = Paint.Align.CENTER
-            this.textSize = textSize
-            this.typeface = typeface
-        }
-    }
-
     companion object {
         private const val COLUMNS_NUMBER = 8
         private const val COLUMNS_HOURS_NUMBER = 1
         private const val ROWS_NUMBER = 24
-        private const val GRID_LINES_STROKE_WIDTH = 3F
         private const val NUM_VERTICAL_GRID_LINES = 6
         private const val NUM_HORIZONTAL_GRID_LINES = 24
-
-        private val hoursIn12HourFormat = listOf(
-            "1 am",
-            "2 am",
-            "3 am",
-            "4 am",
-            "5 am",
-            "6 am",
-            "7 am",
-            "8 am",
-            "9 am",
-            "10 am",
-            "11 am",
-            "12 pm",
-            "1 pm",
-            "2 pm",
-            "3 pm",
-            "4 pm",
-            "5 pm",
-            "6 pm",
-            "7 pm",
-            "8 pm",
-            "9 pm",
-            "10 pm",
-            "11 pm"
-        )
-
-        private val hoursIn24HourFormat = listOf(
-            "1:00",
-            "2:00",
-            "3:00",
-            "4:00",
-            "5:00",
-            "6:00",
-            "7:00",
-            "8:00",
-            "9:00",
-            "10:00",
-            "11:00",
-            "12:00",
-            "13:00",
-            "14:00",
-            "15:00",
-            "16:00",
-            "17:00",
-            "18:00",
-            "19:00",
-            "20:00",
-            "21:00",
-            "22:00",
-            "23:00"
-        )
     }
 }

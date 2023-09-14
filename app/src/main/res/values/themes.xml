@@ -1,9 +1,12 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.UniversitySchedule" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+<resources>
+
+    <style name="Theme.UniversitySchedule" parent="Theme.Material3.Light.NoActionBar">
+        <item name="android:statusBarColor">@color/primary_color</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="appBarLayoutStyle">@style/Widget.UniversitySchedule.AppBarLayout</item>
     </style>
 
-    <style name="Theme.UniversitySchedule" parent="Base.Theme.UniversitySchedule" />
+    <style name="Widget.UniversitySchedule.AppBarLayout" parent="Widget.Material3.AppBarLayout">
+        <item name="android:background">@color/primary_color</item>
+    </style>
 </resources>

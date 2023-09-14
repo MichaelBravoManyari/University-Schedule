@@ -1,11 +1,13 @@
-package com.studentsapps.schedule
+package com.studentsapps.schedule.timetable
 
 import android.app.Application
+import android.content.Context
 import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.annotation.ArrayRes
 import androidx.annotation.DimenRes
 import androidx.annotation.FontRes
 import androidx.core.content.res.ResourcesCompat
@@ -17,6 +19,9 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.studentsapps.schedule.R
+import com.studentsapps.schedule.TestFragment
+import com.studentsapps.schedule.launchFragmentInHiltContainer
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -150,7 +155,7 @@ class TimetableTest {
         val expectedHalfHourHorizontalLinesCoordinates = floatArrayOf(20f, 15f, 45f)
         createTimetable()
         onView(withId(R.id.hour_drawing_container_and_grid)).check(matches(isDisplayed()))
-        verify {
+        verify(exactly = 1) {
             canvasRender.drawGrid(
                 any(),
                 any(),
@@ -168,13 +173,35 @@ class TimetableTest {
         val attrs = createTimetableAttributeSetWithTimeFormat(is12HoursFormat)
         val gridCellHeight = getDimensionPixelSizeById(R.dimen.timetable_grid_cell_height)
         val hourCellWidth = getDimensionPixelSizeById(R.dimen.timetable_hours_cell_width)
+        val hoursIn24HourFormat = getStringArrayById(R.array.hours_in_24_hour_format).toList()
         val xAxis = hourCellWidth / 2f
         createTimetable(attrs)
         onView(withId(R.id.hour_drawing_container_and_grid)).check(matches(isDisplayed()))
-        verify {
+        verify(exactly = 1) {
             canvasRender.drawHoursText24HourFormat(
                 any(),
                 hoursIn24HourFormat,
+                gridCellHeight,
+                any(),
+                xAxis
+            )
+        }
+    }
+
+    @Test
+    fun verifyHoursTextIsDrawn_12HourFormat() {
+        val is12HoursFormat = true
+        val attrs = createTimetableAttributeSetWithTimeFormat(is12HoursFormat)
+        val gridCellHeight = getDimensionPixelSizeById(R.dimen.timetable_grid_cell_height)
+        val hourCellWidth = getDimensionPixelSizeById(R.dimen.timetable_hours_cell_width)
+        val hoursIn12HourFormat = getStringArrayById(R.array.hours_in_12_hour_format).toList()
+        val xAxis = hourCellWidth / 2f
+        createTimetable(attrs)
+        onView(withId(R.id.hour_drawing_container_and_grid)).check(matches(isDisplayed()))
+        verify(exactly = 1) {
+            canvasRender.drawHoursText12HourFormat(
+                any(),
+                hoursIn12HourFormat,
                 gridCellHeight,
                 any(),
                 xAxis
@@ -238,6 +265,12 @@ class TimetableTest {
     private fun getDimensionPixelSizeById(@DimenRes dimenId: Int): Int {
         return ApplicationProvider.getApplicationContext<Application>().resources.getDimensionPixelSize(
             dimenId
+        )
+    }
+
+    private fun getStringArrayById(@ArrayRes arrayId: Int): Array<String> {
+        return ApplicationProvider.getApplicationContext<Context?>().resources.getStringArray(
+            arrayId
         )
     }
 
@@ -374,31 +407,5 @@ class TimetableTest {
 
         private val fakeDaysOfMonthCurrentWeekStartingSunday =
             listOf("1", "2", "3", "4", "5", "6", "7")
-
-        private val hoursIn24HourFormat = listOf(
-            "1:00",
-            "2:00",
-            "3:00",
-            "4:00",
-            "5:00",
-            "6:00",
-            "7:00",
-            "8:00",
-            "9:00",
-            "10:00",
-            "11:00",
-            "12:00",
-            "13:00",
-            "14:00",
-            "15:00",
-            "16:00",
-            "17:00",
-            "18:00",
-            "19:00",
-            "20:00",
-            "21:00",
-            "22:00",
-            "23:00"
-        )
     }
 }
