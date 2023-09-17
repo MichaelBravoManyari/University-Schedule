@@ -2,15 +2,22 @@ package com.studentsapps.schedule.timetable
 
 import android.app.Application
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Typeface
+import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.annotation.ArrayRes
+import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
 import androidx.annotation.FontRes
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.drawable.toBitmap
+import androidx.core.graphics.drawable.toDrawable
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -209,6 +216,22 @@ class TimetableTest {
         }
     }
 
+    @Test
+    fun verifyCurrentMonthDayIsSelected() {
+        mockUtilsGetCurrentMonthDayString()
+        mockUtilGetDaysOfMonthOfWeek()
+        mockCanvasRenderGetCurrentMonthDayBackground()
+        val expectedBackground = getExpectedBackgroundCurrentMonthDay()
+        val expectedCurrentMonthDayTextColor =
+            getColorById(R.color.timetable_current_month_day_text_color)
+        createTimetable()
+        onView(withId(R.id.first_day))
+            .check(matches(withText("2")))
+            .check(matches(isDisplayed()))
+            .check(matches(withTextColor(expectedCurrentMonthDayTextColor)))
+            .check(matches(withBackground(expectedBackground)))
+    }
+
     private fun createTimetable(attr: AttributeSet? = null) {
         launchFragmentInHiltContainer<TestFragment> {
             val attributeSet = attr ?: Robolectric.buildAttributeSet().build()
@@ -221,6 +244,28 @@ class TimetableTest {
             val testFragment = this as TestFragment
             testFragment.binding.root.addView(timetable)
         }
+    }
+
+    private fun getExpectedBackgroundCurrentMonthDay(): Drawable {
+        return Bitmap.createBitmap(
+            10,
+            10,
+            Bitmap.Config.ARGB_8888
+        ).toDrawable(ApplicationProvider.getApplicationContext<Context>().resources)
+    }
+
+    private fun mockCanvasRenderGetCurrentMonthDayBackground() {
+        every {
+            canvasRender.getCurrentMonthDayBackground(
+                any(),
+                any(),
+                any()
+            )
+        } returns Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888)
+    }
+
+    private fun mockUtilsGetCurrentMonthDayString() {
+        every { utils.getCurrentMonthDay() } returns "2"
     }
 
     private fun mockUtilsLineCoordinates() {
@@ -272,6 +317,10 @@ class TimetableTest {
         return ApplicationProvider.getApplicationContext<Context?>().resources.getStringArray(
             arrayId
         )
+    }
+
+    private fun getColorById(@ColorRes colorId: Int): Int {
+        return ContextCompat.getColor(ApplicationProvider.getApplicationContext(), colorId)
     }
 
     private fun verifyTextSize(viewsIds: List<Int>, expectedTextSize: Float) {
@@ -353,6 +402,32 @@ class TimetableTest {
         return attrs.build()
     }
 
+    private fun withTextColor(@ColorInt expectedTextColor: Int): Matcher<View> {
+        return object : BoundedMatcher<View, TextView>(TextView::class.java) {
+            override fun describeTo(description: Description?) {
+                description?.appendText("with textColor: ")
+                description?.appendValue(expectedTextColor)
+            }
+
+            override fun matchesSafely(item: TextView?): Boolean {
+                return item?.currentTextColor == expectedTextColor
+            }
+        }
+    }
+
+    private fun withBackground(@ColorInt expectedBackground: Drawable): Matcher<View> {
+        return object : BoundedMatcher<View, TextView>(TextView::class.java) {
+            override fun describeTo(description: Description?) {
+                description?.appendText("with background: ")
+                description?.appendValue(expectedBackground)
+            }
+
+            override fun matchesSafely(item: TextView): Boolean {
+                return item.background.toBitmap().sameAs(expectedBackground.toBitmap())
+            }
+        }
+    }
+
     private fun withTypeface(expectedTypeface: Typeface): Matcher<View> {
         return object : BoundedMatcher<View, TextView>(TextView::class.java) {
             override fun describeTo(description: Description?) {
@@ -363,7 +438,6 @@ class TimetableTest {
             override fun matchesSafely(item: TextView?): Boolean {
                 return item?.typeface == expectedTypeface
             }
-
         }
     }
 
@@ -377,7 +451,6 @@ class TimetableTest {
             override fun matchesSafely(item: TextView?): Boolean {
                 return item?.textSize == expectedTextSize
             }
-
         }
     }
 

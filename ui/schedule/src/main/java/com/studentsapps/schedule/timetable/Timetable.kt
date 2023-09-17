@@ -15,6 +15,7 @@ import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.drawable.toDrawable
 import com.studentsapps.schedule.R
 import com.studentsapps.schedule.databinding.TimetableBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -33,6 +34,7 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
     private var is12HoursFormat = true
     private var gridCellWidth = 0
     private var isMondayFirstDayOfWeek = true
+    val currentMonth = utils.getMonth()
 
     @Inject
     lateinit var utils: TimetableUtils
@@ -113,6 +115,25 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
         )
     }
 
+    private fun selectCurrentMonthDay() {
+        val currentMonthDay = utils.getCurrentMonthDay()
+        val currentMonthDayTextColor = getColorById(R.color.timetable_current_month_day_text_color)
+        val currentMonthDayBackgroundColor =
+            getColorById(R.color.timetable_current_month_day_background_color)
+        getDaysOfMonthViews().forEach { view ->
+            if (view.text == currentMonthDay) {
+                view.apply {
+                    setTextColor(currentMonthDayTextColor)
+                    background = canvasRender.getCurrentMonthDayBackground(
+                        view.measuredWidth,
+                        view.measuredHeight,
+                        currentMonthDayBackgroundColor
+                    ).toDrawable(resources)
+                }
+            }
+        }
+    }
+
     private fun configureDaysViews(
         daysViews: List<TextView>,
         @Dimension dayTextSize: Float,
@@ -173,6 +194,7 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
             rootViewWidth = realRootViewWidth
             val hoursCellWidth = getDimensionPixelSizeById(R.dimen.timetable_hours_cell_width)
             calculateGridCellWidth(realRootViewWidth, hoursCellWidth)
+            selectCurrentMonthDay()
             val bitmapHoursGrid = createBitmapGridAndHours(realRootViewWidth, hoursCellWidth)
             setBitmapToHourDrawingGridContainer(bitmapHoursGrid)
         }

@@ -4,8 +4,10 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Typeface
+import android.graphics.drawable.Drawable
 import androidx.annotation.ColorInt
 import androidx.annotation.Dimension
+import androidx.core.graphics.drawable.toDrawable
 import javax.inject.Inject
 
 class TimetableCanvasRender @Inject constructor() {
@@ -58,6 +60,19 @@ class TimetableCanvasRender @Inject constructor() {
                 canvas.drawText(text, xAxis, yAxis, hourTextPaint)
             }
         }
+    }
+
+    fun getCurrentMonthDayBackground(viewWidth: Int, viewHeight: Int, @ColorInt circleColor: Int): Bitmap {
+        val bitmap = Bitmap.createBitmap(viewWidth, viewHeight, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        val xAxis = viewWidth / 2f
+        val yAxis = viewHeight / 2f
+        val paint = Paint().apply {
+            color = circleColor
+            style = Paint.Style.FILL
+        }
+        canvas.drawCircle(xAxis, yAxis, yAxis, paint)
+        return bitmap
     }
 
     fun getPaintForGridLines(@ColorInt lineColor: Int, strokeWidth: Float): Paint {

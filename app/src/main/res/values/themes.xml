@@ -4,9 +4,41 @@
         <item name="android:statusBarColor">@color/primary_color</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="appBarLayoutStyle">@style/Widget.UniversitySchedule.AppBarLayout</item>
+        <item name="toolbarStyle">@style/Widget.UniversitySchedule.Toolbar</item>
     </style>
 
     <style name="Widget.UniversitySchedule.AppBarLayout" parent="Widget.Material3.AppBarLayout">
         <item name="android:background">@color/primary_color</item>
+    </style>
+
+    <style name="Widget.UniversitySchedule.Toolbar" parent="Widget.Material3.Toolbar">
+        <!-- theme -->
+        <item name="materialThemeOverlay">@style/ThemeOverlay.UniversitySchedule.Toolbar</item>
+        <!-- top bar title font -->
+        <item name="titleTextAppearance">@style/Widget.UniversitySchedule.textAppearanceTitleLarge
+        </item>
+        <item name="popupTheme">@style/CustomPopupMenuStyle</item>
+    </style>
+
+    <style name="ThemeOverlay.UniversitySchedule.Toolbar" parent="">
+        <!-- Change the color of the top bar icons -->
+        <!-- NOTA: the top bar list icon does not change as it is obtained programmatically -->
+        <item name="colorOnSurfaceVariant">@color/secondary_text_color</item>
+        <!-- Menu and overflow icon color -->
+        <item name="colorControlNormal">@color/secondary_text_color</item>
+    </style>
+
+    <style name="Widget.UniversitySchedule.textAppearanceTitleLarge" parent="TextAppearance.Material3.TitleLarge">
+        <item name="fontFamily">@font/roboto_medium</item>
+        <item name="android:fontFamily">@font/roboto_medium</item>
+        <item name="android:textColor">@color/text_color</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="CustomPopupMenuStyle" parent="Widget.Material3.PopupMenu.Overflow">
+        <item name="android:backgroundTint">@color/primary_color</item>
+        <item name="android:textColor">@color/text_color</item>
+        <item name="fontFamily">@font/roboto_medium</item>
+        <item name="android:fontFamily">@font/roboto_medium</item>
     </style>
 </resources>

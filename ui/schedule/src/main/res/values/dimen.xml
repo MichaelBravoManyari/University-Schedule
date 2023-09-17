@@ -6,4 +6,6 @@
     <dimen name="timetable_days_of_week_text_size">4sp</dimen>
     <dimen name="timetable_days_of_month_text_size">6sp</dimen>
     <dimen name="timetable_grid_lines_stroke_width">1dp</dimen>
+    <dimen name="timetable_days_of_month_padding">3dp</dimen>
+    <dimen name="timetable_days_of_month_margin">5dp</dimen>
 </resources>

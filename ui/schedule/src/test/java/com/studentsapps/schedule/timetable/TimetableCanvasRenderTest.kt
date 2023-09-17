@@ -116,7 +116,7 @@ class TimetableCanvasRenderTest {
     }
 
     @Test
-    fun getPaintForHoursText() {
+    fun getPaintForHoursText_black10fRobotoRegular() {
         val textColor = Color.BLACK
         val textSize = 10f
         val typeface = ResourcesCompat.getFont(
@@ -128,5 +128,19 @@ class TimetableCanvasRenderTest {
         assertThat(realPaint.textAlign, `is`(Paint.Align.CENTER))
         assertThat(realPaint.textSize, `is`(textSize))
         assertThat(realPaint.typeface, `is`(typeface))
+    }
+
+    @Test
+    fun getCurrentMonthDayBackground_50w50h() {
+        val expectedBitmap = Bitmap.createBitmap(50, 50, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(expectedBitmap)
+        val circleColor = Color.BLUE
+        val paint = Paint().apply {
+            color = circleColor
+            style = Paint.Style.FILL
+        }
+        canvas.drawCircle(25f, 25f, 25f, paint)
+        val realBitmap = canvasRender.getCurrentMonthDayBackground(50, 50, circleColor)
+        assertThat("same bitmap", realBitmap.sameAs(expectedBitmap))
     }
 }

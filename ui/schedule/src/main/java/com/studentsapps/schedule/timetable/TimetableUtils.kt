@@ -4,6 +4,8 @@ import com.studentsapps.schedule.R
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.time.format.TextStyle
+import java.util.Locale
 import javax.inject.Inject
 
 class TimetableUtils @Inject constructor() {
@@ -17,6 +19,17 @@ class TimetableUtils @Inject constructor() {
             if (isMondayFirstDayOfWeek) date.with(DayOfWeek.MONDAY) else date.with(DayOfWeek.MONDAY)
                 .minusDays(1)
         return (0 until 7).map { startOfWeek.plusDays(it.toLong()).format(formatter).toString() }
+    }
+
+    fun getCurrentMonthDay(): String {
+        return LocalDate.now().dayOfMonth.toString()
+    }
+
+    fun getMonth(date: LocalDate = LocalDate.now()): String {
+        return date.month.getDisplayName(TextStyle.FULL, Locale.getDefault())
+            .replaceFirstChar {
+                if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+            }
     }
 
     fun getDaysOfWeekOrder(isMondayFirstDayOfWeek: Boolean): List<Int> {

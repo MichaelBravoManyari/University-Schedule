@@ -1,12 +1,16 @@
 package com.studentsapps.schedule.timetable
 
 import com.studentsapps.schedule.R
+import io.mockk.mockk
 import org.hamcrest.CoreMatchers.`is`
 import org.junit.Test
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers
 import org.junit.Assert.assertThrows
+import org.robolectric.annotation.Config
 import java.time.LocalDate
+import java.time.format.TextStyle
+import java.util.Locale
 
 class TimetableUtilsTest {
 
@@ -160,5 +164,20 @@ class TimetableUtilsTest {
             realHalfHourHorizontalLinesCoordinates,
             `is`(expectedHalfHourHorizontalLinesCoordinates)
         )
+    }
+
+    @Test
+    fun verifyGetCurrentMonthDayString() {
+        val expectedDay = LocalDate.now().dayOfMonth.toString()
+        val realDay = utils.getCurrentMonthDay()
+        assertThat(realDay, `is`(expectedDay))
+    }
+
+    @Test
+    fun getMonth_randomDate() {
+        val date = LocalDate.of(2023, 7, 18)
+        val expectedMonth = "July"
+        val realMonth = utils.getMonth(date)
+        assertThat(realMonth, `is`(expectedMonth))
     }
 }
