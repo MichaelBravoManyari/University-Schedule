@@ -1,7 +1,7 @@
 [versions]
 appcompat = "1.6.1"
 constraintlayout = "2.1.4"
-core-ktx = "1.10.1"
+core-ktx = "1.12.0"
 androidGradlePlugin = "8.1.1"
 org-jetbrains-kotlin-android = "1.8.0"
 junit = "4.13.2"

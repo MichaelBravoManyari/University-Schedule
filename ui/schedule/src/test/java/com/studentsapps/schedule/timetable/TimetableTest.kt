@@ -22,13 +22,13 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.BoundedMatcher
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.studentsapps.schedule.R
 import com.studentsapps.schedule.TestFragment
 import com.studentsapps.schedule.launchFragmentInHiltContainer
+import com.studentsapps.schedule.verifyTimetableGridViewIsDisplayed
+import com.studentsapps.schedule.verifyTimetableListViewIsDisplayed
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -38,6 +38,7 @@ import io.mockk.spyk
 import io.mockk.verify
 import org.hamcrest.Description
 import org.hamcrest.Matcher
+import org.hamcrest.Matchers.not
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -232,18 +233,120 @@ class TimetableTest {
             .check(matches(withBackground(expectedBackground)))
     }
 
-    private fun createTimetable(attr: AttributeSet? = null) {
+    @Test
+    fun showAsGrid_true() {
+        createTimetable()
+        verifyTimetableGridViewIsDisplayed()
+    }
+
+    @Test
+    fun showAsGrid_false() {
+        createTimetable(showAsGrid = false)
+        verifyTimetableListViewIsDisplayed()
+    }
+
+    @Test
+    fun verifyTimetableViewVisibilityChangeFromGridToList() {
+        val timetable = createTimetable()
+        verifyTimetableGridViewIsDisplayed()
+        timetable.setShowAsGrid(false)
+        verifyTimetableListViewIsDisplayed()
+    }
+
+    @Test
+    fun verifyTimetableViewVisibilityChangeFromListToGrid() {
+        val timetable = createTimetable(showAsGrid = false)
+        verifyTimetableListViewIsDisplayed()
+        timetable.setShowAsGrid(true)
+        verifyTimetableGridViewIsDisplayed()
+    }
+
+    @Test
+    fun showSaturdayAndStartingMonday() {
+        val attrs = createTimetableAttributeSetWithShowSaturday(
+            showSaturday = true,
+            isMondayFirstOfWeek = true
+        )
+        createTimetable(attrs)
+        onView(withId(R.id.sixth_day)).check(matches(isDisplayed()))
+        onView(withId(R.id.sixth_day_of_week)).check(matches(isDisplayed()))
+        verify { utils.getVerticalLinesCoordinates(6, any(), any(), any()) }
+    }
+
+    @Test
+    fun showSaturdayAndStartingSunday() {
+        val attrs = createTimetableAttributeSetWithShowSaturday(
+            showSaturday = true,
+            isMondayFirstOfWeek = false
+        )
+        createTimetable(attrs)
+        onView(withId(R.id.seventh_day)).check(matches(isDisplayed()))
+        onView(withId(R.id.seventh_day_of_week)).check(matches(isDisplayed()))
+        verify { utils.getVerticalLinesCoordinates(6, any(), any(), any()) }
+    }
+
+    @Test
+    fun notShowSaturdayAndStartingMonday() {
+        val attrs = createTimetableAttributeSetWithShowSaturday(
+            showSaturday = false,
+            isMondayFirstOfWeek = true
+        )
+        createTimetable(attrs)
+        onView(withId(R.id.seventh_day_of_week)).check(matches(not(isDisplayed())))
+        onView(withId(R.id.seventh_day)).check(matches(not(isDisplayed())))
+        verify { utils.getVerticalLinesCoordinates(5, any(), any(), any()) }
+    }
+
+    @Test
+    fun notShowSaturdayAndStartingSunday() {
+        val attrs = createTimetableAttributeSetWithShowSaturday(
+            showSaturday = false,
+            isMondayFirstOfWeek = false
+        )
+        createTimetable(attrs)
+        onView(withId(R.id.seventh_day_of_week)).check(matches(not(isDisplayed())))
+        onView(withId(R.id.seventh_day)).check(matches(not(isDisplayed())))
+        verify { utils.getVerticalLinesCoordinates(5, any(), any(), any()) }
+    }
+
+    @Test
+    fun showSundayAndStartingMonday() {
+        val attrs = createTimetableAttributeSetWithShowSunday(
+            showSunday = true,
+            isMondayFirstOfWeek = true
+        )
+        createTimetable(attrs)
+        onView(withId(R.id.seventh_day_of_week)).check(matches(isDisplayed()))
+        onView(withId(R.id.seventh_day)).check(matches(isDisplayed()))
+        verify { utils.getVerticalLinesCoordinates(6, any(), any(), any()) }
+    }
+
+    @Test
+    fun notShowSundayAndStartingMonday() {
+        val attrs = createTimetableAttributeSetWithShowSunday(
+            showSunday = false,
+            isMondayFirstOfWeek = true
+        )
+        createTimetable(attrs)
+        onView(withId(R.id.seventh_day_of_week)).check(matches(not(isDisplayed())))
+        onView(withId(R.id.seventh_day)).check(matches(not(isDisplayed())))
+        verify { utils.getVerticalLinesCoordinates(5, any(), any(), any()) }
+    }
+
+    private fun createTimetable(attr: AttributeSet? = null, showAsGrid: Boolean = true): Timetable {
+        var timetable: Timetable? = null
         launchFragmentInHiltContainer<TestFragment> {
             val attributeSet = attr ?: Robolectric.buildAttributeSet().build()
-            val timetable = Timetable(this.requireContext(), attributeSet)
+            timetable = Timetable(this.requireContext(), attributeSet)
             val layoutParams = FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT
             )
-            timetable.layoutParams = layoutParams
-            val testFragment = this as TestFragment
-            testFragment.binding.root.addView(timetable)
+            timetable!!.layoutParams = layoutParams
+            binding.fragmentTestContainer.addView(timetable)
+            timetable!!.setShowAsGrid(showAsGrid)
         }
+        return timetable!!
     }
 
     private fun getExpectedBackgroundCurrentMonthDay(): Drawable {
@@ -296,11 +399,21 @@ class TimetableTest {
     }
 
     private fun mockUtilGetDaysOfMonthOfWeek() {
-        every { utils.getDaysOfMonthOfWeek(any()) } answers { if (arg(0)) fakeDaysOfMonthCurrentWeekStartingMonday else fakeDaysOfMonthCurrentWeekStartingSunday }
+        every {
+            utils.getDaysOfMonthOfWeek(
+                any(),
+                any()
+            )
+        } answers { if (arg(0)) fakeDaysOfMonthCurrentWeekStartingMonday else fakeDaysOfMonthCurrentWeekStartingSunday }
     }
 
     private fun mockUtilsGetDayOfWeekOrder() {
-        every { utils.getDaysOfWeekOrder(any()) } answers { if (arg(0)) fakeDaysOfWeekStartingMonday else fakeDaysOfWeekStartingSunday }
+        every {
+            utils.getDaysOfWeekOrder(
+                any(),
+                any()
+            )
+        } answers { if (arg(0)) fakeDaysOfWeekStartingMonday else fakeDaysOfWeekStartingSunday }
     }
 
     private fun getTypeface(@FontRes fontId: Int): Typeface {
@@ -380,6 +493,26 @@ class TimetableTest {
 
     private fun createTimetableAttributeSetMondayFirst(isMondayFirstOfWeek: Boolean): AttributeSet {
         val attr = Robolectric.buildAttributeSet()
+        attr.addAttribute(R.attr.is_monday_first_day_of_week, isMondayFirstOfWeek.toString())
+        return attr.build()
+    }
+
+    private fun createTimetableAttributeSetWithShowSaturday(
+        showSaturday: Boolean,
+        isMondayFirstOfWeek: Boolean
+    ): AttributeSet {
+        val attr = Robolectric.buildAttributeSet()
+        attr.addAttribute(R.attr.show_saturday, showSaturday.toString())
+        attr.addAttribute(R.attr.is_monday_first_day_of_week, isMondayFirstOfWeek.toString())
+        return attr.build()
+    }
+
+    private fun createTimetableAttributeSetWithShowSunday(
+        showSunday: Boolean,
+        isMondayFirstOfWeek: Boolean
+    ): AttributeSet {
+        val attr = Robolectric.buildAttributeSet()
+        attr.addAttribute(R.attr.show_sunday, showSunday.toString())
         attr.addAttribute(R.attr.is_monday_first_day_of_week, isMondayFirstOfWeek.toString())
         return attr.build()
     }

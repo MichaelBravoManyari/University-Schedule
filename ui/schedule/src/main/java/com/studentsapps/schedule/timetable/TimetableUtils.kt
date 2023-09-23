@@ -12,13 +12,28 @@ class TimetableUtils @Inject constructor() {
 
     fun getDaysOfMonthOfWeek(
         isMondayFirstDayOfWeek: Boolean,
+        showSaturday: Boolean,
         date: LocalDate = LocalDate.now()
     ): List<String> {
         val formatter = DateTimeFormatter.ofPattern("d")
         val startOfWeek =
             if (isMondayFirstDayOfWeek) date.with(DayOfWeek.MONDAY) else date.with(DayOfWeek.MONDAY)
                 .minusDays(1)
-        return (0 until 7).map { startOfWeek.plusDays(it.toLong()).format(formatter).toString() }
+        val daysOfMonthOfWeek =
+            (0 until 7).map { startOfWeek.plusDays(it.toLong()).format(formatter).toString() }
+                .toMutableList()
+
+        if (!showSaturday) removeSaturdayFromDaysOfWeek(isMondayFirstDayOfWeek, daysOfMonthOfWeek)
+
+        return daysOfMonthOfWeek
+    }
+
+    private fun removeSaturdayFromDaysOfWeek(
+        isMondayFirstDayOfWeek: Boolean,
+        daysOfMonthOfWeek: MutableList<String>
+    ) {
+        val positionSaturday = if (isMondayFirstDayOfWeek) 5 else 6
+        daysOfMonthOfWeek.removeAt(positionSaturday)
     }
 
     fun getCurrentMonthDay(): String {
@@ -32,28 +47,26 @@ class TimetableUtils @Inject constructor() {
             }
     }
 
-    fun getDaysOfWeekOrder(isMondayFirstDayOfWeek: Boolean): List<Int> {
-        return if (isMondayFirstDayOfWeek) {
-            listOf(
-                R.string.monday_abbr,
-                R.string.tuesday_abbr,
-                R.string.wednesday_abbr,
-                R.string.thursday_abbr,
-                R.string.friday_abbr,
-                R.string.saturday_abbr,
-                R.string.sunday_abbr
-            )
-        } else {
-            listOf(
-                R.string.sunday_abbr,
-                R.string.monday_abbr,
-                R.string.tuesday_abbr,
-                R.string.wednesday_abbr,
-                R.string.thursday_abbr,
-                R.string.friday_abbr,
-                R.string.saturday_abbr
-            )
+    fun getDaysOfWeekOrder(isMondayFirstDayOfWeek: Boolean, showSaturday: Boolean): List<Int> {
+        var orderList = mutableListOf(
+            R.string.monday_abbr,
+            R.string.tuesday_abbr,
+            R.string.wednesday_abbr,
+            R.string.thursday_abbr,
+            R.string.friday_abbr
+        )
+
+        if (showSaturday) orderList.add(R.string.saturday_abbr)
+
+        if (isMondayFirstDayOfWeek)
+            orderList.add(R.string.sunday_abbr)
+        else {
+            val baseOrderList = orderList
+            orderList = mutableListOf(R.string.sunday_abbr)
+            orderList.addAll(baseOrderList)
         }
+
+        return orderList
     }
 
     fun calculateRealRootViewWidth(width: Int, paddingLeft: Int, paddingRight: Int): Int {
@@ -122,5 +135,17 @@ class TimetableUtils @Inject constructor() {
             coordinator.addAll(arrayOf(hoursCellWidth.toFloat(), yAxis, lineLength, yAxis))
         }
         return coordinator.toFloatArray()
+    }
+
+    fun getColumnsNumber(showSaturday: Boolean): Int {
+        var columnsNumber = 8
+        if (!showSaturday) columnsNumber -= 1
+        return columnsNumber
+    }
+
+    fun getNumHorizontalGridLines(showSaturday: Boolean): Int {
+        var numHorizontalGridLines = 6
+        if (!showSaturday) numHorizontalGridLines -= 1
+        return numHorizontalGridLines
     }
 }

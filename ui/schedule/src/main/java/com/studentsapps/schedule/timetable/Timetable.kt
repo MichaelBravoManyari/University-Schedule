@@ -32,8 +32,11 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
     private lateinit var daysOfMonthFont: Typeface
     private lateinit var binding: TimetableBinding
     private var is12HoursFormat = true
-    private var gridCellWidth = 0
+    private var showAsGrid = true
+    private var showSaturday = true
+    private var showSunday = true
     private var isMondayFirstDayOfWeek = true
+    private var gridCellWidth = 0
     val currentMonth = utils.getMonth()
 
     @Inject
@@ -90,23 +93,33 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
                     R.styleable.Timetable_is_monday_first_day_of_week, isMondayFirstDayOfWeek
                 )
 
+                showSaturday = getBoolean(R.styleable.Timetable_show_saturday, showSaturday)
+
+                showSunday = getBoolean(R.styleable.Timetable_show_sunday, showSunday)
             } finally {
                 recycle()
             }
         }
     }
 
+    fun setShowAsGrid(value: Boolean) {
+        showAsGrid = value
+        if (showAsGrid) displayGridView() else displayListView()
+    }
+
     private fun configureDaysOfWeekViews() {
         val daysOfWeekTextSize = getDimensionById(R.dimen.timetable_days_of_week_text_size)
         val daysOfWeekOrder = getDaysOfWeekOrder()
         val daysOfWeekViews = getDaysOfWeekViews()
+        hideIneligibleDaysOfWeekViews()
         configureDaysViews(daysOfWeekViews, daysOfWeekTextSize, daysOfWeekFont, daysOfWeekOrder)
     }
 
     private fun configureDaysOfMonthViews() {
-        val daysOfMonthCurrentWeek = utils.getDaysOfMonthOfWeek(isMondayFirstDayOfWeek)
+        val daysOfMonthCurrentWeek = utils.getDaysOfMonthOfWeek(isMondayFirstDayOfWeek, showSaturday)
         val daysOfMonthTextSize = getDimensionById(R.dimen.timetable_days_of_month_text_size)
         val daysOfMonthViews = getDaysOfMonthViews()
+        hideIneligibleDaysOfMonthViews()
         configureDaysViews(
             daysOfMonthViews,
             daysOfMonthTextSize,
@@ -150,36 +163,50 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
     }
 
     private fun getDaysOfWeekOrder(): List<String> {
-        return utils.getDaysOfWeekOrder(isMondayFirstDayOfWeek).map { resourceId ->
+        return utils.getDaysOfWeekOrder(isMondayFirstDayOfWeek, showSaturday).map { resourceId ->
             getStringById(resourceId)
         }
     }
 
     private fun getDaysOfWeekViews(): List<TextView> {
         return with(binding) {
-            listOf(
+            val daysOfWeekViews = mutableListOf(
                 startDayOfWeek,
                 secondDayOfWeek,
                 thirdDayOfWeek,
                 fourthDayOfWeek,
                 fifthDayOfWeek,
-                sixthDayOfWeek,
-                seventhDayOfWeek
+                sixthDayOfWeek
             )
+
+            if (showSaturday) daysOfWeekViews.add(seventhDayOfWeek)
+
+            daysOfWeekViews
         }
+    }
+
+    private fun hideIneligibleDaysOfWeekViews() {
+        if (!showSaturday) binding.seventhDayOfWeek.visibility = GONE
+    }
+
+    private fun hideIneligibleDaysOfMonthViews() {
+        if (!showSaturday) binding.seventhDay.visibility = GONE
     }
 
     private fun getDaysOfMonthViews(): List<TextView> {
         return with(binding) {
-            listOf(
+            val daysOfMonthViews = mutableListOf(
                 firstDay,
                 secondDay,
                 thirdDay,
                 fourthDay,
                 fifthDay,
-                sixthDay,
-                seventhDay
+                sixthDay
             )
+
+            if (showSaturday) daysOfMonthViews.add(seventhDay)
+
+            daysOfMonthViews
         }
     }
 
@@ -195,9 +222,31 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
             val hoursCellWidth = getDimensionPixelSizeById(R.dimen.timetable_hours_cell_width)
             calculateGridCellWidth(realRootViewWidth, hoursCellWidth)
             selectCurrentMonthDay()
-            val bitmapHoursGrid = createBitmapGridAndHours(realRootViewWidth, hoursCellWidth)
+            val bitmapHoursGrid = createBitmapGridAndHours(rootViewWidth, hoursCellWidth)
             setBitmapToHourDrawingGridContainer(bitmapHoursGrid)
+            provisionalListView()
         }
+    }
+
+    private fun displayListView() {
+        binding.apply {
+            hourDrawingContainerAndGrid.visibility = GONE
+            scheduleListContainer.visibility = VISIBLE
+        }
+    }
+
+    private fun displayGridView() {
+        binding.apply {
+            scheduleListContainer.visibility = GONE
+            hourDrawingContainerAndGrid.visibility = VISIBLE
+        }
+    }
+
+    private fun provisionalListView() {
+        val adapter = TimetableListAdapter()
+        binding.scheduleListContainer.adapter = adapter
+        val listString = mutableListOf("df", "hello")
+        adapter.submitList(listString)
     }
 
     private fun createBitmapGridAndHours(bitmapWidth: Int, hoursCellWidth: Int): Bitmap {
@@ -227,11 +276,12 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
         lineLength: Float
     ) {
         val lineWidth = getDimensionById(R.dimen.timetable_grid_lines_stroke_width)
+        val numHorizontalGridLines = utils.getNumHorizontalGridLines(showSaturday)
         val paintGrid = canvasRender.getPaintForGridLines(gridStrokeColor, lineWidth)
         val paintHalfHourLine =
             canvasRender.getPaintForGridLines(halfHourGridStrokeColor, lineWidth)
         val verticalLinesCoordinates = utils.getVerticalLinesCoordinates(
-            NUM_VERTICAL_GRID_LINES,
+            numHorizontalGridLines,
             hoursCellWidth,
             gridCellWidth,
             lineHeight
@@ -259,10 +309,11 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
     }
 
     private fun calculateGridCellWidth(realRootViewWidth: Int, hoursCellWidth: Int) {
+        val columnsNumber = utils.getColumnsNumber(showSaturday)
         gridCellWidth = utils.calculateGridCellWidth(
             realRootViewWidth,
             hoursCellWidth,
-            COLUMNS_NUMBER,
+            columnsNumber,
             COLUMNS_HOURS_NUMBER
         )
     }
@@ -322,10 +373,8 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
     }
 
     companion object {
-        private const val COLUMNS_NUMBER = 8
         private const val COLUMNS_HOURS_NUMBER = 1
         private const val ROWS_NUMBER = 24
-        private const val NUM_VERTICAL_GRID_LINES = 6
         private const val NUM_HORIZONTAL_GRID_LINES = 24
     }
 }

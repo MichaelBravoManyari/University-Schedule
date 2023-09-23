@@ -8,6 +8,7 @@
     <string name="sunday_abbr">Su</string>
     <string name="gridded_timetable_scrollable_container">Gridded timetable scrollable container</string>
     <string name="drawing_container_for_grid_and_time">Drawing container for grid and time</string>
+    <string name="change_timetable_view">Change timetable view</string>
     <string-array name="hours_in_24_hour_format">
         <item>1:00</item>
         <item>2:00</item>

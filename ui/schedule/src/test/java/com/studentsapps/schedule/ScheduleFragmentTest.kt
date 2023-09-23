@@ -1,6 +1,11 @@
 package com.studentsapps.schedule
 
 import androidx.appcompat.app.AppCompatActivity
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.studentsapps.schedule.timetable.TimetableUtils
 import dagger.hilt.android.testing.BindValue
@@ -31,10 +36,25 @@ class ScheduleFragmentTest {
     fun verifyCurrentMonthDisplayedInAppBar() {
         every { timetableUtils.getMonth(any()) } returns "July"
         launchFragmentInHiltContainer<ScheduleFragment> {
-            this as ScheduleFragment
             val expectedMonth = "July"
             val realMonth = (requireActivity() as AppCompatActivity).supportActionBar?.title
             assertThat(realMonth, `is`(expectedMonth))
         }
+    }
+
+    @Test
+    fun verifyAppBarMenuOptionsDisplayed() {
+        launchFragmentInHiltContainer<ScheduleFragment>()
+        onView(withId(R.id.change_timetable_view)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun verifyTimetableViewsChange() {
+        launchFragmentInHiltContainer<ScheduleFragment>()
+        verifyTimetableGridViewIsDisplayed()
+        onView(withId(R.id.change_timetable_view)).perform(click())
+        verifyTimetableListViewIsDisplayed()
+        onView(withId(R.id.change_timetable_view)).perform(click())
+        verifyTimetableGridViewIsDisplayed()
     }
 }

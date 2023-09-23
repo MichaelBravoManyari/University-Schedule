@@ -8,5 +8,7 @@
         <attr name="days_of_month_font" format="reference" />
         <attr name="is_12_hours_format" format="boolean" />
         <attr name="is_monday_first_day_of_week" format="boolean" />
+        <attr name="show_saturday" format="boolean" />
+        <attr name="show_sunday" format="boolean" />
     </declare-styleable>
 </resources>

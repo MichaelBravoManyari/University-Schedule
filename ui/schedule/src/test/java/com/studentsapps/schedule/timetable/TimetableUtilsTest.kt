@@ -1,42 +1,64 @@
 package com.studentsapps.schedule.timetable
 
 import com.studentsapps.schedule.R
-import io.mockk.mockk
 import org.hamcrest.CoreMatchers.`is`
 import org.junit.Test
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers
 import org.junit.Assert.assertThrows
-import org.robolectric.annotation.Config
 import java.time.LocalDate
-import java.time.format.TextStyle
-import java.util.Locale
 
 class TimetableUtilsTest {
 
     private val utils = TimetableUtils()
 
     @Test
-    fun getDaysOfMonthOfWeek_isMondayFirstDaysOfWeekRandomDate_returnDaysOfMonthOfWeek() {
+    fun getDaysOfMonthOfWeek_isMondayFirstDaysOfWeekShowSaturdayRandomDate_returnDaysOfMonthOfWeek() {
         val isMondayFirstDayOfWeek = true
+        val showSaturday = true
         val date = LocalDate.of(2023, 7, 18)
         val expectedDays = listOf("17", "18", "19", "20", "21", "22", "23")
-        val daysOfWeekOfMonth = utils.getDaysOfMonthOfWeek(isMondayFirstDayOfWeek, date)
-        assertThat(daysOfWeekOfMonth, Matchers.`is`(expectedDays))
+        val daysOfWeekOfMonth =
+            utils.getDaysOfMonthOfWeek(isMondayFirstDayOfWeek, showSaturday, date)
+        assertThat(daysOfWeekOfMonth, `is`(expectedDays))
     }
 
     @Test
-    fun getDaysOfMonthOfWeek_isSundayFirstDaysOfWeekRandomDate_returnDaysOfMonthOfWeek() {
+    fun getDaysOfMonthOfWeek_isMondayFirstDaysOfWeekNoShowSaturdayRandomDate_returnDaysOfMonthOfWeek() {
+        val isMondayFirstDayOfWeek = true
+        val showSaturday = false
+        val date = LocalDate.of(2023, 7, 18)
+        val expectedDays = listOf("17", "18", "19", "20", "21", "23")
+        val daysOfWeekOfMonth =
+            utils.getDaysOfMonthOfWeek(isMondayFirstDayOfWeek, showSaturday, date)
+        assertThat(daysOfWeekOfMonth, `is`(expectedDays))
+    }
+
+    @Test
+    fun getDaysOfMonthOfWeek_isSundayFirstDaysOfWeekShowSaturdayRandomDate_returnDaysOfMonthOfWeek() {
         val isMondayFirstDayOfWeek = false
+        val showSaturday = true
         val date = LocalDate.of(2023, 10, 30)
         val expectedDays = listOf("29", "30", "31", "1", "2", "3", "4")
-        val daysOfWeekOfMonth = utils.getDaysOfMonthOfWeek(isMondayFirstDayOfWeek, date)
-        assertThat(daysOfWeekOfMonth, Matchers.`is`(expectedDays))
+        val daysOfWeekOfMonth =
+            utils.getDaysOfMonthOfWeek(isMondayFirstDayOfWeek, showSaturday, date)
+        assertThat(daysOfWeekOfMonth, `is`(expectedDays))
     }
 
     @Test
-    fun getDaysOfWeekOrder_isMondayFirstDaysOfWeek_returnsDaysOfWeek() {
+    fun getDaysOfMonthOfWeek_isSundayFirstDaysOfWeekNoShowSaturdayRandomDate_returnDaysOfMonthOfWeek() {
+        val isMondayFirstDayOfWeek = false
+        val showSaturday = false
+        val date = LocalDate.of(2023, 10, 30)
+        val expectedDays = listOf("29", "30", "31", "1", "2", "3")
+        val daysOfWeekOfMonth =
+            utils.getDaysOfMonthOfWeek(isMondayFirstDayOfWeek, showSaturday, date)
+        assertThat(daysOfWeekOfMonth, `is`(expectedDays))
+    }
+
+    @Test
+    fun getDaysOfWeekOrder_isMondayFirstDaysOfWeekShowSaturday_returnsDaysOfWeek() {
         val isMondayFirstDayOfWeek = true
+        val showSaturday = true
         val expectedDaysOfWeekOrder = listOf(
             R.string.monday_abbr,
             R.string.tuesday_abbr,
@@ -46,13 +68,30 @@ class TimetableUtilsTest {
             R.string.saturday_abbr,
             R.string.sunday_abbr
         )
-        val daysOfWeekOrder = utils.getDaysOfWeekOrder(isMondayFirstDayOfWeek)
-        assertThat(daysOfWeekOrder, Matchers.`is`(expectedDaysOfWeekOrder))
+        val daysOfWeekOrder = utils.getDaysOfWeekOrder(isMondayFirstDayOfWeek, showSaturday)
+        assertThat(daysOfWeekOrder, `is`(expectedDaysOfWeekOrder))
     }
 
     @Test
-    fun getDaysOfWeekOrder_isSundayFirstDaysOfWeek_returnsDaysOfWeek() {
+    fun getDaysOfWeekOrder_isMondayFirstDaysOfWeekNotShowSaturday_returnsDaysOfWeek() {
+        val isMondayFirstDayOfWeek = true
+        val showSaturday = false
+        val expectedDaysOfWeekOrder = listOf(
+            R.string.monday_abbr,
+            R.string.tuesday_abbr,
+            R.string.wednesday_abbr,
+            R.string.thursday_abbr,
+            R.string.friday_abbr,
+            R.string.sunday_abbr
+        )
+        val daysOfWeekOrder = utils.getDaysOfWeekOrder(isMondayFirstDayOfWeek, showSaturday)
+        assertThat(daysOfWeekOrder, `is`(expectedDaysOfWeekOrder))
+    }
+
+    @Test
+    fun getDaysOfWeekOrder_isSundayFirstDaysOfWeekShowSaturday_returnsDaysOfWeek() {
         val isMondayFirstDayOfWeek = false
+        val showSaturday = true
         val expectedDaysOfWeekOrder = listOf(
             R.string.sunday_abbr,
             R.string.monday_abbr,
@@ -62,8 +101,24 @@ class TimetableUtilsTest {
             R.string.friday_abbr,
             R.string.saturday_abbr
         )
-        val daysOfWeekOrder = utils.getDaysOfWeekOrder(isMondayFirstDayOfWeek)
-        assertThat(daysOfWeekOrder, Matchers.`is`(expectedDaysOfWeekOrder))
+        val daysOfWeekOrder = utils.getDaysOfWeekOrder(isMondayFirstDayOfWeek, showSaturday)
+        assertThat(daysOfWeekOrder, `is`(expectedDaysOfWeekOrder))
+    }
+
+    @Test
+    fun getDaysOfWeekOrder_isSundayFirstDaysOfWeekNotShowSaturday_returnsDaysOfWeek() {
+        val isMondayFirstDayOfWeek = false
+        val showSaturday = false
+        val expectedDaysOfWeekOrder = listOf(
+            R.string.sunday_abbr,
+            R.string.monday_abbr,
+            R.string.tuesday_abbr,
+            R.string.wednesday_abbr,
+            R.string.thursday_abbr,
+            R.string.friday_abbr
+        )
+        val daysOfWeekOrder = utils.getDaysOfWeekOrder(isMondayFirstDayOfWeek, showSaturday)
+        assertThat(daysOfWeekOrder, `is`(expectedDaysOfWeekOrder))
     }
 
     @Test
@@ -179,5 +234,33 @@ class TimetableUtilsTest {
         val expectedMonth = "July"
         val realMonth = utils.getMonth(date)
         assertThat(realMonth, `is`(expectedMonth))
+    }
+
+    @Test
+    fun getColumnsNumber_showSunday_return8() {
+        val expectedColumnsNumber = 8
+        val realColumnsNumber = utils.getColumnsNumber(true)
+        assertThat(realColumnsNumber, `is`(expectedColumnsNumber))
+    }
+
+    @Test
+    fun getColumnsNumber_notShowSunday_return7() {
+        val expectedColumnsNumber = 7
+        val realColumnsNumber = utils.getColumnsNumber(false)
+        assertThat(realColumnsNumber, `is`(expectedColumnsNumber))
+    }
+
+    @Test
+    fun getNumHorizontalGridLines_showSunday_return6() {
+        val expectedNumHorizontalGridLines = 6
+        val realNumHorizontalGridLines = utils.getNumHorizontalGridLines(true)
+        assertThat(realNumHorizontalGridLines, `is`(expectedNumHorizontalGridLines))
+    }
+
+    @Test
+    fun getNumHorizontalGridLines_notShowSunday_return5() {
+        val expectedNumHorizontalGridLines = 5
+        val realNumHorizontalGridLines = utils.getNumHorizontalGridLines(false)
+        assertThat(realNumHorizontalGridLines, `is`(expectedNumHorizontalGridLines))
     }
 }
