@@ -4,10 +4,8 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Typeface
-import android.graphics.drawable.Drawable
 import androidx.annotation.ColorInt
 import androidx.annotation.Dimension
-import androidx.core.graphics.drawable.toDrawable
 import javax.inject.Inject
 
 class TimetableCanvasRender @Inject constructor() {

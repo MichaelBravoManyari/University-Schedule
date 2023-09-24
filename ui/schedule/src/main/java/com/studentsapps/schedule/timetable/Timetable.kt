@@ -116,7 +116,8 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
     }
 
     private fun configureDaysOfMonthViews() {
-        val daysOfMonthCurrentWeek = utils.getDaysOfMonthOfWeek(isMondayFirstDayOfWeek, showSaturday)
+        val daysOfMonthCurrentWeek =
+            utils.getDaysOfMonthOfWeek(isMondayFirstDayOfWeek, showSaturday, showSunday)
         val daysOfMonthTextSize = getDimensionById(R.dimen.timetable_days_of_month_text_size)
         val daysOfMonthViews = getDaysOfMonthViews()
         hideIneligibleDaysOfMonthViews()
@@ -163,9 +164,10 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
     }
 
     private fun getDaysOfWeekOrder(): List<String> {
-        return utils.getDaysOfWeekOrder(isMondayFirstDayOfWeek, showSaturday).map { resourceId ->
-            getStringById(resourceId)
-        }
+        return utils.getDaysOfWeekOrder(isMondayFirstDayOfWeek, showSaturday, showSunday)
+            .map { resourceId ->
+                getStringById(resourceId)
+            }
     }
 
     private fun getDaysOfWeekViews(): List<TextView> {
@@ -175,22 +177,16 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
                 secondDayOfWeek,
                 thirdDayOfWeek,
                 fourthDayOfWeek,
-                fifthDayOfWeek,
-                sixthDayOfWeek
+                fifthDayOfWeek
             )
 
-            if (showSaturday) daysOfWeekViews.add(seventhDayOfWeek)
+            if (showSaturday && showSunday)
+                daysOfWeekViews.addAll(listOf(binding.sixthDayOfWeek, binding.seventhDayOfWeek))
+            else if (showSaturday || showSunday)
+                daysOfWeekViews.add(binding.sixthDayOfWeek)
 
             daysOfWeekViews
         }
-    }
-
-    private fun hideIneligibleDaysOfWeekViews() {
-        if (!showSaturday) binding.seventhDayOfWeek.visibility = GONE
-    }
-
-    private fun hideIneligibleDaysOfMonthViews() {
-        if (!showSaturday) binding.seventhDay.visibility = GONE
     }
 
     private fun getDaysOfMonthViews(): List<TextView> {
@@ -200,13 +196,35 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
                 secondDay,
                 thirdDay,
                 fourthDay,
-                fifthDay,
-                sixthDay
+                fifthDay
             )
 
-            if (showSaturday) daysOfMonthViews.add(seventhDay)
+            if (showSaturday && showSunday)
+                daysOfMonthViews.addAll(listOf(binding.sixthDay, binding.seventhDay))
+            else if (showSaturday || showSunday)
+                daysOfMonthViews.add(binding.sixthDay)
 
             daysOfMonthViews
+        }
+    }
+
+    private fun hideIneligibleDaysOfWeekViews() {
+        with(binding) {
+            if (!showSaturday && !showSunday) {
+                sixthDayOfWeek.visibility = GONE
+                seventhDayOfWeek.visibility = GONE
+            } else if (!showSaturday || !showSunday)
+                seventhDayOfWeek.visibility = GONE
+        }
+    }
+
+    private fun hideIneligibleDaysOfMonthViews() {
+        with(binding) {
+            if (!showSaturday && !showSunday) {
+                sixthDay.visibility = GONE
+                seventhDay.visibility = GONE
+            } else if (!showSaturday || !showSunday)
+                seventhDay.visibility = GONE
         }
     }
 
@@ -276,7 +294,7 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
         lineLength: Float
     ) {
         val lineWidth = getDimensionById(R.dimen.timetable_grid_lines_stroke_width)
-        val numHorizontalGridLines = utils.getNumHorizontalGridLines(showSaturday)
+        val numHorizontalGridLines = utils.getNumHorizontalGridLines(showSaturday, showSunday)
         val paintGrid = canvasRender.getPaintForGridLines(gridStrokeColor, lineWidth)
         val paintHalfHourLine =
             canvasRender.getPaintForGridLines(halfHourGridStrokeColor, lineWidth)
@@ -309,7 +327,7 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
     }
 
     private fun calculateGridCellWidth(realRootViewWidth: Int, hoursCellWidth: Int) {
-        val columnsNumber = utils.getColumnsNumber(showSaturday)
+        val columnsNumber = utils.getColumnsNumber(showSaturday, showSunday)
         gridCellWidth = utils.calculateGridCellWidth(
             realRootViewWidth,
             hoursCellWidth,

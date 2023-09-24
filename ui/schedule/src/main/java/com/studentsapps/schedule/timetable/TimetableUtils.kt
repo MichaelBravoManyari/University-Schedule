@@ -13,6 +13,7 @@ class TimetableUtils @Inject constructor() {
     fun getDaysOfMonthOfWeek(
         isMondayFirstDayOfWeek: Boolean,
         showSaturday: Boolean,
+        showSunday: Boolean,
         date: LocalDate = LocalDate.now()
     ): List<String> {
         val formatter = DateTimeFormatter.ofPattern("d")
@@ -24,6 +25,10 @@ class TimetableUtils @Inject constructor() {
                 .toMutableList()
 
         if (!showSaturday) removeSaturdayFromDaysOfWeek(isMondayFirstDayOfWeek, daysOfMonthOfWeek)
+
+        if (!showSunday) {
+            if (isMondayFirstDayOfWeek) daysOfMonthOfWeek.removeLast() else daysOfMonthOfWeek.removeFirst()
+        }
 
         return daysOfMonthOfWeek
     }
@@ -47,7 +52,11 @@ class TimetableUtils @Inject constructor() {
             }
     }
 
-    fun getDaysOfWeekOrder(isMondayFirstDayOfWeek: Boolean, showSaturday: Boolean): List<Int> {
+    fun getDaysOfWeekOrder(
+        isMondayFirstDayOfWeek: Boolean,
+        showSaturday: Boolean,
+        showSunday: Boolean
+    ): List<Int> {
         var orderList = mutableListOf(
             R.string.monday_abbr,
             R.string.tuesday_abbr,
@@ -58,12 +67,14 @@ class TimetableUtils @Inject constructor() {
 
         if (showSaturday) orderList.add(R.string.saturday_abbr)
 
-        if (isMondayFirstDayOfWeek)
-            orderList.add(R.string.sunday_abbr)
-        else {
-            val baseOrderList = orderList
-            orderList = mutableListOf(R.string.sunday_abbr)
-            orderList.addAll(baseOrderList)
+        if (showSunday) {
+            if (isMondayFirstDayOfWeek)
+                orderList.add(R.string.sunday_abbr)
+            else {
+                val baseOrderList = orderList
+                orderList = mutableListOf(R.string.sunday_abbr)
+                orderList.addAll(baseOrderList)
+            }
         }
 
         return orderList
@@ -137,15 +148,21 @@ class TimetableUtils @Inject constructor() {
         return coordinator.toFloatArray()
     }
 
-    fun getColumnsNumber(showSaturday: Boolean): Int {
+    fun getColumnsNumber(showSaturday: Boolean, showSunday: Boolean): Int {
         var columnsNumber = 8
-        if (!showSaturday) columnsNumber -= 1
+        if (!showSaturday && !showSunday)
+            columnsNumber -= 2
+        else if (!showSaturday || !showSunday)
+            columnsNumber -= 1
         return columnsNumber
     }
 
-    fun getNumHorizontalGridLines(showSaturday: Boolean): Int {
+    fun getNumHorizontalGridLines(showSaturday: Boolean, showSunday: Boolean): Int {
         var numHorizontalGridLines = 6
-        if (!showSaturday) numHorizontalGridLines -= 1
+        if (!showSaturday && !showSunday)
+            numHorizontalGridLines -= 2
+        else if (!showSaturday || !showSunday)
+            numHorizontalGridLines -= 1
         return numHorizontalGridLines
     }
 }
