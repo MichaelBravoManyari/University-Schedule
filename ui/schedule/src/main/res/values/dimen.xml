@@ -8,4 +8,6 @@
     <dimen name="timetable_grid_lines_stroke_width">1dp</dimen>
     <dimen name="timetable_days_of_month_padding">3dp</dimen>
     <dimen name="timetable_days_of_month_margin">5dp</dimen>
+    <dimen name="timetable_schedule_bottom_margin">2dp</dimen>
+    <dimen name="timetable_schedule_end_margin">2dp</dimen>
 </resources>

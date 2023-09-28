@@ -3,6 +3,7 @@ package com.studentsapps.schedule.timetable
 import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
@@ -20,6 +21,7 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.drawable.toDrawable
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.scrollTo
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.BoundedMatcher
 import androidx.test.espresso.matcher.ViewMatchers.*
@@ -45,6 +47,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
 import org.robolectric.annotation.Config
+import java.time.DayOfWeek
+import java.time.LocalTime
 
 @Config(application = HiltTestApplication::class, sdk = [33])
 @HiltAndroidTest
@@ -337,6 +341,70 @@ class TimetableTest {
         verify { utils.getVerticalLinesCoordinates(4, any(), any(), any()) }
     }
 
+    @Test
+    @Config(qualifiers = "w360dp-h640dp")
+    fun showSchedulesInGrid_schedules() {
+        val timetable = createTimetable()
+        onView(withId(R.id.schedule_container_and_grid)).check(matches(isDisplayed()))
+        timetable.showScheduleInGrid(schedules)
+
+        val hourCellWidth = getDimensionPixelSizeById(R.dimen.timetable_hours_cell_width)
+        val cellHeight = getDimensionPixelSizeById(R.dimen.timetable_grid_cell_height)
+        val scheduleBottomMargin =
+            getDimensionPixelSizeById(R.dimen.timetable_schedule_bottom_margin)
+        val scheduleEndMargin = getDimensionPixelSizeById(R.dimen.timetable_schedule_end_margin)
+        val cellWidth = (360 - hourCellWidth) / 7
+
+        val expectedMath1XCoordinate = hourCellWidth.toFloat()
+        val expectedMath1YCoordinate = 12f * cellHeight
+        val expectedMath1Width = (cellWidth / 2) - scheduleEndMargin
+        val expectedMath1Height = cellHeight - scheduleBottomMargin
+
+        val expectedMath2XCoordinate = (hourCellWidth + cellWidth).toFloat()
+        val expectedMath2YCoordinate = 13f * cellHeight
+        val expectedMath2Width = cellWidth - scheduleEndMargin
+        val expectedMath2Height = cellHeight - scheduleBottomMargin
+
+        val expectedMath3XCoordinate =
+            (hourCellWidth + expectedMath1Width + scheduleBottomMargin).toFloat()
+        val expectedMath3YCoordinate = 12.5f * cellHeight
+        val expectedMath3Width = (cellWidth / 2) - scheduleEndMargin
+        val expectedMath3Height = cellHeight - scheduleBottomMargin
+
+        val expectedMath4XCoordinate = (hourCellWidth + (2 * cellWidth)).toFloat()
+        val expectedMath4YCoordinate = 12f * cellHeight
+        val expectedMath4Width = cellWidth- scheduleEndMargin
+        val expectedMath4Height = cellHeight - scheduleBottomMargin
+
+        onView(withContentDescription("1"))
+            .perform(scrollTo())
+            .check(matches(isDisplayed()))
+            .check(matches(withText("Math 1")))
+            .check(matches(withXYCoordinates(expectedMath1XCoordinate, expectedMath1YCoordinate)))
+            .check(matches(withMeasures(expectedMath1Width, expectedMath1Height)))
+
+        onView(withContentDescription("2"))
+            .perform(scrollTo())
+            .check(matches(isDisplayed()))
+            .check(matches(withText("Math 2")))
+            .check(matches(withXYCoordinates(expectedMath2XCoordinate, expectedMath2YCoordinate)))
+            .check(matches(withMeasures(expectedMath2Width, expectedMath2Height)))
+
+        onView(withContentDescription("3"))
+            .perform(scrollTo())
+            .check(matches(isDisplayed()))
+            .check(matches(withText("Math 3")))
+            .check(matches(withXYCoordinates(expectedMath3XCoordinate, expectedMath3YCoordinate)))
+            .check(matches(withMeasures(expectedMath3Width, expectedMath3Height)))
+
+        onView(withContentDescription("4"))
+            .perform(scrollTo())
+            .check(matches(isDisplayed()))
+            .check(matches(withText("Math 4")))
+            .check(matches(withXYCoordinates(expectedMath4XCoordinate, expectedMath4YCoordinate)))
+            .check(matches(withMeasures(expectedMath4Width, expectedMath4Height)))
+    }
+
     private fun createTimetable(attr: AttributeSet? = null, showAsGrid: Boolean = true): Timetable {
         var timetable: Timetable? = null
         launchFragmentInHiltContainer<TestFragment> {
@@ -549,6 +617,34 @@ class TimetableTest {
         }
     }
 
+    private fun withXYCoordinates(x: Float, y: Float): Matcher<View> {
+        return object : BoundedMatcher<View, TextView>(TextView::class.java) {
+            override fun describeTo(description: Description?) {
+                description?.appendText("with X and Y coordinates: ")
+                description?.appendValue("$x and $y")
+            }
+
+            override fun matchesSafely(item: TextView?): Boolean {
+                return (item?.x == x && item.y == y)
+            }
+
+        }
+    }
+
+    private fun withMeasures(width: Int, height: Int): Matcher<View> {
+        return object : BoundedMatcher<View, TextView>(TextView::class.java) {
+            override fun describeTo(description: Description?) {
+                description?.appendText("with measures: ")
+                description?.appendValue("$width and $height")
+            }
+
+            override fun matchesSafely(item: TextView?): Boolean {
+                return (item?.width == width && item.height == height)
+            }
+
+        }
+    }
+
     companion object {
         private val fakeDaysOfWeekStartingMonday = listOf(
             R.string.monday_abbr_test,
@@ -568,6 +664,45 @@ class TimetableTest {
             R.string.thursday_abbr_test,
             R.string.friday_abbr_test,
             R.string.saturday_abbr_test
+        )
+
+        private val schedules = listOf(
+            Schedule(
+                1,
+                LocalTime.of(12, 0),
+                LocalTime.of(13, 0),
+                "classroom 1",
+                DayOfWeek.MONDAY,
+                "Math 1",
+                Color.CYAN
+            ),
+            Schedule(
+                2,
+                LocalTime.of(13, 0),
+                LocalTime.of(14, 0),
+                "classroom 2",
+                DayOfWeek.TUESDAY,
+                "Math 2",
+                Color.BLUE
+            ),
+            Schedule(
+                3,
+                LocalTime.of(12, 30),
+                LocalTime.of(13, 30),
+                "classroom 3",
+                DayOfWeek.MONDAY,
+                "Math 3",
+                Color.DKGRAY
+            ),
+            Schedule(
+                4,
+                LocalTime.of(12, 0),
+                LocalTime.of(13, 0),
+                "classroom 1",
+                DayOfWeek.WEDNESDAY,
+                "Math 4",
+                Color.RED
+            )
         )
 
         private val fakeDaysOfMonthCurrentWeekStartingMonday =

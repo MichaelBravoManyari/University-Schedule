@@ -3,8 +3,10 @@ package com.studentsapps.schedule.timetable
 import com.studentsapps.schedule.R
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
+import java.time.temporal.ChronoUnit
 import java.util.Locale
 import javax.inject.Inject
 
@@ -164,5 +166,59 @@ class TimetableUtils @Inject constructor() {
         else if (!showSaturday || !showSunday)
             numHorizontalGridLines -= 1
         return numHorizontalGridLines
+    }
+
+    fun calculateCrossScheduleViewWidth(
+        gridCellWidth: Int,
+        crossedSchedulesCount: Int,
+        scheduleEndMargin: Int
+    ): Int {
+        return (gridCellWidth / crossedSchedulesCount) - scheduleEndMargin
+    }
+
+    fun calculateSingleScheduleViewWidth(gridCellWidth: Int, scheduleEndMargin: Int): Int {
+        return gridCellWidth - scheduleEndMargin
+    }
+
+    fun calculateScheduleViewHeight(
+        startTime: LocalTime,
+        endTime: LocalTime,
+        cellHeight: Int,
+        scheduleBottomMargin: Int
+    ): Int {
+        val minutesDifference = ChronoUnit.MINUTES.between(startTime, endTime)
+        val minutesInDecimals = convertMinutesToDecimals(minutesDifference)
+        return (minutesInDecimals * cellHeight).toInt() - scheduleBottomMargin
+    }
+
+    fun calculateTopMarginScheduleView(startTime: LocalTime, cellHeight: Int): Int {
+        val localTimeInDecimals = convertLocalTimeToDecimals(startTime)
+        return (localTimeInDecimals * cellHeight).toInt()
+    }
+
+    fun calculateStartMarginSingleScheduleView(
+        hoursCellWidth: Int,
+        gridCellWidth: Int,
+        day: DayOfWeek
+    ): Int {
+        return hoursCellWidth + (gridCellWidth * (day.value - 1))
+    }
+
+    fun calculateStartMarginCrossScheduleView(
+        hoursCellWidth: Int,
+        gridCellWidth: Int,
+        day: DayOfWeek,
+        crossedSchedulesCount: Int,
+        crossScheduleIndex: Int
+    ): Int {
+        return hoursCellWidth + (gridCellWidth * (day.value - 1)) + ((gridCellWidth / crossedSchedulesCount) * crossScheduleIndex)
+    }
+
+    private fun convertMinutesToDecimals(minutes: Long): Double {
+        return (minutes / 60) + ((minutes % 60) / 60.0)
+    }
+
+    private fun convertLocalTimeToDecimals(localTime: LocalTime): Double {
+        return localTime.hour + (localTime.minute / 60.0)
     }
 }

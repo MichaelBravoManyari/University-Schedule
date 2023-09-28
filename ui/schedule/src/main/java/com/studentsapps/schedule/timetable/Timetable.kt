@@ -5,7 +5,9 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Typeface
 import android.util.AttributeSet
+import android.view.Gravity
 import android.view.LayoutInflater
+import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.annotation.ArrayRes
 import androidx.annotation.ColorRes
@@ -16,9 +18,12 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toDrawable
+import com.google.android.material.textview.MaterialTextView
 import com.studentsapps.schedule.R
 import com.studentsapps.schedule.databinding.TimetableBinding
 import dagger.hilt.android.AndroidEntryPoint
+import java.time.DayOfWeek
+import java.time.LocalTime
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -390,9 +395,197 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
         return resources.getDimension(dimenId)
     }
 
+    fun showScheduleInGrid(schedules: List<Schedule>) {
+        schedules.groupByDayOfWeek().forEach { (dayOfWeek, schedulesForOneDayOfWeek) ->
+            val scheduleCrossing = schedulesForOneDayOfWeek.getCrossSchedules()
+            val uniqueSchedules = schedulesForOneDayOfWeek.getUniqueSchedules()
+
+            scheduleCrossing.forEach { crossSchedules ->
+                crossSchedules.forEachIndexed { index, schedule ->
+                    val crossedSchedulesCount = crossSchedules.size
+                    addScheduleToGrid(schedule, crossedSchedulesCount, index)
+                }
+            }
+
+            uniqueSchedules.forEach { uniqueSchedule ->
+                addScheduleToGrid(uniqueSchedule)
+            }
+        }
+    }
+
+    private fun addScheduleToGrid(schedule: Schedule, crossedSchedulesCount: Int = 1, index: Int = 0) {
+        with(schedule) {
+            val scheduleView = createScheduleView(id, courseName, startTime, endTime, day, crossedSchedulesCount, index)
+            binding.scheduleContainerAndGrid.addView(scheduleView)
+        }
+    }
+
+    private fun createScheduleView(
+        id: Int,
+        courseName: String,
+        startTime: LocalTime,
+        endTime: LocalTime,
+        day: DayOfWeek,
+        crossedSchedulesCount: Int = 1,
+        crossScheduleIndex: Int = 0
+    ): MaterialTextView {
+        val layoutParams = getScheduleViewLayoutParams(
+            startTime,
+            endTime,
+            day,
+            crossedSchedulesCount,
+            crossScheduleIndex
+        )
+        return MaterialTextView(context).apply {
+            contentDescription = id.toString()
+            text = courseName
+            gravity = Gravity.CENTER
+            this.layoutParams = layoutParams
+        }
+    }
+
+    private fun getScheduleViewLayoutParams(
+        startTime: LocalTime,
+        endTime: LocalTime,
+        day: DayOfWeek,
+        crossedSchedulesCount: Int = 1,
+        crossScheduleIndex: Int = 0
+    ): RelativeLayout.LayoutParams {
+        val scheduleEndMargin = getDimensionPixelSizeById(R.dimen.timetable_schedule_end_margin)
+        val cellHeight = getDimensionPixelSizeById(R.dimen.timetable_grid_cell_height)
+        val hoursCellWidth = getDimensionPixelSizeById(R.dimen.timetable_hours_cell_width)
+        val scheduleBottomMargin =
+            getDimensionPixelSizeById(R.dimen.timetable_schedule_bottom_margin)
+
+        val width = when (crossedSchedulesCount) {
+            1 -> utils.calculateSingleScheduleViewWidth(gridCellWidth, scheduleEndMargin)
+            else -> utils.calculateCrossScheduleViewWidth(
+                gridCellWidth,
+                crossedSchedulesCount,
+                scheduleEndMargin
+            )
+        }
+
+        val height =
+            utils.calculateScheduleViewHeight(startTime, endTime, cellHeight, scheduleBottomMargin)
+        val topMargin = utils.calculateTopMarginScheduleView(startTime, cellHeight)
+        val startMargin = when (crossedSchedulesCount) {
+            1 -> utils.calculateStartMarginSingleScheduleView(hoursCellWidth, gridCellWidth, day)
+            else -> utils.calculateStartMarginCrossScheduleView(
+                hoursCellWidth,
+                gridCellWidth,
+                day,
+                crossedSchedulesCount,
+                crossScheduleIndex
+            )
+        }
+
+        val layoutParams = RelativeLayout.LayoutParams(width, height).apply {
+            addRule(RelativeLayout.ALIGN_PARENT_START)
+            addRule(RelativeLayout.ALIGN_PARENT_TOP)
+            setMargins(startMargin, topMargin, 0, 0)
+        }
+
+        return layoutParams
+    }
+
     companion object {
         private const val COLUMNS_HOURS_NUMBER = 1
         private const val ROWS_NUMBER = 24
         private const val NUM_HORIZONTAL_GRID_LINES = 24
     }
+}
+
+data class Schedule(
+    val id: Int,
+    val startTime: LocalTime,
+    val endTime: LocalTime,
+    val classPlace: String,
+    val day: DayOfWeek,
+    val courseName: String,
+    val color: Int
+)
+
+fun List<Schedule>.groupByDayOfWeek(): Map<DayOfWeek, List<Schedule>> {
+    return groupBy { it.day }
+}
+
+fun List<Schedule>.getCrossSchedules(): List<List<Schedule>> {
+    val list1 = mutableListOf<MutableList<Schedule>>()
+    for (i in 0 until size - 1) {
+        val schedule = this[i]
+        val list2 = mutableListOf<Schedule>()
+        if (!list1.scheduleContains(schedule))
+            list2.add(schedule)
+
+        for (j in i + 1 until size) {
+            val scheduleToCompare = this[j]
+            if (schedule.isCrossingSchedules(scheduleToCompare)) {
+                if (!list1.scheduleContains(schedule))
+                    list2.add(scheduleToCompare)
+                else
+                    list1.addScheduleToList(schedule, scheduleToCompare)
+            }
+        }
+
+        if (list2.isNotEmpty())
+            list1.add(list2)
+    }
+
+    for (list in list1) {
+        list.sortBy {
+            it.startTime
+        }
+    }
+
+    return list1
+}
+
+fun List<Schedule>.getUniqueSchedules(): List<Schedule> {
+    return if (count() == 1)
+        this
+    else {
+        val uniqueSchedules = mutableListOf<Schedule>()
+        for (i in 0 until size - 1) {
+            val schedule = this[i]
+            var isUnique = true
+            for (j in i + 1 until size) {
+                val scheduleToCompare = this[j]
+                if (schedule.isCrossingSchedules(scheduleToCompare)) {
+                    isUnique = false
+                    break
+                }
+            }
+            if (isUnique) uniqueSchedules.add(schedule)
+        }
+        uniqueSchedules
+    }
+}
+
+fun List<List<Schedule>>.scheduleContains(schedule: Schedule): Boolean {
+    for (list in this) {
+        if (schedule in list)
+            return true
+    }
+    return false
+}
+
+fun List<MutableList<Schedule>>.addScheduleToList(
+    scheduleToCompare: Schedule,
+    scheduleToAdd: Schedule
+) {
+    for (list in this) {
+        if (scheduleToCompare in list) {
+            list.add(scheduleToAdd)
+            break
+        }
+    }
+}
+
+fun Schedule.isCrossingSchedules(scheduleToCompare: Schedule): Boolean {
+    val startHourSchedule = this.startTime
+    val endHourSchedule = this.endTime
+    val startHourScheduleCompare = scheduleToCompare.startTime
+    val endHourScheduleCompare = scheduleToCompare.endTime
+    return startHourSchedule < endHourScheduleCompare && endHourSchedule > startHourScheduleCompare
 }
