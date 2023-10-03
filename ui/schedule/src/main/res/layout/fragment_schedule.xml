@@ -19,6 +19,9 @@
             android:id="@+id/timetable"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            app:show_saturday="false"
+            app:show_sunday="false"
+            app:is_monday_first_day_of_week="false"
             app:showAsGrid="@{scheduleFragment.showAsGrid}"/>
     </FrameLayout>
 </layout>

@@ -5,4 +5,6 @@
     <color name="timetable_default_hours_text_color">#747476</color>
     <color name="timetable_current_month_day_text_color">@color/secondary_color</color>
     <color name="timetable_current_month_day_background_color">@color/accent_color</color>
+    <color name="timetable_schedule_view_light_text_color">#ffffff</color>
+    <color name="timetable_schedule_view_dark_text_color">#4f4f4f</color>
 </resources>

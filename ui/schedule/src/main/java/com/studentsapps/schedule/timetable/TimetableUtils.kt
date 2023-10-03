@@ -199,19 +199,44 @@ class TimetableUtils @Inject constructor() {
     fun calculateStartMarginSingleScheduleView(
         hoursCellWidth: Int,
         gridCellWidth: Int,
-        day: DayOfWeek
+        day: DayOfWeek,
+        isMondayFirstDayOfWeek: Boolean,
+        showSaturday: Boolean,
+        showSunday: Boolean
     ): Int {
-        return hoursCellWidth + (gridCellWidth * (day.value - 1))
+        return if (isMondayFirstDayOfWeek || !showSunday) {
+            val offset = if (!showSaturday && day == DayOfWeek.SUNDAY) {
+                1
+            } else {
+                0
+            }
+            hoursCellWidth + (gridCellWidth * (day.value - 1 - offset))
+        } else {
+            if (day == DayOfWeek.SUNDAY) {
+                hoursCellWidth
+            } else
+                hoursCellWidth + (gridCellWidth * day.value)
+        }
     }
 
     fun calculateStartMarginCrossScheduleView(
         hoursCellWidth: Int,
         gridCellWidth: Int,
         day: DayOfWeek,
+        isMondayFirstDayOfWeek: Boolean,
+        showSaturday: Boolean,
+        showSunday: Boolean,
         crossedSchedulesCount: Int,
         crossScheduleIndex: Int
     ): Int {
-        return hoursCellWidth + (gridCellWidth * (day.value - 1)) + ((gridCellWidth / crossedSchedulesCount) * crossScheduleIndex)
+        return calculateStartMarginSingleScheduleView(
+            hoursCellWidth,
+            gridCellWidth,
+            day,
+            isMondayFirstDayOfWeek,
+            showSaturday,
+            showSunday
+        ) + ((gridCellWidth / crossedSchedulesCount) * crossScheduleIndex)
     }
 
     private fun convertMinutesToDecimals(minutes: Long): Double {

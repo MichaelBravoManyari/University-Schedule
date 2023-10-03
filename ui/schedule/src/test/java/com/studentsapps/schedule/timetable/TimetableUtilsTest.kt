@@ -453,10 +453,30 @@ class TimetableUtilsTest {
     }
 
     @Test
-    fun calculateStartMarginCrossScheduleView_5dp10dpMonday2crosses0Index_return5() {
+    fun calculateStartMarginCrossScheduleView_5dp10dpMonday2crossesShowSaturday0Index_return5() {
         val day = DayOfWeek.MONDAY
         val expectedStartMargin = 5
-        val realStartMargin = utils.calculateStartMarginCrossScheduleView(5, 10, day, 2, 0)
+        val realStartMargin = utils.calculateStartMarginCrossScheduleView(
+            5, 10, day, true,
+            showSaturday = true,
+            showSunday = true,
+            crossedSchedulesCount = 2,
+            crossScheduleIndex = 0
+        )
+        assertThat(realStartMargin, `is`(expectedStartMargin))
+    }
+
+    @Test
+    fun calculateStartMarginCrossScheduleView_5dp10dpSunday2crossesNotShowSaturday1Index_return60() {
+        val day = DayOfWeek.SUNDAY
+        val expectedStartMargin = 60
+        val realStartMargin = utils.calculateStartMarginCrossScheduleView(
+            5, 10, day, true,
+            showSaturday = false,
+            true,
+            crossedSchedulesCount = 2,
+            crossScheduleIndex = 1
+        )
         assertThat(realStartMargin, `is`(expectedStartMargin))
     }
 
@@ -468,10 +488,25 @@ class TimetableUtilsTest {
     }
 
     @Test
-    fun calculateStartMarginSingleScheduleView_5dp10dpTuesday_return15() {
+    fun calculateStartMarginSingleScheduleView_5dp10dpTuesdayShowSaturday_return15() {
         val day = DayOfWeek.TUESDAY
         val expectedStartMargin = 15
-        val realStartMargin = utils.calculateStartMarginSingleScheduleView(5, 10, day)
+        val realStartMargin = utils.calculateStartMarginSingleScheduleView(
+            5, 10, day, true,
+            showSaturday = true, true
+        )
+        assertThat(realStartMargin, `is`(expectedStartMargin))
+    }
+
+    @Test
+    fun calculateStartMarginSingleScheduleView_5dp10dpSundayNotShowSaturday_return55() {
+        val day = DayOfWeek.SUNDAY
+        val expectedStartMargin = 55
+        val realStartMargin = utils.calculateStartMarginSingleScheduleView(
+            5, 10, day, true,
+            showSaturday = false,
+            showSunday = true
+        )
         assertThat(realStartMargin, `is`(expectedStartMargin))
     }
 }

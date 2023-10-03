@@ -100,6 +100,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/timetable_days_of_month_margin"
             android:layout_marginBottom="@dimen/timetable_days_of_month_margin"
+            android:background="@drawable/background_schedule_view"
             android:gravity="center"
             android:padding="@dimen/timetable_days_of_month_padding"
             android:textColor="@color/text_color"

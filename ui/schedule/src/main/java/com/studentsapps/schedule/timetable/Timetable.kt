@@ -1,8 +1,10 @@
 package com.studentsapps.schedule.timetable
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.Gravity
@@ -10,6 +12,7 @@ import android.view.LayoutInflater
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.annotation.ArrayRes
+import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
 import androidx.annotation.Dimension
@@ -17,6 +20,7 @@ import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.drawable.toDrawable
 import com.google.android.material.textview.MaterialTextView
 import com.studentsapps.schedule.R
@@ -248,6 +252,55 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
             val bitmapHoursGrid = createBitmapGridAndHours(rootViewWidth, hoursCellWidth)
             setBitmapToHourDrawingGridContainer(bitmapHoursGrid)
             provisionalListView()
+            showScheduleInGrid(
+                listOf(
+                    Schedule(
+                        2,
+                        LocalTime.of(12, 0),
+                        LocalTime.of(13, 0),
+                        "sdf",
+                        DayOfWeek.TUESDAY,
+                        "Test 1",
+                        Color.RED
+                    ),
+                    Schedule(
+                        3,
+                        LocalTime.of(12, 0),
+                        LocalTime.of(13, 0),
+                        "sdf",
+                        DayOfWeek.TUESDAY,
+                        "Test 2",
+                        Color.YELLOW
+                    ),
+                    Schedule(
+                        4,
+                        LocalTime.of(12, 0),
+                        LocalTime.of(13, 0),
+                        "sdf",
+                        DayOfWeek.SATURDAY,
+                        "Test 3",
+                        Color.YELLOW
+                    ),
+                    Schedule(
+                        5,
+                        LocalTime.of(12, 0),
+                        LocalTime.of(13, 0),
+                        "sdf",
+                        DayOfWeek.SUNDAY,
+                        "Test 4",
+                        Color.RED
+                    ),
+                    Schedule(
+                        6,
+                        LocalTime.of(12, 30),
+                        LocalTime.of(15, 0),
+                        "sdf",
+                        DayOfWeek.MONDAY,
+                        "Test 5",
+                        Color.BLUE
+                    )
+                )
+            )
         }
     }
 
@@ -397,25 +450,41 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
 
     fun showScheduleInGrid(schedules: List<Schedule>) {
         schedules.groupByDayOfWeek().forEach { (dayOfWeek, schedulesForOneDayOfWeek) ->
-            val scheduleCrossing = schedulesForOneDayOfWeek.getCrossSchedules()
-            val uniqueSchedules = schedulesForOneDayOfWeek.getUniqueSchedules()
 
-            scheduleCrossing.forEach { crossSchedules ->
-                crossSchedules.forEachIndexed { index, schedule ->
-                    val crossedSchedulesCount = crossSchedules.size
-                    addScheduleToGrid(schedule, crossedSchedulesCount, index)
+            if ((dayOfWeek != DayOfWeek.SUNDAY || showSunday) && (dayOfWeek != DayOfWeek.SATURDAY || showSaturday)) {
+                val scheduleCrossing = schedulesForOneDayOfWeek.getCrossSchedules()
+                val uniqueSchedules = schedulesForOneDayOfWeek.getUniqueSchedules()
+
+                scheduleCrossing.forEach { crossSchedules ->
+                    crossSchedules.forEachIndexed { index, schedule ->
+                        val crossedSchedulesCount = crossSchedules.size
+                        addScheduleToGrid(schedule, crossedSchedulesCount, index)
+                    }
                 }
-            }
 
-            uniqueSchedules.forEach { uniqueSchedule ->
-                addScheduleToGrid(uniqueSchedule)
+                uniqueSchedules.forEach { uniqueSchedule ->
+                    addScheduleToGrid(uniqueSchedule)
+                }
             }
         }
     }
 
-    private fun addScheduleToGrid(schedule: Schedule, crossedSchedulesCount: Int = 1, index: Int = 0) {
+    private fun addScheduleToGrid(
+        schedule: Schedule,
+        crossedSchedulesCount: Int = 1,
+        index: Int = 0
+    ) {
         with(schedule) {
-            val scheduleView = createScheduleView(id, courseName, startTime, endTime, day, crossedSchedulesCount, index)
+            val scheduleView = createScheduleView(
+                id,
+                courseName,
+                startTime,
+                endTime,
+                day,
+                color,
+                crossedSchedulesCount,
+                index
+            )
             binding.scheduleContainerAndGrid.addView(scheduleView)
         }
     }
@@ -426,6 +495,7 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
         startTime: LocalTime,
         endTime: LocalTime,
         day: DayOfWeek,
+        color: Int,
         crossedSchedulesCount: Int = 1,
         crossScheduleIndex: Int = 0
     ): MaterialTextView {
@@ -436,11 +506,15 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
             crossedSchedulesCount,
             crossScheduleIndex
         )
+        val background = ContextCompat.getDrawable(context, R.drawable.background_schedule_view)
         return MaterialTextView(context).apply {
             contentDescription = id.toString()
             text = courseName
             gravity = Gravity.CENTER
             this.layoutParams = layoutParams
+            this.background = background
+            backgroundTintList = ColorStateList.valueOf(color)
+            setTextColor(getTextColorBasedOnCourseColor(color))
         }
     }
 
@@ -470,11 +544,22 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
             utils.calculateScheduleViewHeight(startTime, endTime, cellHeight, scheduleBottomMargin)
         val topMargin = utils.calculateTopMarginScheduleView(startTime, cellHeight)
         val startMargin = when (crossedSchedulesCount) {
-            1 -> utils.calculateStartMarginSingleScheduleView(hoursCellWidth, gridCellWidth, day)
+            1 -> utils.calculateStartMarginSingleScheduleView(
+                hoursCellWidth,
+                gridCellWidth,
+                day,
+                isMondayFirstDayOfWeek,
+                showSaturday,
+                showSunday
+            )
+
             else -> utils.calculateStartMarginCrossScheduleView(
                 hoursCellWidth,
                 gridCellWidth,
                 day,
+                isMondayFirstDayOfWeek,
+                showSaturday,
+                showSunday,
                 crossedSchedulesCount,
                 crossScheduleIndex
             )
@@ -487,6 +572,13 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
         }
 
         return layoutParams
+    }
+
+    private fun getTextColorBasedOnCourseColor(@ColorInt courseColor: Int): Int {
+        return if (ColorUtils.calculateLuminance(courseColor) < 0.5)
+            getColorById(R.color.timetable_schedule_view_light_text_color)
+        else
+            getColorById(R.color.timetable_schedule_view_dark_text_color)
     }
 
     companion object {
