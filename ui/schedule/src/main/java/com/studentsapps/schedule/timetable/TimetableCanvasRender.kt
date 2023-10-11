@@ -8,7 +8,7 @@ import androidx.annotation.ColorInt
 import androidx.annotation.Dimension
 import javax.inject.Inject
 
-class TimetableCanvasRender @Inject constructor() {
+internal class TimetableCanvasRender @Inject constructor() {
 
     fun createTimetableBitmap(bitmapWith: Int, bitmapHeight: Int): Bitmap {
         return Bitmap.createBitmap(bitmapWith, bitmapHeight, Bitmap.Config.ARGB_8888)

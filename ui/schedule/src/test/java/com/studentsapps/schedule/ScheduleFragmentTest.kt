@@ -8,6 +8,8 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.studentsapps.schedule.timetable.TimetableUtils
+import com.studentsapps.schedule.timetable.verifyTimetableGridViewIsDisplayed
+import com.studentsapps.schedule.timetable.verifyTimetableListViewIsDisplayed
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -30,7 +32,7 @@ class ScheduleFragmentTest {
     val hiltRule = HiltAndroidRule(this)
 
     @BindValue
-    val timetableUtils = spyk<TimetableUtils>()
+    internal val timetableUtils = spyk<TimetableUtils>()
 
     @Test
     fun verifyCurrentMonthDisplayedInAppBar() {

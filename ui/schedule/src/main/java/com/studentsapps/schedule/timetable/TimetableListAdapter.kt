@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.studentsapps.schedule.databinding.TimetableListItemBinding
 
-class TimetableListAdapter : ListAdapter<String, TimetableListAdapter.TimetableListViewHolder>(
+internal class TimetableListAdapter : ListAdapter<String, TimetableListAdapter.TimetableListViewHolder>(
     DiffCallback
 ) {
 

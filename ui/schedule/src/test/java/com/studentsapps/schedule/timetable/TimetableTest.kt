@@ -24,6 +24,7 @@ import androidx.core.graphics.drawable.toDrawable
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.scrollTo
+import androidx.test.espresso.action.ViewActions.swipeLeft
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.BoundedMatcher
@@ -31,10 +32,7 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.studentsapps.schedule.R
 import com.studentsapps.schedule.TestFragment
-import com.studentsapps.schedule.TimetableAttributeSet
 import com.studentsapps.schedule.launchFragmentInHiltContainer
-import com.studentsapps.schedule.verifyTimetableGridViewIsDisplayed
-import com.studentsapps.schedule.verifyTimetableListViewIsDisplayed
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -62,10 +60,10 @@ class TimetableTest {
     val hiltRule = HiltAndroidRule(this)
 
     @BindValue
-    val canvasRender = spyk<TimetableCanvasRender>()
+    internal val canvasRender = spyk<TimetableCanvasRender>()
 
     @BindValue
-    val utils = spyk<TimetableUtils>()
+    internal val utils = spyk<TimetableUtils>()
 
     @Test
     fun setTypefaceDaysOfWeek_defaultTypeface() {
@@ -349,44 +347,22 @@ class TimetableTest {
     fun showSchedulesInGrid_uniqueSchedule() {
         val scheduleId = 1
         val schedules = listOf(uniqueSchedule.copy(id = scheduleId))
-        val timetable = createTimetable()
-        onView(withId(R.id.schedule_container_and_grid)).check(matches(isDisplayed()))
-        timetable.showScheduleInGrid(schedules)
-
         val hourCellWidth = getDimensionPixelSizeById(R.dimen.timetable_hours_cell_width)
         val cellHeight = getDimensionPixelSizeById(R.dimen.timetable_grid_cell_height)
         val bottomMargin = getDimensionPixelSizeById(R.dimen.timetable_schedule_bottom_margin)
         val endMargin = getDimensionPixelSizeById(R.dimen.timetable_schedule_end_margin)
         val cellWidth = (360 - hourCellWidth) / 7
 
-        /*val expectedMath1XCoordinate = hourCellWidth.toFloat()
-        val expectedMath1YCoordinate = 12f * cellHeight
-        val expectedMath1Width = (cellWidth / 2) - scheduleEndMargin
-        val expectedMath1Height = cellHeight - scheduleBottomMargin*/
-
+        val expectedTypeface = getTypeface(R.font.roboto_medium)
+        val expectedTextSize = 4f
         val expectedMath2XCoordinate = (hourCellWidth + cellWidth).toFloat()
         val expectedMath2YCoordinate = 13f * cellHeight
         val expectedMath2Width = cellWidth - endMargin
         val expectedMath2Height = cellHeight - bottomMargin
 
-        /*val expectedMath3XCoordinate =
-            (hourCellWidth + expectedMath1Width + scheduleBottomMargin).toFloat()
-        val expectedMath3YCoordinate = 12.5f * cellHeight
-        val expectedMath3Width = (cellWidth / 2) - scheduleEndMargin
-        val expectedMath3Height = cellHeight - scheduleBottomMargin*/
-
-        /*val expectedMath4XCoordinate = (hourCellWidth + (2 * cellWidth)).toFloat()
-        val expectedMath4YCoordinate = 12f * cellHeight
-        val expectedMath4Width = cellWidth- scheduleEndMargin
-        val expectedMath4Height = cellHeight - scheduleBottomMargin*/
-
-        /*onView(withContentDescription("1"))
-            .perform(scrollTo())
-            .check(matches(isDisplayed()))
-            .check(matches(withText("Math 1")))
-            .check(matches(withXYCoordinates(expectedMath1XCoordinate, expectedMath1YCoordinate)))
-            .check(matches(withMeasures(expectedMath1Width, expectedMath1Height)))*/
-
+        val timetable = createTimetable()
+        onView(withId(R.id.schedule_container_and_grid)).check(matches(isDisplayed()))
+        timetable.showScheduleInGrid(schedules)
 
         onView(withContentDescription(scheduleId.toString()))
             .perform(scrollTo())
@@ -396,21 +372,56 @@ class TimetableTest {
             .check(matches(withMeasures(expectedMath2Width, expectedMath2Height)))
             .check(matches(withBackground(R.drawable.background_schedule_view)))
             .check(matches(withBackgroundTintList(Color.BLUE)))
+            .check(matches(withTypeface(expectedTypeface)))
+            .check(matches(withTextSize(expectedTextSize)))
+    }
 
+    @Test
+    @Config(qualifiers = "w360dp-h640dp")
+    fun showSchedulesInGrid_schedulesCrossing() {
+        val scheduleId1 = 1
+        val scheduleId2 = 2
+        val schedules =
+            listOf(uniqueSchedule.copy(id = scheduleId1), uniqueSchedule.copy(id = scheduleId2))
+        val hourCellWidth = getDimensionPixelSizeById(R.dimen.timetable_hours_cell_width)
+        val cellHeight = getDimensionPixelSizeById(R.dimen.timetable_grid_cell_height)
+        val endMargin = getDimensionPixelSizeById(R.dimen.timetable_schedule_end_margin)
+        val cellWidth = (360 - hourCellWidth) / 7
 
-        /*onView(withContentDescription("3"))
+        val expectedScheduleId1XCoordinate = (hourCellWidth + cellWidth).toFloat()
+        val expectedScheduleId1YCoordinate = 13f * cellHeight
+        val expectedScheduleId1Width = (cellWidth / 2) - endMargin
+        val expectedScheduleId2XCoordinate =
+            (hourCellWidth + cellWidth + expectedScheduleId1Width + endMargin).toFloat()
+        val expectedScheduleId2YCoordinate = 13f * cellHeight
+
+        val timetable = createTimetable()
+        onView(withId(R.id.schedule_container_and_grid)).check(matches(isDisplayed()))
+        timetable.showScheduleInGrid(schedules)
+
+        onView(withContentDescription(scheduleId1.toString()))
             .perform(scrollTo())
             .check(matches(isDisplayed()))
-            .check(matches(withText("Math 3")))
-            .check(matches(withXYCoordinates(expectedMath3XCoordinate, expectedMath3YCoordinate)))
-            .check(matches(withMeasures(expectedMath3Width, expectedMath3Height)))*/
+            .check(
+                matches(
+                    withXYCoordinates(
+                        expectedScheduleId1XCoordinate,
+                        expectedScheduleId1YCoordinate
+                    )
+                )
+            )
 
-        /*onView(withContentDescription("4"))
+        onView(withContentDescription(scheduleId2.toString()))
             .perform(scrollTo())
             .check(matches(isDisplayed()))
-            .check(matches(withText("Math 4")))
-            .check(matches(withXYCoordinates(expectedMath4XCoordinate, expectedMath4YCoordinate)))
-            .check(matches(withMeasures(expectedMath4Width, expectedMath4Height)))*/
+            .check(
+                matches(
+                    withXYCoordinates(
+                        expectedScheduleId2XCoordinate,
+                        expectedScheduleId2YCoordinate
+                    )
+                )
+            )
     }
 
     @Test
@@ -537,6 +548,16 @@ class TimetableTest {
             )
     }
 
+    @Test
+    fun swipeLeftToShowGridView() {
+        val timetableContentDescription = "timetable"
+        createTimetable()
+        every { utils.getDaysOfMonthOfWeek(any(), any(), any(), any()) } returns listOf("9", "10", "11", "12", "13", "14", "15")
+        onView(withContentDescription(timetableContentDescription))
+            .perform(swipeLeft())
+        verifyDaysOfMonthCurrentWeekTexts("9", "10", "11", "12", "13", "14", "15")
+    }
+
     private fun createTimetable(attr: AttributeSet? = null, showAsGrid: Boolean = true): Timetable {
         var timetable: Timetable? = null
         launchFragmentInHiltContainer<TestFragment> {
@@ -546,7 +567,10 @@ class TimetableTest {
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT
             )
-            timetable!!.layoutParams = layoutParams
+            timetable!!.apply {
+                this.layoutParams = layoutParams
+                contentDescription = "timetable"
+            }
             binding.fragmentTestContainer.addView(timetable)
             timetable!!.setShowAsGrid(showAsGrid)
         }

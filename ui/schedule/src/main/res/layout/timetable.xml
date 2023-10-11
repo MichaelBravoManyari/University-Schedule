@@ -212,16 +212,22 @@
         app:layout_constraintTop_toBottomOf="@id/timetable_head">
 
         <RelativeLayout
-            android:id="@+id/schedule_container_and_grid"
+            android:id="@+id/list_container_and_schedule_grid"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <ImageView
-                android:id="@+id/hour_drawing_container_and_grid"
-                android:layout_width="wrap_content"
+            <RelativeLayout
+                android:id="@+id/schedule_container_and_grid"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:contentDescription="@string/drawing_container_for_grid_and_time"
-                android:visibility="gone" />
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/hour_drawing_container_and_grid"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/drawing_container_for_grid_and_time" />
+            </RelativeLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/schedule_list_container"

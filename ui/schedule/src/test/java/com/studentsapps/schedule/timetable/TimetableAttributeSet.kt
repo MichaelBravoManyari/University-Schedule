@@ -1,7 +1,8 @@
-package com.studentsapps.schedule
+package com.studentsapps.schedule.timetable
 
 import android.util.AttributeSet
 import androidx.annotation.FontRes
+import com.studentsapps.schedule.R
 import org.robolectric.Robolectric
 
 class TimetableAttributeSet {

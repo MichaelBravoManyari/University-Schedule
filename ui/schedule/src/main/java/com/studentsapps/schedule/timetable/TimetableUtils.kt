@@ -10,7 +10,7 @@ import java.time.temporal.ChronoUnit
 import java.util.Locale
 import javax.inject.Inject
 
-class TimetableUtils @Inject constructor() {
+internal class TimetableUtils @Inject constructor() {
 
     fun getDaysOfMonthOfWeek(
         isMondayFirstDayOfWeek: Boolean,
@@ -205,11 +205,7 @@ class TimetableUtils @Inject constructor() {
         showSunday: Boolean
     ): Int {
         return if (isMondayFirstDayOfWeek || !showSunday) {
-            val offset = if (!showSaturday && day == DayOfWeek.SUNDAY) {
-                1
-            } else {
-                0
-            }
+            val offset = if (!showSaturday && day == DayOfWeek.SUNDAY) 1 else 0
             hoursCellWidth + (gridCellWidth * (day.value - 1 - offset))
         } else {
             if (day == DayOfWeek.SUNDAY) {

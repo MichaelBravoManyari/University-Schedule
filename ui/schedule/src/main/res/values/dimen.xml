@@ -10,4 +10,5 @@
     <dimen name="timetable_days_of_month_margin">5dp</dimen>
     <dimen name="timetable_schedule_bottom_margin">2dp</dimen>
     <dimen name="timetable_schedule_end_margin">2dp</dimen>
+    <dimen name="timetable_schedule_text_size">4sp</dimen>
 </resources>
