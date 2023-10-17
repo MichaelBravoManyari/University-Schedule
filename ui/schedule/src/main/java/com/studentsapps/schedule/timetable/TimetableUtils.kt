@@ -47,6 +47,10 @@ internal class TimetableUtils @Inject constructor() {
         return LocalDate.now().dayOfMonth.toString()
     }
 
+    fun getCurrentDate(): LocalDate {
+        return LocalDate.now()
+    }
+
     fun getMonth(date: LocalDate = LocalDate.now()): String {
         return date.month.getDisplayName(TextStyle.FULL, Locale.getDefault())
             .replaceFirstChar {

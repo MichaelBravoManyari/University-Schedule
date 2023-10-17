@@ -17,6 +17,7 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.FontRes
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
@@ -25,6 +26,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.scrollTo
 import androidx.test.espresso.action.ViewActions.swipeLeft
+import androidx.test.espresso.action.ViewActions.swipeRight
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.BoundedMatcher
@@ -32,6 +34,7 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.studentsapps.schedule.R
 import com.studentsapps.schedule.TestFragment
+import com.studentsapps.schedule.getOrAwaitValue
 import com.studentsapps.schedule.launchFragmentInHiltContainer
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -42,6 +45,7 @@ import io.mockk.spyk
 import io.mockk.verify
 import org.hamcrest.Description
 import org.hamcrest.Matcher
+import org.hamcrest.Matchers.`is`
 import org.hamcrest.Matchers.not
 import org.junit.Rule
 import org.junit.Test
@@ -49,6 +53,7 @@ import org.junit.runner.RunWith
 import org.robolectric.Robolectric
 import org.robolectric.annotation.Config
 import java.time.DayOfWeek
+import java.time.LocalDate
 import java.time.LocalTime
 
 @Config(application = HiltTestApplication::class, sdk = [33])
@@ -59,11 +64,16 @@ class TimetableTest {
     @get:Rule
     val hiltRule = HiltAndroidRule(this)
 
+    @get:Rule
+    var instantExecutorRule = InstantTaskExecutorRule()
+
     @BindValue
     internal val canvasRender = spyk<TimetableCanvasRender>()
 
     @BindValue
     internal val utils = spyk<TimetableUtils>()
+
+    private val timetableContentDescription = "timetable"
 
     @Test
     fun setTypefaceDaysOfWeek_defaultTypeface() {
@@ -120,7 +130,7 @@ class TimetableTest {
 
     @Test
     fun showDaysOfMonthCurrentWeek_defaultStartingMonday() {
-        mockUtilGetDaysOfMonthOfWeek()
+        mockUtilsGetDaysOfMonthOfWeek()
         createTimetable()
         verifyDaysOfMonthCurrentWeekTexts("2", "3", "4", "5", "6", "7", "8")
     }
@@ -135,7 +145,7 @@ class TimetableTest {
 
     @Test
     fun showDaysOfMonthCurrentWeek_startingMonday() {
-        mockUtilGetDaysOfMonthOfWeek()
+        mockUtilsGetDaysOfMonthOfWeek()
         val attrs = TimetableAttributeSet().addIsMondayFirstOfWeek(true).build()
         createTimetable(attrs)
         verifyDaysOfMonthCurrentWeekTexts("2", "3", "4", "5", "6", "7", "8")
@@ -151,7 +161,7 @@ class TimetableTest {
 
     @Test
     fun showDaysOfMonthCurrentWeek_startingSunday() {
-        mockUtilGetDaysOfMonthOfWeek()
+        mockUtilsGetDaysOfMonthOfWeek()
         val attrs = TimetableAttributeSet().addIsMondayFirstOfWeek(false).build()
         createTimetable(attrs)
         verifyDaysOfMonthCurrentWeekTexts("1", "2", "3", "4", "5", "6", "7")
@@ -220,7 +230,7 @@ class TimetableTest {
     @Test
     fun verifyCurrentMonthDayIsSelected() {
         mockUtilsGetCurrentMonthDayString()
-        mockUtilGetDaysOfMonthOfWeek()
+        mockUtilsGetDaysOfMonthOfWeek()
         mockCanvasRenderGetCurrentMonthDayBackground()
         val expectedBackground = getExpectedBackgroundCurrentMonthDay()
         val expectedCurrentMonthDayTextColor =
@@ -549,13 +559,37 @@ class TimetableTest {
     }
 
     @Test
-    fun swipeLeftToShowGridView() {
-        val timetableContentDescription = "timetable"
+    fun swipeToShowGridViewChangeTextOfDayOfMonthViews() {
+        val daysOfMonthWhenScrollingLeft = listOf("9", "10", "11", "12", "13", "14", "15")
+        mockUtilsGetDaysOfMonthOfWeek()
         createTimetable()
-        every { utils.getDaysOfMonthOfWeek(any(), any(), any(), any()) } returns listOf("9", "10", "11", "12", "13", "14", "15")
+        verifyDaysOfMonthCurrentWeekTexts("2", "3", "4", "5", "6", "7", "8")
+        mockUtilsGetDaysOfMonthOfWeek(daysOfMonthWhenScrollingLeft)
         onView(withContentDescription(timetableContentDescription))
             .perform(swipeLeft())
         verifyDaysOfMonthCurrentWeekTexts("9", "10", "11", "12", "13", "14", "15")
+    }
+
+    @Test
+    fun testNotSelectCurrentMonthDayInNonCurrentWeekGridView() {
+        mockCanvasRenderGetCurrentMonthDayBackground()
+        val currentMonthDayBackground = getExpectedBackgroundCurrentMonthDay()
+        createTimetable()
+        onView(withContentDescription(timetableContentDescription))
+            .perform(swipeRight())
+        getDaysOfMonthViewsIds().forEach { viewId ->
+            onView(withId(viewId)).check(matches(not(withBackground(currentMonthDayBackground))))
+        }
+    }
+
+    @Test
+    fun testSelectedWeekMonthDisplay() {
+        val expectedMonth = "September"
+        every { utils.getCurrentDate() } returns LocalDate.of(2023, 8, 26)
+        val timetable = createTimetable()
+        onView(withContentDescription(timetableContentDescription))
+            .perform(swipeLeft())
+        assertThat(timetable.currentMonth.getOrAwaitValue(), `is`(expectedMonth))
     }
 
     private fun createTimetable(attr: AttributeSet? = null, showAsGrid: Boolean = true): Timetable {
@@ -569,7 +603,7 @@ class TimetableTest {
             )
             timetable!!.apply {
                 this.layoutParams = layoutParams
-                contentDescription = "timetable"
+                contentDescription = timetableContentDescription
             }
             binding.fragmentTestContainer.addView(timetable)
             timetable!!.setShowAsGrid(showAsGrid)
@@ -626,14 +660,17 @@ class TimetableTest {
         } returns floatArrayOf(20f, 15f, 45f)
     }
 
-    private fun mockUtilGetDaysOfMonthOfWeek() {
+    private fun mockUtilsGetDaysOfMonthOfWeek(list: List<String>? = null) {
         every {
-            utils.getDaysOfMonthOfWeek(
-                any(),
-                any(),
-                any()
-            )
-        } answers { if (arg(0)) fakeDaysOfMonthCurrentWeekStartingMonday else fakeDaysOfMonthCurrentWeekStartingSunday }
+            utils.getDaysOfMonthOfWeek(any(), any(), any(), any())
+        } answers {
+            if (!list.isNullOrEmpty())
+                list
+            else if (arg(0))
+                fakeDaysOfMonthCurrentWeekStartingMonday
+            else
+                fakeDaysOfMonthCurrentWeekStartingSunday
+        }
     }
 
     private fun mockUtilsGetDayOfWeekOrder() {
@@ -742,7 +779,9 @@ class TimetableTest {
             }
 
             override fun matchesSafely(item: TextView): Boolean {
-                return item.background.toBitmap().sameAs(expectedBackground.toBitmap())
+                if (item.background != null)
+                    return item.background.toBitmap().sameAs(expectedBackground.toBitmap())
+                return false
             }
         }
     }

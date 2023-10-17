@@ -26,6 +26,7 @@ dependencies {
     testImplementation(libs.espresso.core)
     testImplementation(libs.androidx.test.ext.junit)
     testImplementation(libs.mockk)
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
 
     // Instrumented Test
     testImplementation(libs.espresso.core)

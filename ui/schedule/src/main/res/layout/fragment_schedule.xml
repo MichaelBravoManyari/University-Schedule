@@ -1,27 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        
+
         <variable
             name="scheduleFragment"
             type="com.studentsapps.schedule.ScheduleFragment" />
+
+        <variable
+            name="timetableView"
+            type="com.studentsapps.schedule.timetable.Timetable" />
     </data>
 
-    <FrameLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".ScheduleFragment">
 
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appbar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fitsSystemWindows="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@{timetableView.currentMonth}"/>
+        </com.google.android.material.appbar.AppBarLayout>
+
         <com.studentsapps.schedule.timetable.Timetable
             android:id="@+id/timetable"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:show_saturday="false"
-            app:show_sunday="false"
-            app:is_monday_first_day_of_week="false"
-            app:showAsGrid="@{scheduleFragment.showAsGrid}"/>
-    </FrameLayout>
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/appbar"
+            app:showAsGrid="@{scheduleFragment.showAsGrid}" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

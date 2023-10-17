@@ -5,10 +5,8 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Typeface
 import android.util.AttributeSet
-import android.util.Log
 import android.view.GestureDetector
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -28,11 +26,12 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.drawable.toDrawable
 import androidx.core.view.GestureDetectorCompat
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.google.android.material.textview.MaterialTextView
 import com.studentsapps.schedule.R
 import com.studentsapps.schedule.databinding.TimetableBinding
 import dagger.hilt.android.AndroidEntryPoint
-import java.lang.Math.abs
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
@@ -55,11 +54,12 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
     private var showSunday = true
     private var isMondayFirstDayOfWeek = true
     private var gridCellWidth = 0
-    val currentMonth = utils.getMonth()
-    private val gestureDetector = GestureDetector(context, MyGestureListener())
+    private val _currentMonth = MutableLiveData(utils.getMonth())
+    val currentMonth = _currentMonth as LiveData<String>
+    private val gestureDetector = GestureDetectorCompat(context, MyGestureListener())
     private val mTouchSlop = ViewConfiguration.get(context).scaledTouchSlop
-    private var downX = 0f
-    private var date = LocalDate.now()
+    private var mDownX = 0f
+    private var date = utils.getCurrentDate()
 
     @Inject
     lateinit var utils: TimetableUtils
@@ -161,8 +161,9 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
         val currentMonthDayTextColor = getColorById(R.color.timetable_current_month_day_text_color)
         val currentMonthDayBackgroundColor =
             getColorById(R.color.timetable_current_month_day_background_color)
+        val monthDayTextColor = getColorById(R.color.timetable_month_day_text_color)
         getDaysOfMonthViews().forEach { view ->
-            if (view.text == currentMonthDay) {
+            if (date == LocalDate.now() && view.text == currentMonthDay) {
                 view.apply {
                     setTextColor(currentMonthDayTextColor)
                     background = canvasRender.getCurrentMonthDayBackground(
@@ -170,6 +171,12 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
                         view.measuredHeight,
                         currentMonthDayBackgroundColor
                     ).toDrawable(resources)
+                }
+
+            } else {
+                view.apply {
+                    setTextColor(monthDayTextColor)
+                    background = null
                 }
             }
         }
@@ -605,59 +612,25 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
     override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
         return when (ev.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
-                downX = ev.x
+                mDownX = ev.x
                 false
             }
 
             MotionEvent.ACTION_MOVE -> {
-                val historySize = ev.historySize
-                if (historySize > 0) {
-                    val currentX = ev.x
-                    val xDiff = kotlin.math.abs(currentX - downX)
-                    return xDiff > mTouchSlop
-                }
-                false
+                val deltaX = kotlin.math.abs(ev.x - mDownX)
+                deltaX > mTouchSlop
             }
 
             else -> false
         }
-        /*val historySize = ev.historySize
-        val pointerCount = ev.pointerCount
-        Log.d("Timetable", "historySize: $historySize , pointerCount: $pointerCount, action: ${MotionEvent.actionToString(ev.action)}")
-        for (h in 0 until historySize) {
-            Log.d("Timetable", "At time: ${ev.getHistoricalEventTime(h)}")
-            for (p in 0 until pointerCount) {
-                Log.d(
-                    "Timetable",
-                    "  pointer ${ev.getPointerId(p)}: (${
-                        ev.getHistoricalX(
-                            p,
-                            h
-                        )
-                    }, ${ev.getHistoricalY(p, h)})"
-                )
-            }
-        }
-        Log.d("Timetable", "At time ${ev.eventTime}")
-        for (p in 0 until pointerCount) {
-            Log.d("Timetable",
-                "  pointer ${ev.getPointerId(p)}: (${ev.getX(p)},${ev.getY(p)})"
-            )
-        }
-        return false*/
     }
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        Log.d("Timetable", "touch: motionEvent: $event")
         return gestureDetector.onTouchEvent(event) || super.onTouchEvent(event)
     }
 
-    inner class MyGestureListener : GestureDetector.SimpleOnGestureListener() {
-
-        override fun onDown(e: MotionEvent): Boolean {
-            return true
-        }
+    private inner class MyGestureListener : GestureDetector.SimpleOnGestureListener() {
 
         override fun onFling(
             e1: MotionEvent?,
@@ -665,39 +638,29 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
             velocityX: Float,
             velocityY: Float
         ): Boolean {
-
-            if (isRightSwipe(e1, e2)) {
-                date = date.minusWeeks(1)
-                val daysOfMonthCurrentWeek =
-                    utils.getDaysOfMonthOfWeek(
-                        isMondayFirstDayOfWeek,
-                        showSaturday,
-                        showSunday,
-                        date
-                    )
-                getDaysOfMonthViews().forEachIndexed { index, view ->
-                    view.text = daysOfMonthCurrentWeek[index]
-                }
-            } else {
-                date = date.plusWeeks(1)
-                val daysOfMonthCurrentWeek =
-                    utils.getDaysOfMonthOfWeek(
-                        isMondayFirstDayOfWeek,
-                        showSaturday,
-                        showSunday,
-                        date
-                    )
-                getDaysOfMonthViews().forEachIndexed { index, view ->
-                    view.text = daysOfMonthCurrentWeek[index]
-                }
-            }
-
+            date = if (isRightSwipe(e2)) date.minusWeeks(1) else date.plusWeeks(1)
+            _currentMonth.value = utils.getMonth(date)
+            updateTextOfDayOfMonthViews()
+            selectCurrentMonthDay()
             return true
         }
 
-        private fun isRightSwipe(e1: MotionEvent?, e2: MotionEvent): Boolean {
-            val deltaX = e2.x.minus(downX)
+        private fun isRightSwipe(upEvent: MotionEvent): Boolean {
+            val deltaX = upEvent.x.minus(mDownX)
             return deltaX > 0
+        }
+    }
+
+    private fun updateTextOfDayOfMonthViews() {
+        val daysOfMonthOfWeek =
+            utils.getDaysOfMonthOfWeek(
+                isMondayFirstDayOfWeek,
+                showSaturday,
+                showSunday,
+                date
+            )
+        getDaysOfMonthViews().forEachIndexed { index, view ->
+            view.text = daysOfMonthOfWeek[index]
         }
     }
 
@@ -715,7 +678,8 @@ data class Schedule(
     val classPlace: String,
     val day: DayOfWeek,
     val courseName: String,
-    val color: Int
+    val color: Int,
+    val uniqueDate: LocalDate? = null
 )
 
 fun List<Schedule>.groupByDayOfWeek(): Map<DayOfWeek, List<Schedule>> {
