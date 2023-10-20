@@ -13,22 +13,19 @@ android {
     }
 
     buildFeatures {
+        viewBinding = true
         dataBinding = true
     }
 }
 
 dependencies {
 
-    implementation(project(":ui:schedule"))
-    implementation(project(":designsystem"))
+    implementation(project(":feature:schedule"))
+    implementation(project(":core:designsystem"))
 
-    implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.material)
     implementation(libs.androidx.constraintlayout)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.test.ext.junit)
-    androidTestImplementation(libs.espresso.core)
+    implementation(libs.material)
 }
 
 kapt {

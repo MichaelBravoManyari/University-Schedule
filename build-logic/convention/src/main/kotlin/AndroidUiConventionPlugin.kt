@@ -15,7 +15,7 @@ class AndroidUiConventionPlugin : Plugin<Project> {
             dependencies {
                 add("testImplementation", kotlin("test"))
                 add("androidTestImplementation", kotlin("test"))
-                add("implementation", libs.findLibrary("kotlinx.coroutines.android").get())
+                add("implementation", libs.findLibrary("kotlinx.coroutines.core").get())
             }
         }
     }

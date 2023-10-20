@@ -16,5 +16,10 @@ dependencyResolutionManagement {
 
 rootProject.name = "University Schedule"
 include(":app")
-include(":ui:schedule")
-include(":designsystem")
+include(":feature:schedule")
+include(":core:designsystem")
+include(":core:ui")
+include(":ui-test-hilt-manifest")
+include(":core:testing")
+include(":core:datastore")
+include(":core:model")
