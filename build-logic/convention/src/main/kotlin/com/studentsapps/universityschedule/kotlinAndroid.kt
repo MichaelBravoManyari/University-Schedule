@@ -42,6 +42,7 @@ private fun Project.configureKotlin() {
     tasks.withType<KotlinCompile>().configureEach {
         kotlinOptions {
             jvmTarget = JavaVersion.VERSION_1_8.toString()
+            languageVersion = "1.9"
         }
     }
 }

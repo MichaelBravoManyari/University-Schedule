@@ -11,6 +11,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.studentsapps.testing.launchFragmentInHiltContainer
+import com.studentsapps.testing.util.MainDispatcherRule
 import com.studentsapps.ui.timetable.TimetableUtils
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -18,6 +19,8 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import io.mockk.every
 import io.mockk.spyk
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.hamcrest.Matchers
 import org.junit.Rule
 import org.junit.Test
@@ -28,14 +31,18 @@ import java.time.LocalDate
 
 @Config(application = HiltTestApplication::class, sdk = [33])
 @HiltAndroidTest
+@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class ScheduleFragmentTest {
 
-    @get:Rule
+    @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
 
+    @get:Rule(order = 1)
+    val mainDispatcherRule = MainDispatcherRule()
+
     @BindValue
-    internal val timetableUtils = spyk<TimetableUtils>()
+    val timetableUtils = spyk<TimetableUtils>()
 
     @Test
     fun verifyCurrentMonthDisplayedInAppBar() {
@@ -52,7 +59,7 @@ class ScheduleFragmentTest {
     }
 
     @Test
-    fun verifyTimetableViewsChange() {
+    fun verifyTimetableViewsChange() = runTest {
         launchFragmentInHiltContainer<ScheduleFragment>()
         verifyTimetableGridViewIsDisplayed()
         onView(withId(R.id.change_timetable_view)).perform(click())

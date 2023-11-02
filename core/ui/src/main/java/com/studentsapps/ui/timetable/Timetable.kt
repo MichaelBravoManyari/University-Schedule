@@ -29,6 +29,7 @@ import androidx.core.view.GestureDetectorCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.android.material.textview.MaterialTextView
+import com.studentsapps.model.TimetableUserPreferences
 import com.studentsapps.ui.R
 import com.studentsapps.ui.databinding.TimetableBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -38,7 +39,7 @@ import java.time.LocalTime
 import javax.inject.Inject
 
 @AndroidEntryPoint
-internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(context, attrs) {
+class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(context, attrs) {
 
     private var gridStrokeColor = 0
     private var halfHourGridStrokeColor = 0
@@ -60,6 +61,10 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
     private val mTouchSlop = ViewConfiguration.get(context).scaledTouchSlop
     private var mDownX = 0f
     private var date = utils.getCurrentDate()
+    private var redrawGridsAndHours = false
+    private var wasViewDrawn = false
+    private var remakeTheView = false
+    private var drawView = false
 
     @Inject
     lateinit var utils: TimetableUtils
@@ -69,8 +74,6 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
 
     init {
         configureView(attrs)
-        configureDaysOfWeekViews()
-        configureDaysOfMonthViews()
     }
 
     private fun configureView(attrs: AttributeSet) {
@@ -138,9 +141,63 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
         }
     }
 
-    fun setShowAsGrid(value: Boolean) {
+    fun setTimetableUserPreferences(timetableUserPreferences: TimetableUserPreferences) {
+        drawView = true
+        setShowAsGrid(timetableUserPreferences.showAsGrid)
+        setIs12HoursFormat(timetableUserPreferences.is12HoursFormat)
+        setShowSaturday(timetableUserPreferences.showSaturday)
+        setShowSunday(timetableUserPreferences.showSunday)
+        setIsMondayFirstDayOfWeek(timetableUserPreferences.isMondayFirstDayOfWeek)
+
+        if (!wasViewDrawn || remakeTheView) {
+            configureDayViews()
+            invalidate()
+            requestLayout()
+        } else if (redrawGridsAndHours) {
+            invalidate()
+            requestLayout()
+        }
+    }
+
+    private fun setShowAsGrid(value: Boolean) {
         showAsGrid = value
-        if (showAsGrid) displayGridView() else displayListView()
+        if (showAsGrid)
+            displayGridView()
+        else
+            displayListView()
+    }
+
+    private fun setIs12HoursFormat(value: Boolean) {
+        if (is12HoursFormat != value) {
+            is12HoursFormat = value
+            if (wasViewDrawn) redrawGridsAndHours = true
+        }
+    }
+
+    private fun setShowSaturday(value: Boolean) {
+        if (showSaturday != value) {
+            showSaturday = value
+            if (wasViewDrawn) remakeTheView = true
+        }
+    }
+
+    private fun setShowSunday(value: Boolean) {
+        if (showSunday != value) {
+            showSunday = value
+            if (wasViewDrawn) remakeTheView = true
+        }
+    }
+
+    private fun setIsMondayFirstDayOfWeek(value: Boolean) {
+        if (isMondayFirstDayOfWeek != value) {
+            isMondayFirstDayOfWeek = value
+            if (wasViewDrawn) remakeTheView = true
+        }
+    }
+
+    private fun configureDayViews() {
+        configureDaysOfWeekViews()
+        configureDaysOfMonthViews()
     }
 
     private fun configureDaysOfWeekViews() {
@@ -278,64 +335,79 @@ internal class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayo
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         val realRootViewWidth = getRootViewWidth(widthMeasureSpec)
-        if (rootViewWidth != realRootViewWidth && realRootViewWidth != 0) {
-            rootViewWidth = realRootViewWidth
-            val hoursCellWidth = getDimensionPixelSizeById(R.dimen.timetable_hours_cell_width)
-            calculateGridCellWidth(realRootViewWidth, hoursCellWidth)
-            selectCurrentMonthDay()
-            val bitmapHoursGrid = createBitmapGridAndHours(rootViewWidth, hoursCellWidth)
-            setBitmapToHourDrawingGridContainer(bitmapHoursGrid)
-            provisionalListView()
-            /*showScheduleInGrid(
-                listOf(
-                    Schedule(
-                        2,
-                        LocalTime.of(12, 0),
-                        LocalTime.of(13, 0),
-                        "sdf",
-                        DayOfWeek.TUESDAY,
-                        "Test 1",
-                        Color.RED
-                    ),
-                    Schedule(
-                        3,
-                        LocalTime.of(12, 0),
-                        LocalTime.of(13, 0),
-                        "sdf",
-                        DayOfWeek.TUESDAY,
-                        "Test 2",
-                        Color.YELLOW
-                    ),
-                    Schedule(
-                        4,
-                        LocalTime.of(12, 0),
-                        LocalTime.of(13, 0),
-                        "sdf",
-                        DayOfWeek.SATURDAY,
-                        "Test 3",
-                        Color.YELLOW
-                    ),
-                    Schedule(
-                        5,
-                        LocalTime.of(12, 0),
-                        LocalTime.of(13, 0),
-                        "sdf",
-                        DayOfWeek.SUNDAY,
-                        "Test 4",
-                        Color.RED
-                    ),
-                    Schedule(
-                        6,
-                        LocalTime.of(12, 30),
-                        LocalTime.of(15, 0),
-                        "sdf",
-                        DayOfWeek.MONDAY,
-                        "Test 5",
-                        Color.BLUE
+        if (realRootViewWidth != 0 && realRootViewWidth != rootViewWidth) rootViewWidth =
+            realRootViewWidth
+        if (drawView) {
+            if (redrawGridsAndHours) {
+                drawGridsAndHours()
+                redrawGridsAndHours = false
+            }
+            if (!wasViewDrawn || remakeTheView) {
+                selectCurrentMonthDay()
+                drawGridsAndHours()
+                provisionalListView()
+                wasViewDrawn = true
+                remakeTheView = false
+                /*showScheduleInGrid(
+                    listOf(
+                        Schedule(
+                            2,
+                            LocalTime.of(12, 0),
+                            LocalTime.of(13, 0),
+                            "sdf",
+                            DayOfWeek.TUESDAY,
+                            "Test 1",
+                            Color.RED
+                        ),
+                        Schedule(
+                            3,
+                            LocalTime.of(12, 0),
+                            LocalTime.of(13, 0),
+                            "sdf",
+                            DayOfWeek.TUESDAY,
+                            "Test 2",
+                            Color.YELLOW
+                        ),
+                        Schedule(
+                            4,
+                            LocalTime.of(12, 0),
+                            LocalTime.of(13, 0),
+                            "sdf",
+                            DayOfWeek.SATURDAY,
+                            "Test 3",
+                            Color.YELLOW
+                        ),
+                        Schedule(
+                            5,
+                            LocalTime.of(12, 0),
+                            LocalTime.of(13, 0),
+                            "sdf",
+                            DayOfWeek.SUNDAY,
+                            "Test 4",
+                            Color.RED
+                        ),
+                        Schedule(
+                            6,
+                            LocalTime.of(12, 30),
+                            LocalTime.of(15, 0),
+                            "sdf",
+                            DayOfWeek.MONDAY,
+                            "Test 5",
+                            Color.BLUE
+                        )
                     )
-                )
-            )*/
+                )*/
+            }
+            drawView = false
         }
+    }
+
+    private fun drawGridsAndHours() {
+        val hoursCellWidth = getDimensionPixelSizeById(R.dimen.timetable_hours_cell_width)
+        calculateGridCellWidth(rootViewWidth, hoursCellWidth)
+        val bitmapHoursGrid = createBitmapGridAndHours(rootViewWidth, hoursCellWidth)
+        setBitmapToHourDrawingGridContainer(bitmapHoursGrid)
+        redrawGridsAndHours = false
     }
 
     private fun displayListView() {

@@ -32,9 +32,11 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.BoundedMatcher
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.studentsapps.model.TimetableUserPreferences
 import com.studentsapps.ui.R
 import com.studentsapps.testing.getOrAwaitValue
 import com.studentsapps.testing.launchFragmentInHiltContainer
+import com.studentsapps.ui_test_hilt_manifest.FragmentTest
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -67,10 +69,10 @@ class TimetableTest {
     var instantExecutorRule = InstantTaskExecutorRule()
 
     @BindValue
-    internal val canvasRender = spyk<TimetableCanvasRender>()
+    val canvasRender = spyk<TimetableCanvasRender>()
 
     @BindValue
-    internal val utils = spyk<TimetableUtils>()
+    val utils = spyk<TimetableUtils>()
 
     private val timetableContentDescription = "timetable"
 
@@ -137,32 +139,38 @@ class TimetableTest {
     @Test
     fun showDaysOfWeek_startingMonday() {
         mockUtilsGetDayOfWeekOrder()
-        val attrs = TimetableAttributeSet().addIsMondayFirstOfWeek(true).build()
-        createTimetable(attrs)
+        createTimetable().setTimetableUserPreferences(
+            baseTimetableUserPreferences.copy(
+                isMondayFirstDayOfWeek = true
+            )
+        )
         verifyDaysOfWeekTexts("Mo", "Tu", "We", "Th", "Fr", "Sa", "Su")
     }
 
     @Test
     fun showDaysOfMonthCurrentWeek_startingMonday() {
         mockUtilsGetDaysOfMonthOfWeek()
-        val attrs = TimetableAttributeSet().addIsMondayFirstOfWeek(true).build()
-        createTimetable(attrs)
+        createTimetable().setTimetableUserPreferences(
+            baseTimetableUserPreferences.copy(isMondayFirstDayOfWeek = true)
+        )
         verifyDaysOfMonthCurrentWeekTexts("2", "3", "4", "5", "6", "7", "8")
     }
 
     @Test
     fun showDaysOfWeek_startingSunday() {
         mockUtilsGetDayOfWeekOrder()
-        val attrs = TimetableAttributeSet().addIsMondayFirstOfWeek(false).build()
-        createTimetable(attrs)
+        createTimetable().setTimetableUserPreferences(
+            baseTimetableUserPreferences.copy(isMondayFirstDayOfWeek = false)
+        )
         verifyDaysOfWeekTexts("Su", "Mo", "Tu", "We", "Th", "Fr", "Sa")
     }
 
     @Test
     fun showDaysOfMonthCurrentWeek_startingSunday() {
         mockUtilsGetDaysOfMonthOfWeek()
-        val attrs = TimetableAttributeSet().addIsMondayFirstOfWeek(false).build()
-        createTimetable(attrs)
+        createTimetable().setTimetableUserPreferences(
+            baseTimetableUserPreferences.copy(isMondayFirstDayOfWeek = false)
+        )
         verifyDaysOfMonthCurrentWeekTexts("1", "2", "3", "4", "5", "6", "7")
     }
 
@@ -188,12 +196,13 @@ class TimetableTest {
 
     @Test
     fun verifyHoursTextIsDrawn_24HourFormat() {
-        val attrs = TimetableAttributeSet().addIs12HoursFormat(false).build()
         val gridCellHeight = getDimensionPixelSizeById(R.dimen.timetable_grid_cell_height)
         val hourCellWidth = getDimensionPixelSizeById(R.dimen.timetable_hours_cell_width)
         val hoursIn24HourFormat = getStringArrayById(R.array.hours_in_24_hour_format).toList()
         val xAxis = hourCellWidth / 2f
-        createTimetable(attrs)
+        createTimetable().setTimetableUserPreferences(
+            baseTimetableUserPreferences.copy(is12HoursFormat = false)
+        )
         onView(withId(R.id.hour_drawing_container_and_grid)).check(matches(isDisplayed()))
         verify(exactly = 1) {
             canvasRender.drawHoursText24HourFormat(
@@ -208,12 +217,11 @@ class TimetableTest {
 
     @Test
     fun verifyHoursTextIsDrawn_12HourFormat() {
-        val attrs = TimetableAttributeSet().addIs12HoursFormat(true).build()
         val gridCellHeight = getDimensionPixelSizeById(R.dimen.timetable_grid_cell_height)
         val hourCellWidth = getDimensionPixelSizeById(R.dimen.timetable_hours_cell_width)
         val hoursIn12HourFormat = getStringArrayById(R.array.hours_in_12_hour_format).toList()
         val xAxis = hourCellWidth / 2f
-        createTimetable(attrs)
+        createTimetable()
         onView(withId(R.id.hour_drawing_container_and_grid)).check(matches(isDisplayed()))
         verify(exactly = 1) {
             canvasRender.drawHoursText12HourFormat(
@@ -250,7 +258,9 @@ class TimetableTest {
 
     @Test
     fun showAsGrid_false() {
-        createTimetable(showAsGrid = false)
+        createTimetable().setTimetableUserPreferences(
+            baseTimetableUserPreferences.copy(showAsGrid = false)
+        )
         verifyTimetableListViewIsDisplayed()
     }
 
@@ -258,23 +268,22 @@ class TimetableTest {
     fun verifyTimetableViewVisibilityChangeFromGridToList() {
         val timetable = createTimetable()
         verifyTimetableGridViewIsDisplayed()
-        timetable.setShowAsGrid(false)
+        timetable.setTimetableUserPreferences(baseTimetableUserPreferences.copy(showAsGrid = false))
         verifyTimetableListViewIsDisplayed()
     }
 
     @Test
     fun verifyTimetableViewVisibilityChangeFromListToGrid() {
-        val timetable = createTimetable(showAsGrid = false)
+        val timetable = createTimetable()
+        timetable.setTimetableUserPreferences(baseTimetableUserPreferences.copy(showAsGrid = false))
         verifyTimetableListViewIsDisplayed()
-        timetable.setShowAsGrid(true)
+        timetable.setTimetableUserPreferences(baseTimetableUserPreferences.copy(showAsGrid = true))
         verifyTimetableGridViewIsDisplayed()
     }
 
     @Test
     fun showSaturdayAndStartingMonday() {
-        val attrs =
-            TimetableAttributeSet().addShowSaturday(true).addIsMondayFirstOfWeek(true).build()
-        createTimetable(attrs)
+        createTimetable()
         onView(withId(R.id.sixth_day)).check(matches(isDisplayed()))
         onView(withId(R.id.sixth_day_of_week)).check(matches(isDisplayed()))
         verify { utils.getVerticalLinesCoordinates(6, any(), any(), any()) }
@@ -282,9 +291,11 @@ class TimetableTest {
 
     @Test
     fun showSaturdayAndStartingSunday() {
-        val attrs =
-            TimetableAttributeSet().addShowSaturday(true).addIsMondayFirstOfWeek(false).build()
-        createTimetable(attrs)
+        createTimetable().setTimetableUserPreferences(
+            baseTimetableUserPreferences.copy(
+                isMondayFirstDayOfWeek = false
+            )
+        )
         onView(withId(R.id.seventh_day)).check(matches(isDisplayed()))
         onView(withId(R.id.seventh_day_of_week)).check(matches(isDisplayed()))
         verify { utils.getVerticalLinesCoordinates(6, any(), any(), any()) }
@@ -292,9 +303,9 @@ class TimetableTest {
 
     @Test
     fun notShowSaturdayAndStartingMonday() {
-        val attrs =
-            TimetableAttributeSet().addShowSaturday(false).addIsMondayFirstOfWeek(true).build()
-        createTimetable(attrs)
+        createTimetable().setTimetableUserPreferences(
+            baseTimetableUserPreferences.copy(showSaturday = false)
+        )
         onView(withId(R.id.seventh_day_of_week)).check(matches(not(isDisplayed())))
         onView(withId(R.id.seventh_day)).check(matches(not(isDisplayed())))
         verify { utils.getVerticalLinesCoordinates(5, any(), any(), any()) }
@@ -302,9 +313,9 @@ class TimetableTest {
 
     @Test
     fun notShowSaturdayAndStartingSunday() {
-        val attrs =
-            TimetableAttributeSet().addShowSaturday(false).addIsMondayFirstOfWeek(false).build()
-        createTimetable(attrs)
+        createTimetable().setTimetableUserPreferences(
+            baseTimetableUserPreferences.copy(showSaturday = false, isMondayFirstDayOfWeek = false)
+        )
         onView(withId(R.id.seventh_day_of_week)).check(matches(not(isDisplayed())))
         onView(withId(R.id.seventh_day)).check(matches(not(isDisplayed())))
         verify { utils.getVerticalLinesCoordinates(5, any(), any(), any()) }
@@ -312,9 +323,7 @@ class TimetableTest {
 
     @Test
     fun showSundayAndStartingMonday() {
-        val attrs =
-            TimetableAttributeSet().addShowSunday(true).addIsMondayFirstOfWeek(true).build()
-        createTimetable(attrs)
+        createTimetable()
         onView(withId(R.id.seventh_day_of_week)).check(matches(isDisplayed()))
         onView(withId(R.id.seventh_day)).check(matches(isDisplayed()))
         verify { utils.getVerticalLinesCoordinates(6, any(), any(), any()) }
@@ -322,9 +331,9 @@ class TimetableTest {
 
     @Test
     fun notShowSundayAndStartingMonday() {
-        val attrs =
-            TimetableAttributeSet().addShowSunday(false).addIsMondayFirstOfWeek(true).build()
-        createTimetable(attrs)
+        createTimetable().setTimetableUserPreferences(
+            baseTimetableUserPreferences.copy(showSunday = false)
+        )
         onView(withId(R.id.seventh_day_of_week)).check(matches(not(isDisplayed())))
         onView(withId(R.id.seventh_day)).check(matches(not(isDisplayed())))
         verify { utils.getVerticalLinesCoordinates(5, any(), any(), any()) }
@@ -332,9 +341,9 @@ class TimetableTest {
 
     @Test
     fun notShowSundayAndStartingSunday() {
-        val attrs =
-            TimetableAttributeSet().addShowSunday(false).addIsMondayFirstOfWeek(false).build()
-        createTimetable(attrs)
+        createTimetable().setTimetableUserPreferences(
+            baseTimetableUserPreferences.copy(showSunday = false, isMondayFirstDayOfWeek = false)
+        )
         onView(withId(R.id.seventh_day_of_week)).check(matches(not(isDisplayed())))
         onView(withId(R.id.seventh_day)).check(matches(not(isDisplayed())))
         verify { utils.getVerticalLinesCoordinates(5, any(), any(), any()) }
@@ -342,8 +351,9 @@ class TimetableTest {
 
     @Test
     fun notShowSundayNotShowSaturday() {
-        val attrs = TimetableAttributeSet().addShowSunday(false).addShowSaturday(false).build()
-        createTimetable(attrs)
+        createTimetable().setTimetableUserPreferences(
+            baseTimetableUserPreferences.copy(showSunday = false, showSaturday = false)
+        )
         onView(withId(R.id.seventh_day_of_week)).check(matches(not(isDisplayed())))
         onView(withId(R.id.seventh_day)).check(matches(not(isDisplayed())))
         onView(withId(R.id.sixth_day_of_week)).check(matches(not(isDisplayed())))
@@ -472,8 +482,11 @@ class TimetableTest {
     fun showSchedulesInGrid_notShowSunday() {
         val scheduleId = 1
         val schedule = listOf(uniqueSchedule.copy(id = scheduleId, day = DayOfWeek.SUNDAY))
-        val attrs = TimetableAttributeSet().addShowSunday(false).build()
-        val timetable = createTimetable(attrs)
+        val timetable = createTimetable().apply {
+            setTimetableUserPreferences(
+                baseTimetableUserPreferences.copy(showSunday = false)
+            )
+        }
         onView(withId(R.id.schedule_container_and_grid)).check(matches(isDisplayed()))
         timetable.showScheduleInGrid(schedule)
         onView(withContentDescription(scheduleId.toString())).check(doesNotExist())
@@ -484,7 +497,11 @@ class TimetableTest {
         val scheduleId = 1
         val schedule = listOf(uniqueSchedule.copy(id = scheduleId, day = DayOfWeek.SATURDAY))
         val attrs = TimetableAttributeSet().addShowSaturday(false).build()
-        val timetable = createTimetable(attrs)
+        val timetable = createTimetable(attrs).apply {
+            setTimetableUserPreferences(
+                baseTimetableUserPreferences.copy(showSaturday = false)
+            )
+        }
         onView(withId(R.id.schedule_container_and_grid)).check(matches(isDisplayed()))
         timetable.showScheduleInGrid(schedule)
         onView(withContentDescription(scheduleId.toString())).check(doesNotExist())
@@ -498,8 +515,11 @@ class TimetableTest {
             uniqueSchedule.copy(id = saturdayScheduleId, day = DayOfWeek.SATURDAY),
             uniqueSchedule.copy(id = sundayScheduleId, day = DayOfWeek.SUNDAY)
         )
-        val attrs = TimetableAttributeSet().addShowSaturday(false).build()
-        val timetable = createTimetable(attrs)
+        val timetable = createTimetable().apply {
+            setTimetableUserPreferences(
+                baseTimetableUserPreferences.copy(showSaturday = false)
+            )
+        }
         onView(withId(R.id.schedule_container_and_grid)).check(matches(isDisplayed()))
         timetable.showScheduleInGrid(schedules)
         onView(withContentDescription(saturdayScheduleId.toString())).check(doesNotExist())
@@ -527,8 +547,11 @@ class TimetableTest {
         val expectedMondayScheduleXCoordinate = (hourCellWidth + cellWidth).toFloat()
         val expectedMondayScheduleYCoordinate = 13f * cellHeight
 
-        val attrs = TimetableAttributeSet().addIsMondayFirstOfWeek(false).build()
-        val timetable = createTimetable(attrs)
+        val timetable = createTimetable().apply {
+            setTimetableUserPreferences(
+                baseTimetableUserPreferences.copy(isMondayFirstDayOfWeek = false)
+            )
+        }
         onView(withId(R.id.schedule_container_and_grid)).check(matches(isDisplayed()))
         timetable.showScheduleInGrid(schedules)
 
@@ -591,12 +614,30 @@ class TimetableTest {
         assertThat(timetable.currentMonth.getOrAwaitValue(), `is`(expectedMonth))
     }
 
+    @Test
+    fun setTimetableUserPreferences_showAsGridFalseIs12HoursFormatFalseShowSaturdayFalseIsMondayFalseShowSundayFalse() {
+        createTimetable().setTimetableUserPreferences(
+            baseTimetableUserPreferences.copy(
+                showAsGrid = false,
+                is12HoursFormat = false,
+                showSaturday = false,
+                isMondayFirstDayOfWeek = false,
+                showSunday = false
+            )
+        )
+
+        onView(withContentDescription(timetableContentDescription)).check(matches(isDisplayed()))
+        verifyTimetableListViewIsDisplayed()
+        verify { canvasRender.drawHoursText24HourFormat(any(), any(), any(), any(), any()) }
+        onView(withId(R.id.seventh_day_of_week)).check(matches(not(isDisplayed())))
+        onView(withId(R.id.seventh_day)).check(matches(not(isDisplayed())))
+    }
+
     private fun createTimetable(
-        attr: AttributeSet? = null,
-        showAsGrid: Boolean = true
+        attr: AttributeSet? = null
     ): Timetable {
         var timetable: Timetable? = null
-        launchFragmentInHiltContainer<com.studentsapps.ui_test_hilt_manifest.FragmentTest> {
+        launchFragmentInHiltContainer<FragmentTest> {
             val attributeSet = attr ?: Robolectric.buildAttributeSet().build()
             timetable = Timetable(this.requireContext(), attributeSet)
             val layoutParams = FrameLayout.LayoutParams(
@@ -608,7 +649,7 @@ class TimetableTest {
                 contentDescription = timetableContentDescription
             }
             binding.root.addView(timetable)
-            timetable!!.setShowAsGrid(showAsGrid)
+            timetable!!.setTimetableUserPreferences(baseTimetableUserPreferences)
         }
         return timetable!!
     }
@@ -935,5 +976,14 @@ class TimetableTest {
             "Math 2",
             Color.BLUE
         )
+
+        private val baseTimetableUserPreferences =
+            TimetableUserPreferences(
+                showAsGrid = true,
+                is12HoursFormat = true,
+                showSaturday = true,
+                showSunday = true,
+                isMondayFirstDayOfWeek = true
+            )
     }
 }

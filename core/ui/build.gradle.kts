@@ -12,6 +12,7 @@ android {
 
 dependencies {
     implementation(project(":core:designsystem"))
+    implementation(project(":core:model"))
     testImplementation(project(":core:testing"))
     testImplementation(project(":ui-test-hilt-manifest"))
 

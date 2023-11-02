@@ -5,17 +5,20 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.studentsapps.schedule.databinding.FragmentScheduleBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ScheduleFragment : Fragment() {
 
     private var _binding: FragmentScheduleBinding? = null
     private val binding get() = _binding!!
-    val showAsGrid = MutableStateFlow(true)
+    private val viewModel: ScheduleViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -26,21 +29,26 @@ class ScheduleFragment : Fragment() {
             lifecycleOwner = viewLifecycleOwner
             scheduleFragment = this@ScheduleFragment
             timetableView = timetable
+            scheduleViewModel = viewModel
         }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { currentState ->
+                    if (currentState is ScheduleUiState.Success) {
+                        binding.timetable.setTimetableUserPreferences(currentState.timetableUserPreferences)
+                    }
+                }
+            }
+        }
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        //showCurrentMonthInAppBar()
         configureMenuOptionsInAppBar()
     }
-
-    /*private fun showCurrentMonthInAppBar() {
-        binding.apply {
-            toolbar.title = timetable._currentMonth
-        }
-    }*/
 
     private fun configureMenuOptionsInAppBar() {
         binding.toolbar.apply {
@@ -48,9 +56,7 @@ class ScheduleFragment : Fragment() {
             setOnMenuItemClickListener { menuItem ->
                 when (menuItem.itemId) {
                     R.id.change_timetable_view -> {
-                        showAsGrid.update {
-                            !it
-                        }
+                        viewModel.setShowAsGrid()
                         true
                     }
 
