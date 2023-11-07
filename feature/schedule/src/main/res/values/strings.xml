@@ -1,4 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="change_timetable_view">Change timetable view</string>
+    <string name="calendar_preferences">Calendar</string>
+    <string name="first_day_of_week">First day of the week</string>
+    <string name="time_preferences">Schedule</string>
+    <string name="show_classrooms">Show classrooms</string>
+    <string name="classroom_showing_switch">Classroom showing switch</string>
+    <string name="display_saturday">Display Saturday</string>
+    <string name="saturday_display_switch">Saturday display switch</string>
+    <string name="display_sunday">Display Sunday</string>
+    <string name="sunday_display_switch">Sunday display switch</string>
+    <string name="hour_format">Hour format</string>
+    <string name="hour_format_value">Hour format value</string>
 </resources>

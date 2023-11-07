@@ -1,5 +1,6 @@
 plugins {
     id("universityschedule.android.ui")
+    alias(libs.plugins.org.jetbrains.kotlin.android)
 }
 
 android {
