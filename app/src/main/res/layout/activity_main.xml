@@ -9,7 +9,7 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/main_activity_fragment_container"
-        android:name="com.studentsapps.schedule.ScheduleFragment"
+        android:name="com.studentsapps.schedule.fragments.ScheduleFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@id/bottom_nav_view"

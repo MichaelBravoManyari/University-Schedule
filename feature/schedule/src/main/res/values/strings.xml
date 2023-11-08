@@ -12,4 +12,8 @@
     <string name="sunday_display_switch">Sunday display switch</string>
     <string name="hour_format">Hour format</string>
     <string name="hour_format_value">Hour format value</string>
+    <string name="monday">Monday</string>
+    <string name="sunday">Sunday</string>
+    <string name="twelve_hours">12 hours</string>
+    <string name="twenty_four_hours">24 hours</string>
 </resources>

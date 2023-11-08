@@ -16,7 +16,8 @@ val baseTimetableUserPreferencesData = TimetableUserPreferences(
     isMondayFirstDayOfWeek = true
 )
 
-class FakeTimetableUserPreferencesRepository @Inject constructor(): TimetableUserPreferencesRepository {
+class FakeTimetableUserPreferencesRepository @Inject constructor() :
+    TimetableUserPreferencesRepository {
 
     private val _userData = MutableSharedFlow<TimetableUserPreferences>(
         replay = 1,
@@ -37,18 +38,18 @@ class FakeTimetableUserPreferencesRepository @Inject constructor(): TimetableUse
     }
 
     override suspend fun updateIs12HoursFormat() {
-        // Todo
+        _userData.tryEmit(currentUserData.copy(is12HoursFormat = !currentUserData.is12HoursFormat))
     }
 
     override suspend fun updateShowSaturday() {
-        // Todo
+        _userData.tryEmit(currentUserData.copy(showSaturday = !currentUserData.showSaturday))
     }
 
     override suspend fun updateShowSunday() {
-        // Todo
+        _userData.tryEmit(currentUserData.copy(showSunday = !currentUserData.showSunday))
     }
 
     override suspend fun updateIsMondayFirstDayOfWeek() {
-        // Todo
+        _userData.tryEmit(currentUserData.copy(isMondayFirstDayOfWeek = !currentUserData.isMondayFirstDayOfWeek))
     }
 }

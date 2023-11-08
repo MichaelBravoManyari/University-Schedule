@@ -7,7 +7,7 @@
 
         <variable
             name="scheduleFragment"
-            type="com.studentsapps.schedule.ScheduleFragment" />
+            type="com.studentsapps.schedule.fragments.ScheduleFragment" />
 
         <variable
             name="timetableView"
@@ -15,13 +15,13 @@
 
         <variable
             name="scheduleViewModel"
-            type="com.studentsapps.schedule.ScheduleViewModel" />
+            type="com.studentsapps.schedule.viewmodels.ScheduleViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ScheduleFragment">
+        tools:context=".fragments.ScheduleFragment">
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/appbar"

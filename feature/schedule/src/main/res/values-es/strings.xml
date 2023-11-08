@@ -12,4 +12,8 @@
     <string name="sunday_display_switch">Switch de mostrar domingo</string>
     <string name="hour_format">Formato de hora</string>
     <string name="hour_format_value">Val</string>
+    <string name="monday">lunes</string>
+    <string name="sunday">domingo</string>
+    <string name="twelve_hours">12 horas</string>
+    <string name="twenty_four_hours">24 horas</string>
 </resources>

@@ -1,4 +1,4 @@
-package com.studentsapps.schedule
+package com.studentsapps.schedule.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

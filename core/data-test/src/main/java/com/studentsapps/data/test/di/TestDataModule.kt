@@ -1,4 +1,4 @@
-package com.studentsapps.schedule
+package com.studentsapps.data.test.di
 
 import com.studentsapps.data.di.DataModule
 import com.studentsapps.data.repository.TimetableUserPreferencesRepository

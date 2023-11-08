@@ -17,6 +17,7 @@ dependencies {
     implementation(project(":core:data"))
     implementation(project(":core:model"))
     testImplementation(project(":core:testing"))
+    testImplementation(project(":core:data-test"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -31,4 +32,10 @@ dependencies {
     testImplementation(libs.androidx.test.ext.junit)
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
+
+    // Navigation component
+    implementation("androidx.navigation:navigation-fragment-ktx:2.7.5")
+    implementation("androidx.navigation:navigation-ui-ktx:2.7.5")
+    implementation("androidx.navigation:navigation-dynamic-features-fragment:2.7.5")
+
 }

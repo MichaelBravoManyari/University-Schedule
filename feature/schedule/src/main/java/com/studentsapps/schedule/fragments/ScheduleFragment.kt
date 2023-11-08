@@ -1,4 +1,4 @@
-package com.studentsapps.schedule
+package com.studentsapps.schedule.fragments
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -9,6 +9,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.studentsapps.schedule.R
+import com.studentsapps.schedule.viewmodels.ScheduleUiState
+import com.studentsapps.schedule.viewmodels.ScheduleViewModel
 import com.studentsapps.schedule.databinding.FragmentScheduleBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
