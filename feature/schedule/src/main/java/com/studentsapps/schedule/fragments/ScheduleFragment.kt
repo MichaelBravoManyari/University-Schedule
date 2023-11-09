@@ -1,18 +1,21 @@
 package com.studentsapps.schedule.fragments
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.findNavController
+import androidx.navigation.ui.onNavDestinationSelected
+import androidx.navigation.ui.setupWithNavController
 import com.studentsapps.schedule.R
+import com.studentsapps.schedule.databinding.FragmentScheduleBinding
 import com.studentsapps.schedule.viewmodels.ScheduleUiState
 import com.studentsapps.schedule.viewmodels.ScheduleViewModel
-import com.studentsapps.schedule.databinding.FragmentScheduleBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -28,6 +31,7 @@ class ScheduleFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentScheduleBinding.inflate(inflater, container, false)
+
         binding.apply {
             lifecycleOwner = viewLifecycleOwner
             scheduleFragment = this@ScheduleFragment
@@ -35,8 +39,14 @@ class ScheduleFragment : Fragment() {
             scheduleViewModel = viewModel
         }
 
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.uiState.collect { currentState ->
                     if (currentState is ScheduleUiState.Success) {
                         binding.timetable.setTimetableUserPreferences(currentState.timetableUserPreferences)
@@ -45,11 +55,7 @@ class ScheduleFragment : Fragment() {
             }
         }
 
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        binding.toolbar.setupWithNavController(view.findNavController())
         configureMenuOptionsInAppBar()
     }
 
@@ -63,7 +69,7 @@ class ScheduleFragment : Fragment() {
                         true
                     }
 
-                    else -> false
+                    else -> menuItem.onNavDestinationSelected(findNavController())
                 }
             }
         }

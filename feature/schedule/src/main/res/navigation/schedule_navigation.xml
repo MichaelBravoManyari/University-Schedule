@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/schedule_nav_graph"
+    app:startDestination="@id/scheduleFragment">
+
+    <fragment
+        android:id="@+id/scheduleFragment"
+        android:name="com.studentsapps.schedule.fragments.ScheduleFragment"
+        android:label="ScheduleFragment" >
+        <action
+            android:id="@+id/action_scheduleFragment_to_scheduleConfigurationFragment"
+            app:destination="@id/scheduleConfigurationFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/scheduleConfigurationFragment"
+        android:name="com.studentsapps.schedule.fragments.ScheduleConfigurationFragment"
+        android:label="ScheduleConfigurationFragment" >
+        <action
+            android:id="@+id/action_scheduleConfigurationFragment_to_scheduleFragment"
+            app:destination="@id/scheduleFragment" />
+    </fragment>
+</navigation>

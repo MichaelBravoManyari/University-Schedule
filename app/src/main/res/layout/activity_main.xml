@@ -6,16 +6,17 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/main_activity_fragment_container"
-        android:name="com.studentsapps.schedule.fragments.ScheduleFragment"
+        android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@id/bottom_nav_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/schedule_navigation"
         tools:layout="@layout/fragment_schedule" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView

@@ -15,6 +15,7 @@ import com.studentsapps.ui_test_hilt_manifest.HiltTestActivity
 inline fun <reified T : Fragment> launchFragmentInHiltContainer(
     fragmentArgs: Bundle? = null,
     @StyleRes themeResId: Int = androidx.fragment.testing.manifest.R.style.FragmentScenarioEmptyFragmentActivityTheme,
+    crossinline navigation: T.() -> Unit = {},
     crossinline action: T.() -> Unit = {}
 ) {
     val startActivityIntent = Intent.makeMainActivity(
@@ -33,6 +34,11 @@ inline fun <reified T : Fragment> launchFragmentInHiltContainer(
             T::class.java.name
         )
         fragment.arguments = fragmentArgs
+        fragment.viewLifecycleOwnerLiveData.observeForever {
+            if (it != null) {
+                (fragment as T).navigation()
+            }
+        }
         activity.supportFragmentManager
             .beginTransaction()
             .add(android.R.id.content, fragment, "")

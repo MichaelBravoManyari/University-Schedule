@@ -54,9 +54,22 @@ class ScheduleConfigurationFragment : Fragment() {
                             else
                                 getText(R.string.twenty_four_hours)
 
-                        binding.saturdayDisplaySwitch.isChecked = currentState.showSaturday
+                        binding.saturdayDisplaySwitch.apply {
+                            if (isChecked != currentState.showSaturday)
+                                isChecked = currentState.showSaturday
+                            setOnCheckedChangeListener { _, _ ->
+                                viewModel.setShowSaturday()
+                            }
+                        }
 
-                        binding.sundayDisplaySwitch.isChecked = currentState.showSunday
+                        binding.sundayDisplaySwitch.apply {
+                            if (isChecked != currentState.showSunday)
+                                isChecked = currentState.showSunday
+
+                            setOnCheckedChangeListener { _, _ ->
+                                viewModel.setShowSunday()
+                            }
+                        }
                     }
                 }
             }

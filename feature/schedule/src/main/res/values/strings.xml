@@ -16,4 +16,5 @@
     <string name="sunday">Sunday</string>
     <string name="twelve_hours">12 hours</string>
     <string name="twenty_four_hours">24 hours</string>
+    <string name="configuration">Configuration</string>
 </resources>

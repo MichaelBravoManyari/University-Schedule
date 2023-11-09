@@ -1,10 +1,15 @@
 package com.studentsapps.schedule.fragments
 
+import androidx.navigation.Navigation
+import androidx.navigation.testing.TestNavHostController
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.Espresso.openContextualActionModeOverflowMenu
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.swipeLeft
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.assertThat
 import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -22,7 +27,9 @@ import io.mockk.every
 import io.mockk.spyk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.Matchers
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -45,23 +52,31 @@ class ScheduleFragmentTest {
     @BindValue
     val timetableUtils = spyk<TimetableUtils>()
 
+    private lateinit var navController: TestNavHostController
+
+    @Before
+    fun setup() {
+        navController = TestNavHostController(ApplicationProvider.getApplicationContext())
+        navController.setGraph(R.navigation.schedule_navigation)
+    }
+
     @Test
     fun verifyCurrentMonthDisplayedInAppBar() {
         every { timetableUtils.getMonth(any()) } returns "July"
         val expectedMonth = "July"
-        launchFragmentInHiltContainer<ScheduleFragment>()
+        createScheduleFragment()
         onView(withId(R.id.toolbar)).check(matches(hasDescendant(withText(expectedMonth))))
     }
 
     @Test
     fun verifyAppBarMenuOptionsDisplayed() {
-        launchFragmentInHiltContainer<ScheduleFragment>()
+        createScheduleFragment()
         onView(withId(R.id.change_timetable_view)).check(matches(isDisplayed()))
     }
 
     @Test
     fun verifyTimetableViewsChange() = runTest {
-        launchFragmentInHiltContainer<ScheduleFragment>()
+        createScheduleFragment()
         verifyTimetableGridViewIsDisplayed()
         onView(withId(R.id.change_timetable_view)).perform(click())
         verifyTimetableListViewIsDisplayed()
@@ -73,9 +88,23 @@ class ScheduleFragmentTest {
     fun testCorrectMonthDisplayedOnCurrentWeekChange() {
         val expectedMonth = "September"
         every { timetableUtils.getCurrentDate() } returns LocalDate.of(2023, 8, 26)
-        launchFragmentInHiltContainer<ScheduleFragment>()
+        createScheduleFragment()
         onView(withId(R.id.timetable)).perform(swipeLeft())
         onView(withId(R.id.toolbar)).check(matches(hasDescendant(withText(expectedMonth))))
+    }
+
+    @Test
+    fun verifyNavigationToTimetableSettingsOnActionClick() {
+        createScheduleFragment()
+        openContextualActionModeOverflowMenu()
+        onView(withText(R.string.configuration)).perform(click())
+        assertThat(navController.currentDestination?.id, `is`(R.id.scheduleConfigurationFragment))
+    }
+
+    private fun createScheduleFragment() {
+        launchFragmentInHiltContainer<ScheduleFragment>(navigation = {
+            Navigation.setViewNavController(requireView(), navController)
+        })
     }
 
     private fun verifyTimetableGridViewIsDisplayed() {
