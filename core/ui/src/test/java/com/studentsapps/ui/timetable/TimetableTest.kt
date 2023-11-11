@@ -22,8 +22,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.drawable.toDrawable
+import androidx.core.view.marginStart
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.scrollTo
 import androidx.test.espresso.action.ViewActions.swipeLeft
 import androidx.test.espresso.action.ViewActions.swipeRight
@@ -33,9 +35,9 @@ import androidx.test.espresso.matcher.BoundedMatcher
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.studentsapps.model.TimetableUserPreferences
-import com.studentsapps.ui.R
 import com.studentsapps.testing.getOrAwaitValue
 import com.studentsapps.testing.launchFragmentInHiltContainer
+import com.studentsapps.ui.R
 import com.studentsapps.ui_test_hilt_manifest.FragmentTest
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -607,7 +609,7 @@ class TimetableTest {
     @Test
     fun testSelectedWeekMonthDisplay() {
         val expectedMonth = "September"
-        every { utils.getCurrentDate() } returns LocalDate.of(2023, 8, 26)
+        mockUtilsGetCurrentDate()
         val timetable = createTimetable()
         onView(withContentDescription(timetableContentDescription))
             .perform(swipeLeft())
@@ -631,6 +633,44 @@ class TimetableTest {
         verify { canvasRender.drawHoursText24HourFormat(any(), any(), any(), any(), any()) }
         onView(withId(R.id.seventh_day_of_week)).check(matches(not(isDisplayed())))
         onView(withId(R.id.seventh_day)).check(matches(not(isDisplayed())))
+    }
+
+    @Test
+    fun verifyCorrectFirstDayOfWeekMarginInGridOrListMode() {
+        val expectedMarginGrid = getDimensionPixelSizeById(R.dimen.timetable_hours_cell_width)
+        val expectedMarginList = 0
+        val timetable = createTimetable()
+        onView(withId(R.id.start_day_of_week)).check(matches(withMarginStart(expectedMarginGrid)))
+        timetable.setTimetableUserPreferences(baseTimetableUserPreferences.copy(showAsGrid = false))
+        onView(withId(R.id.start_day_of_week)).check(matches(withMarginStart(expectedMarginList)))
+    }
+
+    @Test
+    fun verifySwipeUpdatesDate() {
+        val currentDate = LocalDate.of(2023, 8, 26)
+        val swipeLeftDate = currentDate.plusWeeks(1)
+        val swipeRightDate = currentDate.minusWeeks(1)
+        mockUtilsGetCurrentDate()
+        val timetable = createTimetable()
+        onView(withContentDescription(timetableContentDescription)).perform(swipeLeft())
+        assertThat(timetable.date.getOrAwaitValue(), `is`(swipeLeftDate))
+        onView(withContentDescription(timetableContentDescription)).perform(swipeRight())
+        assertThat(timetable.date.getOrAwaitValue(), `is`(currentDate))
+        onView(withContentDescription(timetableContentDescription)).perform(swipeRight())
+        assertThat(timetable.date.getOrAwaitValue(), `is`(swipeRightDate))
+    }
+
+    @Test
+    fun verifyListTypeDayClickUpdatesDate() {
+        mockUtilsGetCurrentDate()
+        mockCanvasRenderGetCurrentMonthDayBackground()
+        val expectedDate = LocalDate.of(2023, 8, 21)
+        val expectedBackground = getExpectedBackgroundCurrentMonthDay()
+        val timetable = createTimetable()
+        timetable.setTimetableUserPreferences(baseTimetableUserPreferences.copy(showAsGrid = false))
+        onView(withId(R.id.first_day)).perform(click())
+        assertThat(timetable.date.getOrAwaitValue(), `is`(expectedDate))
+        onView(withId(R.id.first_day)).check(matches(withBackground(expectedBackground)))
     }
 
     private fun createTimetable(
@@ -660,6 +700,10 @@ class TimetableTest {
             10,
             Bitmap.Config.ARGB_8888
         ).toDrawable(ApplicationProvider.getApplicationContext<Context>().resources)
+    }
+
+    private fun mockUtilsGetCurrentDate() {
+        every { utils.getCurrentDate() } returns LocalDate.of(2023, 8, 26)
     }
 
     private fun mockCanvasRenderGetCurrentMonthDayBackground() {
@@ -910,6 +954,20 @@ class TimetableTest {
 
             override fun matchesSafely(item: TextView?): Boolean {
                 return (item?.width == width && item.height == height)
+            }
+
+        }
+    }
+
+    private fun withMarginStart(marginStart: Int): Matcher<View> {
+        return object : BoundedMatcher<View, TextView>(TextView::class.java) {
+            override fun describeTo(description: Description?) {
+                description?.appendText("with marginStart: ")
+                description?.appendValue(marginStart)
+            }
+
+            override fun matchesSafely(item: TextView?): Boolean {
+                return item?.marginStart == marginStart
             }
 
         }

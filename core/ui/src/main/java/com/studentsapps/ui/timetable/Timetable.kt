@@ -60,7 +60,8 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
     private val gestureDetector = GestureDetectorCompat(context, MyGestureListener())
     private val mTouchSlop = ViewConfiguration.get(context).scaledTouchSlop
     private var mDownX = 0f
-    private var date = utils.getCurrentDate()
+    private var _date = MutableLiveData(utils.getCurrentDate())
+    val date = _date as LiveData<LocalDate>
     private var redrawGridsAndHours = false
     private var wasViewDrawn = false
     private var remakeTheView = false
@@ -151,20 +152,33 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
 
         if (!wasViewDrawn || remakeTheView) {
             configureDayViews()
-            invalidate()
-            requestLayout()
+            restartView()
         } else if (redrawGridsAndHours) {
-            invalidate()
-            requestLayout()
+            restartView()
         }
     }
 
     private fun setShowAsGrid(value: Boolean) {
         showAsGrid = value
-        if (showAsGrid)
+        val hoursCellWidth: Int
+
+        if (showAsGrid) {
+            hoursCellWidth = getDimensionPixelSizeById(R.dimen.timetable_hours_cell_width)
             displayGridView()
-        else
+        } else {
+            hoursCellWidth = 0
             displayListView()
+        }
+
+        (binding.startDayOfWeek.layoutParams as MarginLayoutParams).let { layoutParams ->
+            layoutParams.marginStart = hoursCellWidth
+            binding.startDayOfWeek.layoutParams = layoutParams
+        }
+    }
+
+    private fun restartView() {
+        invalidate()
+        requestLayout()
     }
 
     private fun setIs12HoursFormat(value: Boolean) {
@@ -210,7 +224,12 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
 
     private fun configureDaysOfMonthViews() {
         val daysOfMonthCurrentWeek =
-            utils.getDaysOfMonthOfWeek(isMondayFirstDayOfWeek, showSaturday, showSunday, date)
+            utils.getDaysOfMonthOfWeek(
+                isMondayFirstDayOfWeek,
+                showSaturday,
+                showSunday,
+                _date.value!!
+            )
         val daysOfMonthTextSize = getDimensionById(R.dimen.timetable_days_of_month_text_size)
         val daysOfMonthViews = getDaysOfMonthViews()
         hideIneligibleDaysOfMonthViews()
@@ -229,7 +248,7 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
             getColorById(R.color.timetable_current_month_day_background_color)
         val monthDayTextColor = getColorById(R.color.timetable_month_day_text_color)
         getDaysOfMonthViews().forEach { view ->
-            if (date == LocalDate.now() && view.text == currentMonthDay) {
+            if (_date.value == LocalDate.now() && view.text == currentMonthDay) {
                 view.apply {
                     setTextColor(currentMonthDayTextColor)
                     background = canvasRender.getCurrentMonthDayBackground(
@@ -719,8 +738,8 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
             velocityX: Float,
             velocityY: Float
         ): Boolean {
-            date = if (isRightSwipe(e2)) date.minusWeeks(1) else date.plusWeeks(1)
-            _currentMonth.value = utils.getMonth(date)
+            _date.value = if (isRightSwipe(e2)) _date.value?.minusWeeks(1) else _date.value?.plusWeeks(1)
+            _currentMonth.value = _date.value?.let { utils.getMonth(it) }
             updateTextOfDayOfMonthViews()
             selectCurrentMonthDay()
             return true
@@ -738,7 +757,7 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
                 isMondayFirstDayOfWeek,
                 showSaturday,
                 showSunday,
-                date
+                _date.value!!
             )
         getDaysOfMonthViews().forEachIndexed { index, view ->
             view.text = daysOfMonthOfWeek[index]
