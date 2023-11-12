@@ -2,9 +2,9 @@ package com.studentsapps.ui.timetable
 
 import com.studentsapps.ui.R
 import org.hamcrest.CoreMatchers.`is`
-import org.junit.Test
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Assert.assertThrows
+import org.junit.Test
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
@@ -19,7 +19,15 @@ class TimetableUtilsTest {
         val showSaturday = true
         val showSunday = true
         val date = LocalDate.of(2023, 7, 18)
-        val expectedDays = listOf("17", "18", "19", "20", "21", "22", "23")
+        val expectedDays = listOf(
+            LocalDate.of(2023, 7, 17),
+            LocalDate.of(2023, 7, 18),
+            LocalDate.of(2023, 7, 19),
+            LocalDate.of(2023, 7, 20),
+            LocalDate.of(2023, 7, 21),
+            LocalDate.of(2023, 7, 22),
+            LocalDate.of(2023, 7, 23)
+        )
         val daysOfWeekOfMonth =
             utils.getDaysOfMonthOfWeek(isMondayFirstDayOfWeek, showSaturday, showSunday, date)
         assertThat(daysOfWeekOfMonth, `is`(expectedDays))
@@ -31,7 +39,14 @@ class TimetableUtilsTest {
         val showSaturday = true
         val showSunday = false
         val date = LocalDate.of(2023, 7, 18)
-        val expectedDays = listOf("17", "18", "19", "20", "21", "22")
+        val expectedDays = listOf(
+            LocalDate.of(2023, 7, 17),
+            LocalDate.of(2023, 7, 18),
+            LocalDate.of(2023, 7, 19),
+            LocalDate.of(2023, 7, 20),
+            LocalDate.of(2023, 7, 21),
+            LocalDate.of(2023, 7, 22)
+        )
         val daysOfWeekOfMonth =
             utils.getDaysOfMonthOfWeek(isMondayFirstDayOfWeek, showSaturday, showSunday, date)
         assertThat(daysOfWeekOfMonth, `is`(expectedDays))
@@ -43,7 +58,14 @@ class TimetableUtilsTest {
         val showSaturday = false
         val showSunday = true
         val date = LocalDate.of(2023, 7, 18)
-        val expectedDays = listOf("17", "18", "19", "20", "21", "23")
+        val expectedDays = listOf(
+            LocalDate.of(2023, 7, 17),
+            LocalDate.of(2023, 7, 18),
+            LocalDate.of(2023, 7, 19),
+            LocalDate.of(2023, 7, 20),
+            LocalDate.of(2023, 7, 21),
+            LocalDate.of(2023, 7, 23)
+        )
         val daysOfWeekOfMonth =
             utils.getDaysOfMonthOfWeek(isMondayFirstDayOfWeek, showSaturday, showSunday, date)
         assertThat(daysOfWeekOfMonth, `is`(expectedDays))
@@ -55,7 +77,13 @@ class TimetableUtilsTest {
         val showSaturday = false
         val showSunday = false
         val date = LocalDate.of(2023, 7, 18)
-        val expectedDays = listOf("17", "18", "19", "20", "21")
+        val expectedDays = listOf(
+            LocalDate.of(2023, 7, 17),
+            LocalDate.of(2023, 7, 18),
+            LocalDate.of(2023, 7, 19),
+            LocalDate.of(2023, 7, 20),
+            LocalDate.of(2023, 7, 21)
+        )
         val daysOfWeekOfMonth =
             utils.getDaysOfMonthOfWeek(isMondayFirstDayOfWeek, showSaturday, showSunday, date)
         assertThat(daysOfWeekOfMonth, `is`(expectedDays))
@@ -67,7 +95,15 @@ class TimetableUtilsTest {
         val showSaturday = true
         val showSunday = true
         val date = LocalDate.of(2023, 10, 30)
-        val expectedDays = listOf("29", "30", "31", "1", "2", "3", "4")
+        val expectedDays = listOf(
+            LocalDate.of(2023, 10, 29),
+            LocalDate.of(2023, 10, 30),
+            LocalDate.of(2023, 10, 31),
+            LocalDate.of(2023, 11, 1),
+            LocalDate.of(2023, 11, 2),
+            LocalDate.of(2023, 11, 3),
+            LocalDate.of(2023, 11, 4)
+        )
         val daysOfWeekOfMonth =
             utils.getDaysOfMonthOfWeek(isMondayFirstDayOfWeek, showSaturday, showSunday, date)
         assertThat(daysOfWeekOfMonth, `is`(expectedDays))
@@ -79,7 +115,14 @@ class TimetableUtilsTest {
         val showSaturday = true
         val showSunday = false
         val date = LocalDate.of(2023, 10, 30)
-        val expectedDays = listOf("30", "31", "1", "2", "3", "4")
+        val expectedDays = listOf(
+            LocalDate.of(2023, 10, 30),
+            LocalDate.of(2023, 10, 31),
+            LocalDate.of(2023, 11, 1),
+            LocalDate.of(2023, 11, 2),
+            LocalDate.of(2023, 11, 3),
+            LocalDate.of(2023, 11, 4)
+        )
         val daysOfWeekOfMonth =
             utils.getDaysOfMonthOfWeek(isMondayFirstDayOfWeek, showSaturday, showSunday, date)
         assertThat(daysOfWeekOfMonth, `is`(expectedDays))
@@ -91,7 +134,14 @@ class TimetableUtilsTest {
         val showSaturday = false
         val showSunday = true
         val date = LocalDate.of(2023, 10, 30)
-        val expectedDays = listOf("29", "30", "31", "1", "2", "3")
+        val expectedDays = listOf(
+            LocalDate.of(2023, 10, 29),
+            LocalDate.of(2023, 10, 30),
+            LocalDate.of(2023, 10, 31),
+            LocalDate.of(2023, 11, 1),
+            LocalDate.of(2023, 11, 2),
+            LocalDate.of(2023, 11, 3)
+        )
         val daysOfWeekOfMonth =
             utils.getDaysOfMonthOfWeek(isMondayFirstDayOfWeek, showSaturday, showSunday, date)
         assertThat(daysOfWeekOfMonth, `is`(expectedDays))
@@ -103,7 +153,13 @@ class TimetableUtilsTest {
         val showSaturday = false
         val showSunday = false
         val date = LocalDate.of(2023, 10, 30)
-        val expectedDays = listOf("30", "31", "1", "2", "3")
+        val expectedDays = listOf(
+            LocalDate.of(2023, 10, 30),
+            LocalDate.of(2023, 10, 31),
+            LocalDate.of(2023, 11, 1),
+            LocalDate.of(2023, 11, 2),
+            LocalDate.of(2023, 11, 3)
+        )
         val daysOfWeekOfMonth =
             utils.getDaysOfMonthOfWeek(isMondayFirstDayOfWeek, showSaturday, showSunday, date)
         assertThat(daysOfWeekOfMonth, `is`(expectedDays))

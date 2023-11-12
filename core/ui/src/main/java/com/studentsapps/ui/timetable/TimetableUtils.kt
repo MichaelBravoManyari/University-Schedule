@@ -4,7 +4,6 @@ import com.studentsapps.ui.R
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
 import java.util.Locale
@@ -17,13 +16,12 @@ class TimetableUtils @Inject constructor() {
         showSaturday: Boolean,
         showSunday: Boolean,
         date: LocalDate = LocalDate.now()
-    ): List<String> {
-        val formatter = DateTimeFormatter.ofPattern("d")
+    ): List<LocalDate> {
         val startOfWeek =
             if (isMondayFirstDayOfWeek) date.with(DayOfWeek.MONDAY) else date.with(DayOfWeek.MONDAY)
                 .minusDays(1)
         val daysOfMonthOfWeek =
-            (0 until 7).map { startOfWeek.plusDays(it.toLong()).format(formatter).toString() }
+            (0 until 7).map { startOfWeek.plusDays(it.toLong()) }
                 .toMutableList()
 
         if (!showSaturday) removeSaturdayFromDaysOfWeek(isMondayFirstDayOfWeek, daysOfMonthOfWeek)
@@ -37,7 +35,7 @@ class TimetableUtils @Inject constructor() {
 
     private fun removeSaturdayFromDaysOfWeek(
         isMondayFirstDayOfWeek: Boolean,
-        daysOfMonthOfWeek: MutableList<String>
+        daysOfMonthOfWeek: MutableList<LocalDate>
     ) {
         val positionSaturday = if (isMondayFirstDayOfWeek) 5 else 6
         daysOfMonthOfWeek.removeAt(positionSaturday)

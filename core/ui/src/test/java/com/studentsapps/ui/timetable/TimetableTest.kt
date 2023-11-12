@@ -8,6 +8,7 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
@@ -663,14 +664,20 @@ class TimetableTest {
     @Test
     fun verifyListTypeDayClickUpdatesDate() {
         mockUtilsGetCurrentDate()
+        every { utils.getCurrentMonthDay() } returns "26"
         mockCanvasRenderGetCurrentMonthDayBackground()
         val expectedDate = LocalDate.of(2023, 8, 21)
         val expectedBackground = getExpectedBackgroundCurrentMonthDay()
+        val expectedCurrentDayColor =
+            getColorById(R.color.timetable_current_month_day_background_color)
+        val expectedSelectedDayColor = getColorById(R.color.timetable_current_month_day_text_color)
         val timetable = createTimetable()
         timetable.setTimetableUserPreferences(baseTimetableUserPreferences.copy(showAsGrid = false))
         onView(withId(R.id.first_day)).perform(click())
         assertThat(timetable.date.getOrAwaitValue(), `is`(expectedDate))
         onView(withId(R.id.first_day)).check(matches(withBackground(expectedBackground)))
+        onView(withId(R.id.first_day)).check(matches(withTextColor(expectedSelectedDayColor)))
+        onView(withId(R.id.sixth_day)).check(matches(withTextColor(expectedCurrentDayColor)))
     }
 
     private fun createTimetable(
@@ -751,12 +758,21 @@ class TimetableTest {
         every {
             utils.getDaysOfMonthOfWeek(any(), any(), any(), any())
         } answers {
-            if (!list.isNullOrEmpty())
-                list
-            else if (arg(0))
-                fakeDaysOfMonthCurrentWeekStartingMonday
-            else
-                fakeDaysOfMonthCurrentWeekStartingSunday
+            list?.map { LocalDate.of(2023, 7, it.toInt()) }
+                ?: if (arg(0)) fakeDaysOfMonthCurrentWeekStartingMonday.map {
+                    LocalDate.of(
+                        2023,
+                        7,
+                        it.toInt()
+                    )
+                }
+                else fakeDaysOfMonthCurrentWeekStartingSunday.map {
+                    LocalDate.of(
+                        2023,
+                        7,
+                        it.toInt()
+                    )
+                }
         }
     }
 
