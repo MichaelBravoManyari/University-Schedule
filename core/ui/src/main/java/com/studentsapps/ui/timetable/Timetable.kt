@@ -6,6 +6,7 @@ import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Typeface
+import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.Gravity
@@ -79,6 +80,7 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
     private fun configureView(attrs: AttributeSet) {
         inflateView()
         getAttrs(attrs)
+        configureDayViews()
     }
 
     private fun inflateView() {
@@ -143,14 +145,17 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
 
     fun setTimetableUserPreferences(timetableUserPreferences: TimetableUserPreferences) {
         drawView = true
-        setShowAsGrid(timetableUserPreferences.showAsGrid)
+
         setIs12HoursFormat(timetableUserPreferences.is12HoursFormat)
         setShowSaturday(timetableUserPreferences.showSaturday)
         setShowSunday(timetableUserPreferences.showSunday)
         setIsMondayFirstDayOfWeek(timetableUserPreferences.isMondayFirstDayOfWeek)
+        setShowAsGrid(timetableUserPreferences.showAsGrid)
 
         if (!wasViewDrawn || remakeTheView) {
             configureDayViews()
+            updateTextOfDayOfMonthViews()
+            updateTextOfDayOfWeekViews()
             restartView()
         } else if (redrawGridsAndHours) {
             restartView()
@@ -164,14 +169,27 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
         if (showAsGrid) {
             hoursCellWidth = getDimensionPixelSizeById(R.dimen.timetable_hours_cell_width)
             displayGridView()
+            setDaysOfMonthViewsEnabledState(false)
+            _date.value = utils.getCurrentDate()
+            updateTextOfDayOfMonthViews()
+            post {
+                selectDayOfMonth()
+            }
         } else {
             hoursCellWidth = 0
             displayListView()
+            setDaysOfMonthViewsEnabledState(true)
         }
 
         (binding.startDayOfWeek.layoutParams as MarginLayoutParams).let { layoutParams ->
             layoutParams.marginStart = hoursCellWidth
             binding.startDayOfWeek.layoutParams = layoutParams
+        }
+    }
+
+    private fun setDaysOfMonthViewsEnabledState(enabled: Boolean) {
+        getDaysOfMonthViews().forEach {
+            it.isEnabled = enabled
         }
     }
 
@@ -215,13 +233,20 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
 
     private fun configureDaysOfWeekViews() {
         val daysOfWeekTextSize = getDimensionById(R.dimen.timetable_days_of_week_text_size)
-        val daysOfWeekOrder = getDaysOfWeekOrder()
         val daysOfWeekViews = getDaysOfWeekViews()
         hideIneligibleDaysOfWeekViews()
-        daysOfWeekViews.forEachIndexed { index, view ->
+        daysOfWeekViews.forEach { view ->
             view.apply {
                 textSize = daysOfWeekTextSize
                 typeface = daysOfWeekFont
+            }
+        }
+    }
+
+    private fun updateTextOfDayOfWeekViews() {
+        val daysOfWeekOrder = getDaysOfWeekOrder()
+        getDaysOfWeekViews().forEachIndexed { index, view ->
+            view.apply {
                 text = daysOfWeekOrder[index]
             }
         }
@@ -244,23 +269,80 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
                 tag = dateView
                 textSize = daysOfMonthTextSize
                 typeface = daysOfMonthFont
-                text = dateView.dayOfMonth.toString()
                 setOnClickListener {
                     _date.value = dateView
-                    selectCurrentMonthDay()
+                    selectDayOfMonth()
                 }
             }
         }
     }
 
-    private fun selectCurrentMonthDay() {
+    private fun selectDayOfMonth() {
+        val currentDate = utils.getCurrentDate()
+        val monthDayTextColor = getColorById(R.color.timetable_month_day_text_color)
+        val currentMonthDayTextColor = getColorById(R.color.timetable_current_month_day_text_color)
+        val currentMonthDayBackgroundColor =
+            getColorById(R.color.timetable_current_month_day_background_color)
+
+        getDaysOfMonthViews().forEach { view ->
+            val viewDate = view.tag as LocalDate
+
+            when {
+                viewDate == currentDate && viewDate == date.value -> {
+                    if (view.measuredWidth != 0 && view.measuredHeight != 0) {
+                        val backgroundDrawable = canvasRender.getCurrentMonthDayBackground(
+                            view.measuredWidth,
+                            view.measuredHeight,
+                            currentMonthDayBackgroundColor
+                        ).toDrawable(resources)
+                        applyViewStyle(view, currentMonthDayTextColor, backgroundDrawable)
+                    }
+                }
+
+                viewDate == currentDate && viewDate != date.value -> {
+                    applyViewStyle(view, currentMonthDayBackgroundColor, null)
+                }
+
+                viewDate == date.value && viewDate != currentDate && !showAsGrid -> {
+                    if (view.measuredWidth != 0 && view.measuredHeight != 0) {
+                        val backgroundDrawable = canvasRender.getCurrentMonthDayBackground(
+                            view.measuredWidth,
+                            view.measuredHeight,
+                            monthDayTextColor
+                        ).toDrawable(resources)
+                        applyViewStyle(view, currentMonthDayTextColor, backgroundDrawable)
+                    }
+                }
+
+                else -> {
+                    applyViewStyle(view, monthDayTextColor, null)
+                }
+            }
+        }
+    }
+
+    private fun applyViewStyle(view: TextView, textColor: Int, backgroundDrawable: Drawable?) {
+        view.apply {
+            setTextColor(textColor)
+            background = backgroundDrawable
+        }
+    }
+
+    /*private fun selectCurrentMonthDay() {
+        val daysOfMonthCurrentWeek =
+            utils.getDaysOfMonthOfWeek(
+                isMondayFirstDayOfWeek,
+                showSaturday,
+                showSunday,
+                date.value!!
+            )
         val currentMonthDay = utils.getCurrentMonthDay()
         val currentMonthDayTextColor = getColorById(R.color.timetable_current_month_day_text_color)
         val currentMonthDayBackgroundColor =
             getColorById(R.color.timetable_current_month_day_background_color)
         val monthDayTextColor = getColorById(R.color.timetable_month_day_text_color)
-        getDaysOfMonthViews().forEach { view ->
-            val dateView = view.tag as LocalDate
+        getDaysOfMonthViews().forEachIndexed { index, view ->
+            val dateView = (view.tag as LocalDate?) ?: daysOfMonthCurrentWeek[index]
             if (date.value == LocalDate.now() && view.text == currentMonthDay && date.value == dateView)
                 view.apply {
                     setTextColor(currentMonthDayTextColor)
@@ -290,7 +372,7 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
                     background = null
                 }
         }
-    }
+    }*/
 
     private fun getDaysOfWeekOrder(): List<String> {
         return utils.getDaysOfWeekOrder(isMondayFirstDayOfWeek, showSaturday, showSunday)
@@ -372,7 +454,7 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
                 redrawGridsAndHours = false
             }
             if (!wasViewDrawn || remakeTheView) {
-                selectCurrentMonthDay()
+                selectDayOfMonth()
                 drawGridsAndHours()
                 provisionalListView()
                 wasViewDrawn = true
@@ -748,11 +830,19 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
             velocityX: Float,
             velocityY: Float
         ): Boolean {
-            _date.value =
-                if (isRightSwipe(e2)) _date.value?.minusWeeks(1) else _date.value?.plusWeeks(1)
-            _currentMonth.value = _date.value?.let { utils.getMonth(it) }
-            updateTextOfDayOfMonthViews()
-            selectCurrentMonthDay()
+            if (showAsGrid) {
+                _date.value =
+                    if (isRightSwipe(e2)) date.value?.minusWeeks(1) else date.value?.plusWeeks(1)
+                _currentMonth.value = date.value?.let { utils.getMonth(it) }
+                updateTextOfDayOfMonthViews()
+                selectDayOfMonth()
+            } else {
+                _date.value =
+                    if (isRightSwipe(e2)) date.value?.minusDays(1) else date.value?.plusDays(1)
+                _currentMonth.value = _date.value?.let { utils.getMonth(it) }
+                updateTextOfDayOfMonthViews()
+                selectDayOfMonth()
+            }
             return true
         }
 
@@ -768,10 +858,14 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
                 isMondayFirstDayOfWeek,
                 showSaturday,
                 showSunday,
-                _date.value!!
+                date.value!!
             )
         getDaysOfMonthViews().forEachIndexed { index, view ->
-            view.text = daysOfMonthOfWeek[index].dayOfMonth.toString()
+            val viewDate = daysOfMonthOfWeek[index]
+            view.apply {
+                text = viewDate.dayOfMonth.toString()
+                tag = viewDate
+            }
         }
     }
 
