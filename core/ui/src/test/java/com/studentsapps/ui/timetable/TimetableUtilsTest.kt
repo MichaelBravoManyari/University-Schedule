@@ -14,6 +14,26 @@ class TimetableUtilsTest {
     private val utils = TimetableUtils()
 
     @Test
+    fun getDaysOfMonthOfWeek_startingSundayShowSaturdayShowSunday_returnDaysOfMonthOfWeek() {
+        val isMondayFirstDayOfWeek = false
+        val showSaturday = true
+        val showSunday = true
+        val date = LocalDate.of(2023, 11, 12)
+        val expectedDays = listOf(
+            LocalDate.of(2023, 11, 12),
+            LocalDate.of(2023, 11, 13),
+            LocalDate.of(2023, 11, 14),
+            LocalDate.of(2023, 11, 15),
+            LocalDate.of(2023, 11, 16),
+            LocalDate.of(2023, 11, 17),
+            LocalDate.of(2023, 11, 18)
+        )
+        val daysOfWeekOfMonth =
+            utils.getDaysOfMonthOfWeek(isMondayFirstDayOfWeek, showSaturday, showSunday, date)
+        assertThat(daysOfWeekOfMonth, `is`(expectedDays))
+    }
+
+    @Test
     fun getDaysOfMonthOfWeek_startingMondayShowSaturdayShowSundayRandomDate_returnDaysOfMonthOfWeek() {
         val isMondayFirstDayOfWeek = true
         val showSaturday = true

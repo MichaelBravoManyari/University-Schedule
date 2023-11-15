@@ -270,7 +270,7 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
                 textSize = daysOfMonthTextSize
                 typeface = daysOfMonthFont
                 setOnClickListener {
-                    _date.value = dateView
+                    _date.value = it.tag as LocalDate
                     selectDayOfMonth()
                 }
             }
@@ -838,8 +838,28 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
                 selectDayOfMonth()
             } else {
                 _date.value =
-                    if (isRightSwipe(e2)) date.value?.minusDays(1) else date.value?.plusDays(1)
-                _currentMonth.value = _date.value?.let { utils.getMonth(it) }
+                    if (isRightSwipe(e2)) {
+                        var dateReturns = date.value?.minusDays(1)
+                        if (dateReturns?.dayOfWeek == DayOfWeek.SUNDAY && !showSunday)
+                            dateReturns = dateReturns.minusDays(1)
+                        if (dateReturns?.dayOfWeek == DayOfWeek.SATURDAY && !showSaturday)
+                            dateReturns = dateReturns.minusDays(1)
+                        dateReturns
+                    } else {
+                        var dateReturns = date.value?.plusDays(1)
+                        if (dateReturns?.dayOfWeek == DayOfWeek.SATURDAY && !showSaturday)
+                            dateReturns = dateReturns.plusDays(1)
+                        if (dateReturns?.dayOfWeek == DayOfWeek.SUNDAY && !showSunday)
+                            dateReturns = dateReturns.plusDays(1)
+                        dateReturns
+                    }
+                /*if (date.value?.dayOfWeek == DayOfWeek.SATURDAY && !showSaturday)
+                    _date.value =
+                        if (isRightSwipe(e2)) date.value?.minusDays(1) else date.value?.plusDays(1)
+                if (date.value?.dayOfWeek == DayOfWeek.SUNDAY && !showSunday)
+                    _date.value =
+                        if (isRightSwipe(e2)) date.value?.minusDays(1) else date.value?.plusDays(1)
+                _currentMonth.value = _date.value?.let { utils.getMonth(it) }*/
                 updateTextOfDayOfMonthViews()
                 selectDayOfMonth()
             }

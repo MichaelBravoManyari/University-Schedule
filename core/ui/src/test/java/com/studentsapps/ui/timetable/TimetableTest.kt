@@ -774,6 +774,74 @@ class TimetableTest {
         onView(withId(R.id.sixth_day)).check(matches(withTextColor(expectedCurrentDayColor)))
     }
 
+    @Test
+    fun verifySwipeAndChangeFromCurrentWeekInListMode() {
+        mockUtilsGetCurrentDate(LocalDate.of(2023, 11, 13))
+        val expectedDate = LocalDate.of(2023, 11, 20)
+        val expectedTextColor = getColorById(R.color.timetable_current_month_day_text_color)
+        val timetable = createTimetable()
+        timetable.setTimetableUserPreferences(
+            baseTimetableUserPreferences.copy(
+                showAsGrid = false,
+                showSunday = false,
+                showSaturday = false
+            )
+        )
+        onView(withId(R.id.fifth_day)).perform(click())
+        onView(withContentDescription(timetableContentDescription)).perform(swipeLeft())
+        assertThat(timetable.date.getOrAwaitValue(), `is`(expectedDate))
+        onView(withId(R.id.first_day)).check(matches(withTextColor(expectedTextColor)))
+    }
+
+    @Test
+    fun verifyChangeWeekInListModeAndClickOnDayOfMonth() {
+        mockUtilsGetCurrentDate(LocalDate.of(2023, 11, 13))
+        val expectedDate = LocalDate.of(2023, 11, 21)
+        val expectedTextColor = getColorById(R.color.timetable_current_month_day_text_color)
+        val timetable = createTimetable()
+        timetable.setTimetableUserPreferences(baseTimetableUserPreferences.copy(showAsGrid = false))
+        onView(withId(R.id.seventh_day)).perform(click())
+        onView(withContentDescription(timetableContentDescription)).perform(swipeLeft())
+        onView(withId(R.id.second_day)).perform(click())
+        assertThat(timetable.date.getOrAwaitValue(), `is`(expectedDate))
+        onView(withId(R.id.second_day)).check(matches(withTextColor(expectedTextColor)))
+    }
+
+    @Test
+    fun verifySwipeRightInListModeWithoutSatSunSelectsCorrectDay() {
+        mockUtilsGetCurrentDate(LocalDate.of(2023, 11, 13))
+        val expectedDate = LocalDate.of(2023, 11, 10)
+        val expectedTextColor = getColorById(R.color.timetable_current_month_day_text_color)
+        val timetable = createTimetable()
+        timetable.setTimetableUserPreferences(
+            baseTimetableUserPreferences.copy(
+                showAsGrid = false,
+                showSaturday = false,
+                showSunday = false
+            )
+        )
+        onView(withContentDescription(timetableContentDescription)).perform(swipeRight())
+        assertThat(timetable.date.getOrAwaitValue(), `is`(expectedDate))
+        onView(withId(R.id.fifth_day)).check(matches(withTextColor(expectedTextColor)))
+    }
+
+    @Test
+    fun verifySwipeRightInListModeWithSundayAsFirstDaySelectsCorrectDay() {
+        mockUtilsGetCurrentDate(LocalDate.of(2023, 11, 13))
+        val expectedTextColor = getColorById(R.color.timetable_current_month_day_text_color)
+        val expectedDate = LocalDate.of(2023, 11, 12)
+        val timetable = createTimetable()
+        timetable.setTimetableUserPreferences(
+            baseTimetableUserPreferences.copy(
+                isMondayFirstDayOfWeek = false,
+                showAsGrid = false
+            )
+        )
+        onView(withContentDescription(timetableContentDescription)).perform(swipeRight())
+        assertThat(timetable.date.getOrAwaitValue(), `is`(expectedDate))
+        onView(withId(R.id.first_day)).check(matches(withTextColor(expectedTextColor)))
+    }
+
     private fun createTimetable(
         attr: AttributeSet? = null
     ): Timetable {
@@ -803,8 +871,8 @@ class TimetableTest {
         ).toDrawable(ApplicationProvider.getApplicationContext<Context>().resources)
     }
 
-    private fun mockUtilsGetCurrentDate() {
-        every { utils.getCurrentDate() } returns LocalDate.of(2023, 8, 26)
+    private fun mockUtilsGetCurrentDate(localDate: LocalDate? = null) {
+        every { utils.getCurrentDate() } returns (localDate ?: LocalDate.of(2023, 8, 26))
     }
 
     private fun mockCanvasRenderGetCurrentMonthDayBackground() {

@@ -18,8 +18,15 @@ class TimetableUtils @Inject constructor() {
         date: LocalDate = LocalDate.now()
     ): List<LocalDate> {
         val startOfWeek =
-            if (isMondayFirstDayOfWeek) date.with(DayOfWeek.MONDAY) else date.with(DayOfWeek.MONDAY)
-                .minusDays(1)
+            if (isMondayFirstDayOfWeek)
+                date.with(DayOfWeek.MONDAY)
+            else {
+                if (date.dayOfWeek == DayOfWeek.SUNDAY)
+                    date
+                else
+                    date.with(DayOfWeek.MONDAY).minusDays(1)
+            }
+
         val daysOfMonthOfWeek =
             (0 until 7).map { startOfWeek.plusDays(it.toLong()) }
                 .toMutableList()
