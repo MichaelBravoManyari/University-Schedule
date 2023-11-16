@@ -7,6 +7,8 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
+import android.os.Parcel
+import android.os.Parcelable
 import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.Gravity
@@ -75,6 +77,7 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
 
     init {
         configureView(attrs)
+        isSaveEnabled = true
     }
 
     private fun configureView(attrs: AttributeSet) {
@@ -822,6 +825,66 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
         return gestureDetector.onTouchEvent(event) || super.onTouchEvent(event)
     }
 
+    override fun onSaveInstanceState(): Parcelable {
+        return SavedState(super.onSaveInstanceState()).apply {
+            date.value?.let {
+                year = it.year
+                month = it.monthValue
+                day = it.dayOfMonth
+            }
+        }
+    }
+
+    override fun onRestoreInstanceState(state: Parcelable?) {
+        when (state) {
+            is SavedState -> {
+                super.onRestoreInstanceState(state.superState)
+                _date.value = LocalDate.of(state.year, state.month, state.day)
+            }
+
+            else -> super.onRestoreInstanceState(state)
+        }
+    }
+
+    private class SavedState : BaseSavedState {
+
+        var year = 0
+        var month = 0
+        var day = 0
+
+        constructor(superState: Parcelable?) : super(superState)
+
+        private constructor(parcel: Parcel) : super(parcel) {
+            with(parcel) {
+                year = readInt()
+                month = readInt()
+                day = readInt()
+            }
+        }
+
+        override fun writeToParcel(out: Parcel, flags: Int) {
+            super.writeToParcel(out, flags)
+            with(out) {
+                writeInt(year)
+                writeInt(month)
+                writeInt(day)
+            }
+        }
+
+        companion object {
+            @JvmField
+            val CREATOR: Parcelable.Creator<SavedState> = object : Parcelable.Creator<SavedState> {
+                override fun createFromParcel(source: Parcel): SavedState {
+                    return SavedState(source)
+                }
+
+                override fun newArray(size: Int): Array<SavedState?> {
+                    return arrayOfNulls(size)
+                }
+            }
+        }
+    }
+
     private inner class MyGestureListener : GestureDetector.SimpleOnGestureListener() {
 
         override fun onFling(
@@ -853,13 +916,6 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
                             dateReturns = dateReturns.plusDays(1)
                         dateReturns
                     }
-                /*if (date.value?.dayOfWeek == DayOfWeek.SATURDAY && !showSaturday)
-                    _date.value =
-                        if (isRightSwipe(e2)) date.value?.minusDays(1) else date.value?.plusDays(1)
-                if (date.value?.dayOfWeek == DayOfWeek.SUNDAY && !showSunday)
-                    _date.value =
-                        if (isRightSwipe(e2)) date.value?.minusDays(1) else date.value?.plusDays(1)
-                _currentMonth.value = _date.value?.let { utils.getMonth(it) }*/
                 updateTextOfDayOfMonthViews()
                 selectDayOfMonth()
             }
