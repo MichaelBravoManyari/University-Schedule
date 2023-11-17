@@ -53,6 +53,10 @@ class ScheduleFragment : Fragment() {
                     }
                 }
             }
+
+            binding.timetable.date.observe(viewLifecycleOwner) {
+
+            }
         }
 
         binding.toolbar.setupWithNavController(view.findNavController())
@@ -66,6 +70,11 @@ class ScheduleFragment : Fragment() {
                 when (menuItem.itemId) {
                     R.id.change_timetable_view -> {
                         viewModel.setShowAsGrid()
+                        true
+                    }
+
+                    R.id.timetable_today -> {
+                        binding.timetable.selectCurrentDay()
                         true
                     }
 

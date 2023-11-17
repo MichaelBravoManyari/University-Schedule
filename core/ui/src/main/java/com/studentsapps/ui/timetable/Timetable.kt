@@ -165,6 +165,14 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
         }
     }
 
+    fun selectCurrentDay() {
+        _date.value = utils.getCurrentDate()
+        updateTextOfDayOfMonthViews()
+        post {
+            selectDayOfMonth()
+        }
+    }
+
     private fun setShowAsGrid(value: Boolean) {
         showAsGrid = value
         val hoursCellWidth: Int
@@ -173,11 +181,7 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
             hoursCellWidth = getDimensionPixelSizeById(R.dimen.timetable_hours_cell_width)
             displayGridView()
             setDaysOfMonthViewsEnabledState(false)
-            _date.value = utils.getCurrentDate()
-            updateTextOfDayOfMonthViews()
-            post {
-                selectDayOfMonth()
-            }
+            selectCurrentDay()
         } else {
             hoursCellWidth = 0
             displayListView()

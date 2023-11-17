@@ -2,23 +2,23 @@
 appcompat = "1.6.1"
 constraintlayout = "2.1.4"
 core-ktx = "1.12.0"
-androidGradlePlugin = "8.1.2"
+androidGradlePlugin = "8.1.3"
 navigationFragmentKtx = "2.7.5"
-org-jetbrains-kotlin-android = "1.8.0"
 junit = "4.13.2"
 androidx-test-ext-junit = "1.1.5"
 androidx-arch-core-testing = "2.2.0"
 androidx-datastore-preferences = "1.0.0"
 espresso-core = "3.5.1"
 material = "1.10.0"
+ksp = "1.9.20-1.0.14"
 desugar_jdk_libs = "2.0.4"
 robolectric = "4.10.3"
 hamcrest = "2.2"
 fragment-testing = "1.6.2"
-kotlin = "1.9.0"
-org-jetbrains-kotlin-jvm = "1.8.0"
+kotlin = "1.9.20"
+room = "2.6.0"
 hilt = "2.47"
-kotlinxCoroutines = "1.6.4"
+kotlinxCoroutines = "1.7.1"
 mockk = "1.13.7"
 androidx-test-runner = "1.5.2"
 androidx-test-rules = "1.5.0"
@@ -27,7 +27,6 @@ androidx-lifecycle-viewmodel-ktx = "2.6.2"
 
 [libraries]
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
-android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
 androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "androidx-datastore-preferences" }
@@ -36,12 +35,14 @@ androidx-navigation-fragment-ktx = { module = "androidx.navigation:navigation-fr
 androidx-navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigationFragmentKtx" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 desugar_jdk_libs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugar_jdk_libs" }
-kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
 androidx-fragment-ktx = { group = "androidx.fragment", name = "fragment-ktx", version.ref = "androidx-fragment-ktx" }
 androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "androidx-lifecycle-viewmodel-ktx" }
+room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-ext-junit" }
@@ -57,11 +58,17 @@ androidx-test-rules = { group = "androidx.test", name = "rules", version.ref = "
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 androidx-navigation-testing = { group = "androidx.navigation", name = "navigation-testing", version.ref = "navigationFragmentKtx" }
 
+# Dependencies of the included build-logic
+ksp-gradlePlugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
+kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 com-android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
-org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "org-jetbrains-kotlin-android" }
-org-jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "org-jetbrains-kotlin-jvm" }
+org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+org-jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 
 [bundles]

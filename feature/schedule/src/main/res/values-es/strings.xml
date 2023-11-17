@@ -17,4 +17,5 @@
     <string name="twelve_hours">12 horas</string>
     <string name="twenty_four_hours">24 horas</string>
     <string name="configuration">Configuración</string>
+    <string name="today">Hoy</string>
 </resources>

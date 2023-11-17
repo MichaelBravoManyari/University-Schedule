@@ -17,6 +17,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 dependencies {
     compileOnly(libs.android.gradlePlugin)
     compileOnly(libs.kotlin.gradlePlugin)
+    compileOnly(libs.ksp.gradlePlugin)
 }
 
 gradlePlugin {
@@ -32,6 +33,10 @@ gradlePlugin {
         register("androidUi") {
             id = "universityschedule.android.ui"
             implementationClass = "AndroidUiConventionPlugin"
+        }
+        register("androidRoom") {
+            id = "universityschedule.android.room"
+            implementationClass = "AndroidRoomConventionPlugin"
         }
         register("androidApplication") {
             id = "universityschedule.android.application"

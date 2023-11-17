@@ -1,5 +1,6 @@
 package com.studentsapps.schedule.fragments
 
+import androidx.core.content.ContextCompat
 import androidx.navigation.Navigation
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ApplicationProvider
@@ -18,6 +19,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.studentsapps.schedule.R
 import com.studentsapps.testing.launchFragmentInHiltContainer
 import com.studentsapps.testing.util.MainDispatcherRule
+import com.studentsapps.testing.util.withTextColor
 import com.studentsapps.ui.timetable.TimetableUtils
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -99,6 +101,26 @@ class ScheduleFragmentTest {
         openContextualActionModeOverflowMenu()
         onView(withText(R.string.configuration)).perform(click())
         assertThat(navController.currentDestination?.id, `is`(R.id.scheduleConfigurationFragment))
+    }
+
+    @Test
+    fun testClickOnTodayOptionSelectsCurrentDay() {
+        every { timetableUtils.getCurrentDate() } returns LocalDate.of(2023, 11, 13)
+        val expectedTextColor = ContextCompat.getColor(
+            ApplicationProvider.getApplicationContext(),
+            com.studentsapps.ui.R.color.timetable_current_month_day_text_color
+        )
+        createScheduleFragment()
+        onView(withId(R.id.timetable)).perform(swipeLeft())
+        openContextualActionModeOverflowMenu()
+        onView(withText(R.string.today)).perform(click())
+        onView(withId(com.studentsapps.ui.R.id.first_day)).check(
+            matches(
+                withTextColor(
+                    expectedTextColor
+                )
+            )
+        )
     }
 
     private fun createScheduleFragment() {

@@ -9,6 +9,12 @@
         app:showAsAction="ifRoom" />
 
     <item
+        android:id="@+id/timetable_today"
+        android:icon="@drawable/ic_today"
+        android:title="@string/today"
+        app:showAsAction="ifRoom"/>
+
+    <item
         android:id="@+id/scheduleConfigurationFragment"
         android:title="@string/configuration"
         app:showAsAction="never"/>

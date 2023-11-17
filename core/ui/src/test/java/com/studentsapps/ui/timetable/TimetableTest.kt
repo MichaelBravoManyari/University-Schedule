@@ -37,6 +37,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.studentsapps.model.TimetableUserPreferences
 import com.studentsapps.testing.getOrAwaitValue
 import com.studentsapps.testing.launchFragmentInHiltContainer
+import com.studentsapps.testing.util.withTextColor
 import com.studentsapps.ui.R
 import com.studentsapps.ui_test_hilt_manifest.FragmentTest
 import dagger.hilt.android.testing.BindValue
@@ -701,22 +702,6 @@ class TimetableTest {
         onView(withId(R.id.sixth_day)).check(matches(withTextColor(expectedSelectedDayColor)))
     }
 
-    /*@Test
-    fun verifySwipeAndClickUpdatesDateAndAppearanceInList() {
-        mockUtilsGetCurrentDate()
-        mockCanvasRenderGetCurrentMonthDayBackground()
-        val expectedDate = LocalDate.of(2023, 8, 31)
-        val expectedBackground = getExpectedBackgroundCurrentMonthDay()
-        val expectedSelectedDayColor = getColorById(R.color.timetable_current_month_day_text_color)
-        val timetable = createTimetable()
-        timetable.setTimetableUserPreferences(baseTimetableUserPreferences.copy(showAsGrid = false))
-        onView(withContentDescription(timetableContentDescription)).perform(swipeLeft())
-        onView(withId(R.id.fourth_day)).perform(click())
-        assertThat(timetable.date.getOrAwaitValue(), `is`(expectedDate))
-        onView(withId(R.id.fourth_day)).check(matches(withBackground(expectedBackground)))
-        onView(withId(R.id.fourth_day)).check(matches(withTextColor(expectedSelectedDayColor)))
-    }*/
-
     @Test
     fun verifySwipeInGridModeSelectsOnlyCurrentDate() {
         mockCanvasRenderGetCurrentMonthDayBackground()
@@ -838,6 +823,31 @@ class TimetableTest {
             )
         )
         onView(withContentDescription(timetableContentDescription)).perform(swipeRight())
+        assertThat(timetable.date.getOrAwaitValue(), `is`(expectedDate))
+        onView(withId(R.id.first_day)).check(matches(withTextColor(expectedTextColor)))
+    }
+
+    @Test
+    fun selectCurrentDay_inGridMode() {
+        val expectedDate = LocalDate.of(2023, 11, 13)
+        val expectedTextColor = getColorById(R.color.timetable_current_month_day_text_color)
+        mockUtilsGetCurrentDate(expectedDate)
+        val timetable = createTimetable()
+        onView(withContentDescription(timetableContentDescription)).perform(swipeRight())
+        timetable.selectCurrentDay()
+        assertThat(timetable.date.getOrAwaitValue(), `is`(expectedDate))
+        onView(withId(R.id.first_day)).check(matches(withTextColor(expectedTextColor)))
+    }
+
+    @Test
+    fun selectCurrentDay_inListMode() {
+        val expectedDate = LocalDate.of(2023, 11, 13)
+        val expectedTextColor = getColorById(R.color.timetable_current_month_day_text_color)
+        mockUtilsGetCurrentDate(expectedDate)
+        val timetable = createTimetable()
+        timetable.setTimetableUserPreferences(baseTimetableUserPreferences.copy(showAsGrid = false))
+        onView(withContentDescription(timetableContentDescription)).perform(swipeRight())
+        timetable.selectCurrentDay()
         assertThat(timetable.date.getOrAwaitValue(), `is`(expectedDate))
         onView(withId(R.id.first_day)).check(matches(withTextColor(expectedTextColor)))
     }
@@ -1017,19 +1027,6 @@ class TimetableTest {
             R.id.fourth_day, R.id.fifth_day, R.id.sixth_day,
             R.id.seventh_day
         )
-    }
-
-    private fun withTextColor(@ColorInt expectedTextColor: Int): Matcher<View> {
-        return object : BoundedMatcher<View, TextView>(TextView::class.java) {
-            override fun describeTo(description: Description?) {
-                description?.appendText("with textColor: ")
-                description?.appendValue(expectedTextColor)
-            }
-
-            override fun matchesSafely(item: TextView?): Boolean {
-                return item?.currentTextColor == expectedTextColor
-            }
-        }
     }
 
     private fun withBackground(expectedBackground: Drawable): Matcher<View> {
