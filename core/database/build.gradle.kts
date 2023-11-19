@@ -10,4 +10,10 @@ android {
 
 dependencies {
     implementation(project(":core:model"))
+
+    // Test
+    androidTestImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.kotlinx.coroutines.test)
+    androidTestImplementation(libs.androidx.test.rules)
 }
