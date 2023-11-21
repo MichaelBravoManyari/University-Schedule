@@ -7,7 +7,7 @@ data class Schedule(
     val id: Int,
     val startTime: LocalTime,
     val endTime: LocalTime,
-    val classPlace: String,
+    val classPlace: String?,
     val dayOfWeek: DayOfWeek,
     val courseId: Int
 )

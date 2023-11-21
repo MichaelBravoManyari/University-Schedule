@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "df1b44ebe5d5003530b4f7316aafc105",
+    "identityHash": "0737728c64e4cde8b277955007656771",
     "entities": [
       {
         "tableName": "schedules",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `start_time` TEXT NOT NULL, `end_time` TEXT NOT NULL, `class_place` TEXT NOT NULL, `day_of_week` INTEGER NOT NULL, `course_id` INTEGER NOT NULL, FOREIGN KEY(`course_id`) REFERENCES `courses`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `start_time` TEXT NOT NULL, `end_time` TEXT NOT NULL, `class_place` TEXT, `day_of_week` INTEGER NOT NULL, `specific_date` TEXT, `course_id` INTEGER NOT NULL, FOREIGN KEY(`course_id`) REFERENCES `courses`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
         "fields": [
           {
             "fieldPath": "id",
@@ -30,13 +30,19 @@
             "fieldPath": "classPlace",
             "columnName": "class_place",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "dayOfWeek",
             "columnName": "day_of_week",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "specificDate",
+            "columnName": "specific_date",
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "courseId",
@@ -105,10 +111,15 @@
         "foreignKeys": []
       }
     ],
-    "views": [],
+    "views": [
+      {
+        "viewName": "schedule_details",
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT s.id as schedule_id, s.start_time, s.end_time, s.class_place, s.day_of_week, \n        s.course_id, c.name as course_name, s.specific_date\n        FROM schedules s INNER JOIN courses c \n        ON s.course_id = course_id"
+      }
+    ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'df1b44ebe5d5003530b4f7316aafc105')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0737728c64e4cde8b277955007656771')"
     ]
   }
 }

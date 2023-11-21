@@ -13,6 +13,7 @@ import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.assertThat
 import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.withContentDescription
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -121,6 +122,13 @@ class ScheduleFragmentTest {
                 )
             )
         )
+    }
+
+    @Test
+    fun testRepeatedSchedulesDisplayedInGridMode() {
+        createScheduleFragment()
+        onView(withContentDescription("1")).check(matches(isDisplayed()))
+        onView(withContentDescription("2")).check(matches(isDisplayed()))
     }
 
     private fun createScheduleFragment() {

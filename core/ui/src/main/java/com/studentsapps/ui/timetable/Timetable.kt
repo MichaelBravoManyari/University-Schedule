@@ -165,6 +165,8 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
         }
     }
 
+    fun isDisplayedAsGrid(): Boolean = showAsGrid
+
     fun selectCurrentDay() {
         _date.value = utils.getCurrentDate()
         updateTextOfDayOfMonthViews()

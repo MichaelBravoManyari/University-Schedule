@@ -54,8 +54,12 @@ class ScheduleFragment : Fragment() {
                 }
             }
 
-            binding.timetable.date.observe(viewLifecycleOwner) {
-
+            with(binding.timetable) {
+                date.observe(viewLifecycleOwner) {
+                    if (isDisplayedAsGrid()) {
+                        // Obtener los horarios de lunes a viernes y horarios de fechas especificas, de sabado y domingo solo si estan activos.
+                    }
+                }
             }
         }
 

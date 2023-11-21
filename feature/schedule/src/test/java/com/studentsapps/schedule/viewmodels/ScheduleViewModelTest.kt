@@ -2,8 +2,6 @@ package com.studentsapps.schedule.viewmodels
 
 import com.studentsapps.data.repository.fake.FakeTimetableUserPreferencesRepository
 import com.studentsapps.model.TimetableUserPreferences
-import com.studentsapps.schedule.viewmodels.ScheduleUiState
-import com.studentsapps.schedule.viewmodels.ScheduleViewModel
 import com.studentsapps.testing.util.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect

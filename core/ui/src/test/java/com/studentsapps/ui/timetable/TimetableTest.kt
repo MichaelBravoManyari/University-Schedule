@@ -852,6 +852,14 @@ class TimetableTest {
         onView(withId(R.id.first_day)).check(matches(withTextColor(expectedTextColor)))
     }
 
+    @Test
+    fun isDisplayedAsGrid_returnTrueAndFalse() {
+        val timetable = createTimetable()
+        assertThat(true, `is`(timetable.isDisplayedAsGrid()))
+        timetable.setTimetableUserPreferences(baseTimetableUserPreferences.copy(showAsGrid = false))
+        assertThat(false, `is`(timetable.isDisplayedAsGrid()))
+    }
+
     private fun createTimetable(
         attr: AttributeSet? = null
     ): Timetable {
