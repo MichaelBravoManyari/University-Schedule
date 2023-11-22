@@ -31,6 +31,7 @@ import androidx.core.view.GestureDetectorCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.android.material.textview.MaterialTextView
+import com.studentsapps.model.ScheduleDetails
 import com.studentsapps.model.TimetableUserPreferences
 import com.studentsapps.ui.R
 import com.studentsapps.ui.databinding.TimetableBinding
@@ -165,7 +166,19 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
         }
     }
 
-    fun isDisplayedAsGrid(): Boolean = showAsGrid
+    fun isDisplayedAsGrid() = showAsGrid
+
+    fun displaySaturday() = showSaturday
+
+    fun displaySunday() = showSunday
+
+    fun getStartDate(): LocalDate {
+        return binding.firstDay.tag as LocalDate
+    }
+
+    fun getEndDate(): LocalDate {
+        return getDaysOfMonthViews().last().tag as LocalDate
+    }
 
     fun selectCurrentDay() {
         _date.value = utils.getCurrentDate()
@@ -674,7 +687,7 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
         return resources.getDimension(dimenId)
     }
 
-    fun showScheduleInGrid(schedules: List<Schedule>) {
+    fun showScheduleInGrid(schedules: List<ScheduleView>) {
         schedules.groupByDayOfWeek().forEach { (dayOfWeek, schedulesForOneDayOfWeek) ->
 
             if ((dayOfWeek != DayOfWeek.SUNDAY || showSunday) && (dayOfWeek != DayOfWeek.SATURDAY || showSaturday)) {
@@ -696,7 +709,7 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
     }
 
     private fun addScheduleToGrid(
-        schedule: Schedule,
+        schedule: ScheduleView,
         crossedSchedulesCount: Int = 1,
         index: Int = 0
     ) {
@@ -958,26 +971,36 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
     }
 }
 
-data class Schedule(
+data class ScheduleView(
     val id: Int,
     val startTime: LocalTime,
     val endTime: LocalTime,
-    val classPlace: String,
+    val classPlace: String?,
     val day: DayOfWeek,
     val courseName: String,
-    val color: Int,
-    val uniqueDate: LocalDate? = null
+    val color: Int
 )
 
-fun List<Schedule>.groupByDayOfWeek(): Map<DayOfWeek, List<Schedule>> {
+fun ScheduleDetails.asScheduleView() =
+    ScheduleView(
+        id = scheduleId,
+        startTime = startTime,
+        endTime = endTime,
+        classPlace = classPlace,
+        day = dayOfWeek,
+        courseName = courseName,
+        color = courseColor,
+    )
+
+fun List<ScheduleView>.groupByDayOfWeek(): Map<DayOfWeek, List<ScheduleView>> {
     return groupBy { it.day }
 }
 
-fun List<Schedule>.getCrossSchedules(): List<List<Schedule>> {
-    val list1 = mutableListOf<MutableList<Schedule>>()
+fun List<ScheduleView>.getCrossSchedules(): List<List<ScheduleView>> {
+    val list1 = mutableListOf<MutableList<ScheduleView>>()
     for (i in 0 until size - 1) {
         val schedule = this[i]
-        val list2 = mutableListOf<Schedule>()
+        val list2 = mutableListOf<ScheduleView>()
         if (!list1.scheduleContains(schedule))
             list2.add(schedule)
 
@@ -1004,11 +1027,11 @@ fun List<Schedule>.getCrossSchedules(): List<List<Schedule>> {
     return list1
 }
 
-fun List<Schedule>.getUniqueSchedules(): List<Schedule> {
+fun List<ScheduleView>.getUniqueSchedules(): List<ScheduleView> {
     return if (count() == 1)
         this
     else {
-        val uniqueSchedules = mutableListOf<Schedule>()
+        val uniqueSchedules = mutableListOf<ScheduleView>()
         for (i in 0 until size - 1) {
             val schedule = this[i]
             var isUnique = true
@@ -1025,7 +1048,7 @@ fun List<Schedule>.getUniqueSchedules(): List<Schedule> {
     }
 }
 
-fun List<List<Schedule>>.scheduleContains(schedule: Schedule): Boolean {
+fun List<List<ScheduleView>>.scheduleContains(schedule: ScheduleView): Boolean {
     for (list in this) {
         if (schedule in list)
             return true
@@ -1033,9 +1056,9 @@ fun List<List<Schedule>>.scheduleContains(schedule: Schedule): Boolean {
     return false
 }
 
-fun List<MutableList<Schedule>>.addScheduleToList(
-    scheduleToCompare: Schedule,
-    scheduleToAdd: Schedule
+fun List<MutableList<ScheduleView>>.addScheduleToList(
+    scheduleToCompare: ScheduleView,
+    scheduleToAdd: ScheduleView
 ) {
     for (list in this) {
         if (scheduleToCompare in list) {
@@ -1045,7 +1068,7 @@ fun List<MutableList<Schedule>>.addScheduleToList(
     }
 }
 
-fun Schedule.isCrossingSchedules(scheduleToCompare: Schedule): Boolean {
+fun ScheduleView.isCrossingSchedules(scheduleToCompare: ScheduleView): Boolean {
     val startHourSchedule = this.startTime
     val endHourSchedule = this.endTime
     val startHourScheduleCompare = scheduleToCompare.startTime

@@ -10,6 +10,7 @@ android {
 dependencies {
     implementation(project(":core:model"))
     implementation(project(":core:datastore"))
+    implementation(project(":core:database"))
     androidTestImplementation(project(":core:datastore-test"))
 
     androidTestImplementation(libs.junit)

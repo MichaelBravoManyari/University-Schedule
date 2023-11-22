@@ -1204,7 +1204,7 @@ class TimetableTest {
         private val fakeDaysOfMonthCurrentWeekStartingSunday =
             listOf("1", "2", "3", "4", "5", "6", "7")
 
-        private val uniqueSchedule = Schedule(
+        private val uniqueSchedule = ScheduleView(
             2,
             LocalTime.of(13, 0),
             LocalTime.of(14, 0),

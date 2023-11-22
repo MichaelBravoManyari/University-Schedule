@@ -16,6 +16,7 @@ import com.studentsapps.schedule.R
 import com.studentsapps.schedule.databinding.FragmentScheduleBinding
 import com.studentsapps.schedule.viewmodels.ScheduleUiState
 import com.studentsapps.schedule.viewmodels.ScheduleViewModel
+import com.studentsapps.ui.timetable.asScheduleView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -49,7 +50,11 @@ class ScheduleFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.uiState.collect { currentState ->
                     if (currentState is ScheduleUiState.Success) {
-                        binding.timetable.setTimetableUserPreferences(currentState.timetableUserPreferences)
+                        with(binding.timetable) {
+                            setTimetableUserPreferences(currentState.timetableUserPreferences)
+                            if (currentState.scheduleDetailsList != null)
+                                showScheduleInGrid(currentState.scheduleDetailsList.map { it.asScheduleView() })
+                        }
                     }
                 }
             }
@@ -57,7 +62,12 @@ class ScheduleFragment : Fragment() {
             with(binding.timetable) {
                 date.observe(viewLifecycleOwner) {
                     if (isDisplayedAsGrid()) {
-                        // Obtener los horarios de lunes a viernes y horarios de fechas especificas, de sabado y domingo solo si estan activos.
+                        viewModel.updateScheduleDetailsListInGridMode(
+                            displaySaturday(),
+                            displaySunday(),
+                            getStartDate(),
+                            getEndDate()
+                        )
                     }
                 }
             }

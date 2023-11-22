@@ -2,9 +2,9 @@ package com.studentsapps.database.dao
 
 import androidx.room.Dao
 import androidx.room.Query
-import com.studentsapps.database.model.ScheduleDetails
+import com.studentsapps.database.model.ScheduleDetailsView
 import com.studentsapps.database.model.ScheduleEntity
-import kotlinx.coroutines.flow.Flow
+import java.time.DayOfWeek
 import java.time.LocalDate
 
 @Dao
@@ -16,7 +16,7 @@ abstract class ScheduleDao : BaseDao<ScheduleEntity> {
     @Query(
         value = """ 
              SELECT * FROM schedule_details
-             wHERE
+             WHERE
                 CASE WHEN NOT :showSaturday
                     THEN day_of_week != 6
                     ELSE 1
@@ -44,10 +44,24 @@ abstract class ScheduleDao : BaseDao<ScheduleEntity> {
                 specific_date BETWEEN :startDate AND :endDate
         """
     )
-    abstract fun sdfds(
+    abstract suspend fun getSchedulesForTimetableInGridMode(
         showSaturday: Boolean,
         showSunday: Boolean,
         startDate: LocalDate,
         endDate: LocalDate
-    ): Flow<List<ScheduleDetails>>
+    ): List<ScheduleDetailsView>
+
+    @Query(
+        value = """
+            SELECT * FROM schedule_details
+            WHERE
+                (day_of_week = :dayOfWeek AND specific_date IS NULL)
+            OR
+                specific_date = :specificDate
+        """
+    )
+    abstract suspend fun getSchedulesForTimetableInListMode(
+        dayOfWeek: DayOfWeek,
+        specificDate: LocalDate
+    ): List<ScheduleDetailsView>
 }
