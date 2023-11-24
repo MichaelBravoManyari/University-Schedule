@@ -855,9 +855,41 @@ class TimetableTest {
     @Test
     fun isDisplayedAsGrid_returnTrueAndFalse() {
         val timetable = createTimetable()
-        assertThat(true, `is`(timetable.isDisplayedAsGrid()))
+        assertThat(timetable.isDisplayedAsGrid(), `is`(true))
         timetable.setTimetableUserPreferences(baseTimetableUserPreferences.copy(showAsGrid = false))
-        assertThat(false, `is`(timetable.isDisplayedAsGrid()))
+        assertThat(timetable.isDisplayedAsGrid(), `is`(false))
+    }
+
+    @Test
+    fun displaySaturday_returnTrueAndFalse() {
+        val timetable = createTimetable()
+        assertThat(timetable.displaySaturday(), `is`(true))
+        timetable.setTimetableUserPreferences(baseTimetableUserPreferences.copy(showSaturday = false))
+        assertThat(timetable.displaySaturday(), `is`(false))
+    }
+
+    @Test
+    fun displaySunday_returnTrueAndFalse() {
+        val timetable = createTimetable()
+        assertThat(timetable.displaySunday(), `is`(true))
+        timetable.setTimetableUserPreferences(baseTimetableUserPreferences.copy(showSunday = false))
+        assertThat(timetable.displaySunday(), `is`(false))
+    }
+
+    @Test
+    fun getStartDate_returnDate() {
+        mockUtilsGetCurrentDate(LocalDate.of(2023, 11, 23))
+        val expectedStartDate = LocalDate.of(2023, 11, 20)
+        val timetable = createTimetable()
+        assertThat(timetable.getStartDate(), `is`(expectedStartDate))
+    }
+
+    @Test
+    fun getEndDate_returnDate() {
+        mockUtilsGetCurrentDate(LocalDate.of(2023, 11, 23))
+        val expectedEndDate = LocalDate.of(2023, 11, 26)
+        val timetable = createTimetable()
+        assertThat(timetable.getEndDate(), `is`(expectedEndDate))
     }
 
     private fun createTimetable(

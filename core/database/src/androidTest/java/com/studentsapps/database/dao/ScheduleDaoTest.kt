@@ -8,6 +8,7 @@ import com.studentsapps.database.UniversityScheduleDatabase
 import com.studentsapps.database.model.CourseEntity
 import com.studentsapps.database.model.ScheduleDetailsView
 import com.studentsapps.database.model.ScheduleEntity
+import com.studentsapps.database.test.data.scheduleDetailsList
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.nullValue
@@ -34,7 +35,7 @@ class ScheduleDaoTest {
         db = Room.inMemoryDatabaseBuilder(context, UniversityScheduleDatabase::class.java).build()
         scheduleDao = db.scheduleDao()
         courseDao = db.courseDao()
-        courseDao.insert(CourseEntity(id = 1, name = "Math", nameProfessor = "", 123))
+        courseDao.insert(CourseEntity(id = 1, name = "Math", nameProfessor = "", 1234))
     }
 
     @After
@@ -168,36 +169,6 @@ class ScheduleDaoTest {
         assertThat(actualScheduleList, `is`(expectedScheduleList))
     }
 
-    private val scheduleDetailsList = mutableListOf(
-        createTestScheduleDetails(id = 1, dayOfWeek = DayOfWeek.MONDAY),
-        createTestScheduleDetails(id = 2, dayOfWeek = DayOfWeek.TUESDAY),
-        createTestScheduleDetails(id = 3, dayOfWeek = DayOfWeek.WEDNESDAY),
-        createTestScheduleDetails(id = 4, dayOfWeek = DayOfWeek.THURSDAY),
-        createTestScheduleDetails(id = 5, dayOfWeek = DayOfWeek.FRIDAY),
-        createTestScheduleDetails(id = 6, dayOfWeek = DayOfWeek.SATURDAY),
-        createTestScheduleDetails(id = 7, dayOfWeek = DayOfWeek.SUNDAY),
-        createTestScheduleDetails(
-            id = 8,
-            dayOfWeek = DayOfWeek.MONDAY,
-            specificDate = LocalDate.of(2023, 11, 20)
-        ),
-        createTestScheduleDetails(
-            id = 9,
-            dayOfWeek = DayOfWeek.MONDAY,
-            specificDate = LocalDate.of(2023, 11, 20)
-        ),
-        createTestScheduleDetails(
-            id = 10,
-            dayOfWeek = DayOfWeek.THURSDAY,
-            specificDate = LocalDate.of(2023, 11, 23)
-        ),
-        createTestScheduleDetails(
-            id = 11,
-            dayOfWeek = DayOfWeek.SUNDAY,
-            specificDate = LocalDate.of(2023, 11, 19)
-        ),
-    )
-
     private suspend fun insertSchedules() {
         scheduleDetailsList.forEach {
             scheduleDao.insert(it.toScheduleEntity())
@@ -215,23 +186,6 @@ class ScheduleDaoTest {
             dayOfWeek = DayOfWeek.SATURDAY,
             courseId = 1,
             specificDate = null
-        )
-
-    private fun createTestScheduleDetails(
-        id: Int,
-        dayOfWeek: DayOfWeek,
-        specificDate: LocalDate? = null
-    ) =
-        ScheduleDetailsView(
-            scheduleId = id,
-            startTime = LocalTime.of(14, 5),
-            endTime = LocalTime.of(15, 5),
-            classPlace = null,
-            dayOfWeek = dayOfWeek,
-            courseId = 1,
-            specificDate = specificDate,
-            courseName = "Math",
-            courseColor = 1234
         )
 
     private fun ScheduleDetailsView.toScheduleEntity() =

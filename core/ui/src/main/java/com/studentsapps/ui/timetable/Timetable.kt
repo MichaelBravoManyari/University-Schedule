@@ -147,6 +147,20 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
         }
     }
 
+    fun isDisplayedAsGrid() = showAsGrid
+
+    fun displaySaturday() = showSaturday
+
+    fun displaySunday() = showSunday
+
+    fun getStartDate(): LocalDate {
+        return binding.firstDay.tag as LocalDate
+    }
+
+    fun getEndDate(): LocalDate {
+        return getDaysOfMonthViews().last().tag as LocalDate
+    }
+
     fun setTimetableUserPreferences(timetableUserPreferences: TimetableUserPreferences) {
         drawView = true
 
@@ -163,28 +177,6 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
             restartView()
         } else if (redrawGridsAndHours) {
             restartView()
-        }
-    }
-
-    fun isDisplayedAsGrid() = showAsGrid
-
-    fun displaySaturday() = showSaturday
-
-    fun displaySunday() = showSunday
-
-    fun getStartDate(): LocalDate {
-        return binding.firstDay.tag as LocalDate
-    }
-
-    fun getEndDate(): LocalDate {
-        return getDaysOfMonthViews().last().tag as LocalDate
-    }
-
-    fun selectCurrentDay() {
-        _date.value = utils.getCurrentDate()
-        updateTextOfDayOfMonthViews()
-        post {
-            selectDayOfMonth()
         }
     }
 
@@ -206,6 +198,14 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
         (binding.startDayOfWeek.layoutParams as MarginLayoutParams).let { layoutParams ->
             layoutParams.marginStart = hoursCellWidth
             binding.startDayOfWeek.layoutParams = layoutParams
+        }
+    }
+
+    fun selectCurrentDay() {
+        _date.value = utils.getCurrentDate()
+        updateTextOfDayOfMonthViews()
+        post {
+            selectDayOfMonth()
         }
     }
 

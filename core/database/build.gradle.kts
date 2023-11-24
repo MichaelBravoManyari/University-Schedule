@@ -17,4 +17,8 @@ dependencies {
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.test.rules)
+    androidTestImplementation(project(":core:database-test"))
+
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(project(":core:database-test"))
 }
