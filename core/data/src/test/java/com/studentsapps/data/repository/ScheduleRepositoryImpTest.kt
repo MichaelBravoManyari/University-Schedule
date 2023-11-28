@@ -1,6 +1,8 @@
-package com.studentsapps.database.datasources
+package com.studentsapps.data.repository
 
-import com.studentsapps.database.dao.ScheduleDao
+import com.studentsapps.database.datasources.ScheduleLocalDataSource
+import com.studentsapps.database.model.ScheduleDetailsView
+import com.studentsapps.database.model.asExternalModel
 import com.studentsapps.database.test.data.testdoubles.TestScheduleDao
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -12,34 +14,33 @@ import org.junit.Test
 import java.time.LocalDate
 
 @ExperimentalCoroutinesApi
-class ScheduleLocalDataSourceTest {
+class ScheduleRepositoryImpTest {
 
     private val testDispatcher = UnconfinedTestDispatcher()
-    private lateinit var subject: ScheduleLocalDataSource
-    private lateinit var scheduleDao: ScheduleDao
+    private lateinit var subject: ScheduleRepositoryImp
+    private lateinit var scheduleLocalDataSource: ScheduleLocalDataSource
 
     @Before
     fun setup() {
-        scheduleDao = TestScheduleDao()
-        subject = ScheduleLocalDataSource(scheduleDao, testDispatcher)
+        scheduleLocalDataSource = ScheduleLocalDataSource(TestScheduleDao(), testDispatcher)
+        subject = ScheduleRepositoryImp(scheduleLocalDataSource)
     }
 
     @Test
-    fun getSchedulesForTimetableInGridMode_returnScheduleDetailsView() = runTest(testDispatcher) {
+    fun getSchedulesForTimetableInGridMode_returnsScheduleDetails() = runTest(testDispatcher) {
         assertThat(
             subject.getSchedulesForTimetableInGridMode(
                 showSaturday = true,
                 showSunday = true,
                 startDate = LocalDate.of(2023, 11, 20),
                 endDate = LocalDate.of(2023, 11, 26)
-            ),
-            `is`(
-                scheduleDao.getSchedulesForTimetableInGridMode(
+            ), `is`(
+                scheduleLocalDataSource.getSchedulesForTimetableInGridMode(
                     showSaturday = true,
                     showSunday = true,
                     startDate = LocalDate.of(2023, 11, 20),
                     endDate = LocalDate.of(2023, 11, 26)
-                )
+                ).map(ScheduleDetailsView::asExternalModel)
             )
         )
     }

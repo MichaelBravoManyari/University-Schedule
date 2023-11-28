@@ -7,7 +7,10 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.openContextualActionModeOverflowMenu
 import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.scrollTo
 import androidx.test.espresso.action.ViewActions.swipeLeft
+import androidx.test.espresso.action.ViewActions.swipeRight
+import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.assertThat
@@ -31,7 +34,7 @@ import io.mockk.spyk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.Matchers
+import org.hamcrest.Matchers.not
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -106,7 +109,7 @@ class ScheduleFragmentTest {
 
     @Test
     fun testClickOnTodayOptionSelectsCurrentDay() {
-        every { timetableUtils.getCurrentDate() } returns LocalDate.of(2023, 11, 13)
+        mockUtilsGetCurrentDate(LocalDate.of(2023, 11, 13))
         val expectedTextColor = ContextCompat.getColor(
             ApplicationProvider.getApplicationContext(),
             com.studentsapps.ui.R.color.timetable_current_month_day_text_color
@@ -125,10 +128,45 @@ class ScheduleFragmentTest {
     }
 
     @Test
-    fun testRepeatedSchedulesDisplayedInGridMode() {
+    fun testRepeatedSchedulesDisplayedInGridMode() = runTest {
+        mockUtilsGetCurrentDate(LocalDate.of(2023, 11, 20))
         createScheduleFragment()
-        onView(withContentDescription("1")).check(matches(isDisplayed()))
-        onView(withContentDescription("2")).check(matches(isDisplayed()))
+        onView(withContentDescription("8")).perform(scrollTo()).check(matches(isDisplayed()))
+        onView(withContentDescription("9")).perform(scrollTo()).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun testSchedulesDisplayedInGridModeForSpecificDate() = runTest {
+        mockUtilsGetCurrentDate(LocalDate.of(2023, 11, 20))
+        createScheduleFragment()
+        onView(withContentDescription("1")).perform(scrollTo()).check(matches(isDisplayed()))
+        onView(withContentDescription("2")).perform(scrollTo()).check(matches(isDisplayed()))
+        onView(withContentDescription("3")).perform(scrollTo()).check(matches(isDisplayed()))
+        onView(withContentDescription("4")).perform(scrollTo()).check(matches(isDisplayed()))
+        onView(withContentDescription("5")).perform(scrollTo()).check(matches(isDisplayed()))
+        onView(withContentDescription("6")).perform(scrollTo()).check(matches(isDisplayed()))
+        onView(withContentDescription("7")).perform(scrollTo()).check(matches(isDisplayed()))
+        onView(withContentDescription("8")).perform(scrollTo()).check(matches(isDisplayed()))
+        onView(withContentDescription("9")).perform(scrollTo()).check(matches(isDisplayed()))
+        onView(withContentDescription("10")).perform(scrollTo()).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun testChangeDateInGridModeDisplaysSchedulesForCurrentDate() = runTest {
+        mockUtilsGetCurrentDate(LocalDate.of(2023, 11, 20))
+        createScheduleFragment()
+        onView(withId(R.id.timetable)).perform(swipeRight())
+        onView(withContentDescription("11")).perform(scrollTo()).check(matches(isDisplayed()))
+        onView(withContentDescription("1")).check(doesNotExist())
+        onView(withContentDescription("2")).check(doesNotExist())
+        onView(withContentDescription("3")).check(doesNotExist())
+        onView(withContentDescription("4")).check(doesNotExist())
+        onView(withContentDescription("5")).check(doesNotExist())
+        onView(withContentDescription("6")).check(doesNotExist())
+        onView(withContentDescription("7")).check(doesNotExist())
+        onView(withContentDescription("8")).check(doesNotExist())
+        onView(withContentDescription("9")).check(doesNotExist())
+        onView(withContentDescription("10")).check(doesNotExist())
     }
 
     private fun createScheduleFragment() {
@@ -137,13 +175,17 @@ class ScheduleFragmentTest {
         })
     }
 
+    private fun mockUtilsGetCurrentDate(date: LocalDate) {
+        every { timetableUtils.getCurrentDate() } returns date
+    }
+
     private fun verifyTimetableGridViewIsDisplayed() {
         onView(withId(com.studentsapps.ui.R.id.schedule_container_and_grid))
             .check(matches(isDisplayed())).check(
                 matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE))
             )
         onView(withId(com.studentsapps.ui.R.id.schedule_list_container))
-            .check(matches(Matchers.not(isDisplayed()))).check(
+            .check(matches(not(isDisplayed()))).check(
                 matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE))
             )
     }
@@ -156,7 +198,7 @@ class ScheduleFragmentTest {
                 )
             )
         onView(withId(com.studentsapps.ui.R.id.schedule_container_and_grid))
-            .check(matches(Matchers.not(isDisplayed())))
+            .check(matches(not(isDisplayed())))
             .check(
                 matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE))
             )

@@ -12,13 +12,13 @@ class ScheduleRepositoryImp @Inject constructor(
 ) : ScheduleRepository {
     override suspend fun getSchedulesForTimetableInGridMode(
         showSaturday: Boolean,
-        showMonday: Boolean,
+        showSunday: Boolean,
         startDate: LocalDate,
         endDate: LocalDate
     ): List<ScheduleDetails> {
         return scheduleLocalDataSource.getSchedulesForTimetableInGridMode(
             showSaturday,
-            showMonday,
+            showSunday,
             startDate,
             endDate
         ).map(ScheduleDetailsView::asExternalModel)

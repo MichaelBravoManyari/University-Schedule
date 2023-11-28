@@ -1,4 +1,4 @@
-package com.studentsapps.database.testdoubles
+package com.studentsapps.database.test.data.testdoubles
 
 import com.studentsapps.database.dao.ScheduleDao
 import com.studentsapps.database.model.ScheduleDetailsView
@@ -18,14 +18,15 @@ class TestScheduleDao : ScheduleDao() {
         startDate: LocalDate,
         endDate: LocalDate
     ): List<ScheduleDetailsView> {
-        return scheduleDetailsList.toMutableList().apply {
-            removeIf {
-                if (!showSaturday)
-                    it.dayOfWeek == DayOfWeek.SATURDAY
-                else if (!showSunday)
-                    it.dayOfWeek == DayOfWeek.SUNDAY
-            }
+        val filteredByDayOfWeek = scheduleDetailsList.filter {
+            it.specificDate == null && (showSaturday || it.dayOfWeek != DayOfWeek.SATURDAY) && (showSunday || it.dayOfWeek != DayOfWeek.SUNDAY)
         }
+
+        val filteredBySpecificDate = scheduleDetailsList.filter {
+            it.specificDate != null && (showSaturday || it.dayOfWeek != DayOfWeek.SATURDAY) && (showSunday || it.dayOfWeek != DayOfWeek.SUNDAY) && it.specificDate!! in startDate..endDate
+        }
+
+        return filteredByDayOfWeek + filteredBySpecificDate
     }
 
     override suspend fun getSchedulesForTimetableInListMode(

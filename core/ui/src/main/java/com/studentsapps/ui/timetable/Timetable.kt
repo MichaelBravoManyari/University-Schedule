@@ -912,14 +912,10 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
             velocityX: Float,
             velocityY: Float
         ): Boolean {
-            if (showAsGrid) {
-                _date.value =
+            val selectedDate =
+                if (showAsGrid) {
                     if (isRightSwipe(e2)) date.value?.minusWeeks(1) else date.value?.plusWeeks(1)
-                _currentMonth.value = date.value?.let { utils.getMonth(it) }
-                updateTextOfDayOfMonthViews()
-                selectDayOfMonth()
-            } else {
-                _date.value =
+                } else {
                     if (isRightSwipe(e2)) {
                         var dateReturns = date.value?.minusDays(1)
                         if (dateReturns?.dayOfWeek == DayOfWeek.SUNDAY && !showSunday)
@@ -935,9 +931,11 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
                             dateReturns = dateReturns.plusDays(1)
                         dateReturns
                     }
-                updateTextOfDayOfMonthViews()
-                selectDayOfMonth()
-            }
+                }
+            updateTextOfDayOfMonthViews(selectedDate)
+            _date.value = selectedDate
+            _currentMonth.value = date.value?.let { utils.getMonth(it) }
+            selectDayOfMonth()
             return true
         }
 
@@ -947,13 +945,13 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
         }
     }
 
-    private fun updateTextOfDayOfMonthViews() {
+    private fun updateTextOfDayOfMonthViews(selectedDate: LocalDate? = null) {
         val daysOfMonthOfWeek =
             utils.getDaysOfMonthOfWeek(
                 isMondayFirstDayOfWeek,
                 showSaturday,
                 showSunday,
-                date.value!!
+                selectedDate ?: date.value!!
             )
         getDaysOfMonthViews().forEachIndexed { index, view ->
             val viewDate = daysOfMonthOfWeek[index]
@@ -1009,8 +1007,8 @@ fun List<ScheduleView>.getCrossSchedules(): List<List<ScheduleView>> {
             if (schedule.isCrossingSchedules(scheduleToCompare)) {
                 if (!list1.scheduleContains(schedule))
                     list2.add(scheduleToCompare)
-                else
-                    list1.addScheduleToList(schedule, scheduleToCompare)
+                /*else
+                    list1.addScheduleToList(schedule, scheduleToCompare)*/
             }
         }
 
@@ -1056,7 +1054,7 @@ fun List<List<ScheduleView>>.scheduleContains(schedule: ScheduleView): Boolean {
     return false
 }
 
-fun List<MutableList<ScheduleView>>.addScheduleToList(
+/*fun List<MutableList<ScheduleView>>.addScheduleToList(
     scheduleToCompare: ScheduleView,
     scheduleToAdd: ScheduleView
 ) {
@@ -1066,7 +1064,7 @@ fun List<MutableList<ScheduleView>>.addScheduleToList(
             break
         }
     }
-}
+}*/
 
 fun ScheduleView.isCrossingSchedules(scheduleToCompare: ScheduleView): Boolean {
     val startHourSchedule = this.startTime

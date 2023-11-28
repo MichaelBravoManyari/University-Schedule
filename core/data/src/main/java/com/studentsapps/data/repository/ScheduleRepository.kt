@@ -7,7 +7,7 @@ interface ScheduleRepository {
 
     suspend fun getSchedulesForTimetableInGridMode(
         showSaturday: Boolean,
-        showMonday: Boolean,
+        showSunday: Boolean,
         startDate: LocalDate,
         endDate: LocalDate
     ): List<ScheduleDetails>

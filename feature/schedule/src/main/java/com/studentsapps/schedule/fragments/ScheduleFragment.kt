@@ -58,17 +58,17 @@ class ScheduleFragment : Fragment() {
                     }
                 }
             }
+        }
 
-            with(binding.timetable) {
-                date.observe(viewLifecycleOwner) {
-                    if (isDisplayedAsGrid()) {
-                        viewModel.updateScheduleDetailsListInGridMode(
-                            displaySaturday(),
-                            displaySunday(),
-                            getStartDate(),
-                            getEndDate()
-                        )
-                    }
+        with(binding.timetable) {
+            date.observe(viewLifecycleOwner) {
+                if (isDisplayedAsGrid()) {
+                    viewModel.updateScheduleDetailsListInGridMode(
+                        displaySaturday(),
+                        displaySunday(),
+                        getStartDate(),
+                        getEndDate()
+                    )
                 }
             }
         }

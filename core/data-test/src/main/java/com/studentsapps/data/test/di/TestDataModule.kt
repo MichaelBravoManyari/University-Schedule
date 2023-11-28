@@ -1,7 +1,9 @@
 package com.studentsapps.data.test.di
 
 import com.studentsapps.data.di.DataModule
+import com.studentsapps.data.repository.ScheduleRepository
 import com.studentsapps.data.repository.TimetableUserPreferencesRepository
+import com.studentsapps.data.repository.fake.FakeScheduleRepository
 import com.studentsapps.data.repository.fake.FakeTimetableUserPreferencesRepository
 import dagger.Binds
 import dagger.Module
@@ -21,4 +23,10 @@ interface TestDataModule {
     fun bindTimetableUserPreferencesRepository(
         timetableUserPreferencesRepository: FakeTimetableUserPreferencesRepository
     ): TimetableUserPreferencesRepository
+
+    @Binds
+    @Singleton
+    fun bindScheduleRepository(
+        scheduleRepository: FakeScheduleRepository
+    ): ScheduleRepository
 }

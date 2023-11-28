@@ -6,36 +6,36 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 val scheduleDetailsList = mutableListOf(
-    createTestScheduleDetails(id = 1, dayOfWeek = DayOfWeek.MONDAY),
-    createTestScheduleDetails(id = 2, dayOfWeek = DayOfWeek.TUESDAY),
-    createTestScheduleDetails(id = 3, dayOfWeek = DayOfWeek.WEDNESDAY),
-    createTestScheduleDetails(id = 4, dayOfWeek = DayOfWeek.THURSDAY),
-    createTestScheduleDetails(id = 5, dayOfWeek = DayOfWeek.FRIDAY),
-    createTestScheduleDetails(id = 6, dayOfWeek = DayOfWeek.SATURDAY),
-    createTestScheduleDetails(id = 7, dayOfWeek = DayOfWeek.SUNDAY),
-    createTestScheduleDetails(
+    createTestScheduleDetailsView(id = 1, dayOfWeek = DayOfWeek.MONDAY),
+    createTestScheduleDetailsView(id = 2, dayOfWeek = DayOfWeek.TUESDAY),
+    createTestScheduleDetailsView(id = 3, dayOfWeek = DayOfWeek.WEDNESDAY),
+    createTestScheduleDetailsView(id = 4, dayOfWeek = DayOfWeek.THURSDAY),
+    createTestScheduleDetailsView(id = 5, dayOfWeek = DayOfWeek.FRIDAY),
+    createTestScheduleDetailsView(id = 6, dayOfWeek = DayOfWeek.SATURDAY),
+    createTestScheduleDetailsView(id = 7, dayOfWeek = DayOfWeek.SUNDAY),
+    createTestScheduleDetailsView(
         id = 8,
         dayOfWeek = DayOfWeek.MONDAY,
         specificDate = LocalDate.of(2023, 11, 20)
     ),
-    createTestScheduleDetails(
+    createTestScheduleDetailsView(
         id = 9,
         dayOfWeek = DayOfWeek.MONDAY,
         specificDate = LocalDate.of(2023, 11, 20)
     ),
-    createTestScheduleDetails(
+    createTestScheduleDetailsView(
         id = 10,
         dayOfWeek = DayOfWeek.THURSDAY,
         specificDate = LocalDate.of(2023, 11, 23)
     ),
-    createTestScheduleDetails(
+    createTestScheduleDetailsView(
         id = 11,
         dayOfWeek = DayOfWeek.SUNDAY,
         specificDate = LocalDate.of(2023, 11, 19)
     ),
 )
 
-private fun createTestScheduleDetails(
+private fun createTestScheduleDetailsView(
     id: Int,
     dayOfWeek: DayOfWeek,
     specificDate: LocalDate? = null

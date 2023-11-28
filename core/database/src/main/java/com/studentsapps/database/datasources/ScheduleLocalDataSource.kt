@@ -16,14 +16,14 @@ class ScheduleLocalDataSource @Inject constructor(
 
     suspend fun getSchedulesForTimetableInGridMode(
         showSaturday: Boolean,
-        showMonday: Boolean,
+        showSunday: Boolean,
         startDate: LocalDate,
         endDate: LocalDate
     ): List<ScheduleDetailsView> =
         withContext(ioDispatcher) {
             scheduleDao.getSchedulesForTimetableInGridMode(
                 showSaturday,
-                showMonday,
+                showSunday,
                 startDate,
                 endDate
             )
