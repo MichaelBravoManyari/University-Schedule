@@ -31,8 +31,11 @@ import androidx.core.view.GestureDetectorCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.android.material.textview.MaterialTextView
-import com.studentsapps.model.ScheduleDetails
+import com.studentsapps.model.ScheduleView
 import com.studentsapps.model.TimetableUserPreferences
+import com.studentsapps.model.getCrossSchedules
+import com.studentsapps.model.getUniqueSchedules
+import com.studentsapps.model.groupByDayOfWeek
 import com.studentsapps.ui.R
 import com.studentsapps.ui.databinding.TimetableBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -69,6 +72,8 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
     private var wasViewDrawn = false
     private var remakeTheView = false
     private var drawView = false
+    private var timetableUserPreferences: TimetableUserPreferences? = null
+    private var schedulesViewsList = emptyList<ScheduleView>()
 
     @Inject
     lateinit var utils: TimetableUtils
@@ -162,21 +167,24 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
     }
 
     fun setTimetableUserPreferences(timetableUserPreferences: TimetableUserPreferences) {
-        drawView = true
+        if (timetableUserPreferences != this.timetableUserPreferences) {
+            this.timetableUserPreferences = timetableUserPreferences
+            drawView = true
 
-        setIs12HoursFormat(timetableUserPreferences.is12HoursFormat)
-        setShowSaturday(timetableUserPreferences.showSaturday)
-        setShowSunday(timetableUserPreferences.showSunday)
-        setIsMondayFirstDayOfWeek(timetableUserPreferences.isMondayFirstDayOfWeek)
-        setShowAsGrid(timetableUserPreferences.showAsGrid)
+            setIs12HoursFormat(timetableUserPreferences.is12HoursFormat)
+            setShowSaturday(timetableUserPreferences.showSaturday)
+            setShowSunday(timetableUserPreferences.showSunday)
+            setIsMondayFirstDayOfWeek(timetableUserPreferences.isMondayFirstDayOfWeek)
+            setShowAsGrid(timetableUserPreferences.showAsGrid)
 
-        if (!wasViewDrawn || remakeTheView) {
-            configureDayViews()
-            updateTextOfDayOfMonthViews()
-            updateTextOfDayOfWeekViews()
-            restartView()
-        } else if (redrawGridsAndHours) {
-            restartView()
+            if (!wasViewDrawn || remakeTheView) {
+                configureDayViews()
+                updateTextOfDayOfMonthViews()
+                updateTextOfDayOfWeekViews()
+                restartView()
+            } else if (redrawGridsAndHours) {
+                restartView()
+            }
         }
     }
 
@@ -350,52 +358,6 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
         }
     }
 
-    /*private fun selectCurrentMonthDay() {
-        val daysOfMonthCurrentWeek =
-            utils.getDaysOfMonthOfWeek(
-                isMondayFirstDayOfWeek,
-                showSaturday,
-                showSunday,
-                date.value!!
-            )
-        val currentMonthDay = utils.getCurrentMonthDay()
-        val currentMonthDayTextColor = getColorById(R.color.timetable_current_month_day_text_color)
-        val currentMonthDayBackgroundColor =
-            getColorById(R.color.timetable_current_month_day_background_color)
-        val monthDayTextColor = getColorById(R.color.timetable_month_day_text_color)
-        getDaysOfMonthViews().forEachIndexed { index, view ->
-            val dateView = (view.tag as LocalDate?) ?: daysOfMonthCurrentWeek[index]
-            if (date.value == LocalDate.now() && view.text == currentMonthDay && date.value == dateView)
-                view.apply {
-                    setTextColor(currentMonthDayTextColor)
-                    background = canvasRender.getCurrentMonthDayBackground(
-                        view.measuredWidth,
-                        view.measuredHeight,
-                        currentMonthDayBackgroundColor
-                    ).toDrawable(resources)
-                }
-            else if (date.value != utils.getCurrentDate() && dateView == utils.getCurrentDate() && view.text == currentMonthDay)
-                view.apply {
-                    setTextColor(currentMonthDayBackgroundColor)
-                    background = null
-                }
-            else if (date.value == dateView && view.text == date.value?.dayOfMonth.toString())
-                view.apply {
-                    setTextColor(currentMonthDayTextColor)
-                    background = canvasRender.getCurrentMonthDayBackground(
-                        view.measuredWidth,
-                        view.measuredHeight,
-                        monthDayTextColor
-                    ).toDrawable(resources)
-                }
-            else
-                view.apply {
-                    setTextColor(monthDayTextColor)
-                    background = null
-                }
-        }
-    }*/
-
     private fun getDaysOfWeekOrder(): List<String> {
         return utils.getDaysOfWeekOrder(isMondayFirstDayOfWeek, showSaturday, showSunday)
             .map { resourceId ->
@@ -481,55 +443,6 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
                 provisionalListView()
                 wasViewDrawn = true
                 remakeTheView = false
-                /*showScheduleInGrid(
-                    listOf(
-                        Schedule(
-                            2,
-                            LocalTime.of(12, 0),
-                            LocalTime.of(13, 0),
-                            "sdf",
-                            DayOfWeek.TUESDAY,
-                            "Test 1",
-                            Color.RED
-                        ),
-                        Schedule(
-                            3,
-                            LocalTime.of(12, 0),
-                            LocalTime.of(13, 0),
-                            "sdf",
-                            DayOfWeek.TUESDAY,
-                            "Test 2",
-                            Color.YELLOW
-                        ),
-                        Schedule(
-                            4,
-                            LocalTime.of(12, 0),
-                            LocalTime.of(13, 0),
-                            "sdf",
-                            DayOfWeek.SATURDAY,
-                            "Test 3",
-                            Color.YELLOW
-                        ),
-                        Schedule(
-                            5,
-                            LocalTime.of(12, 0),
-                            LocalTime.of(13, 0),
-                            "sdf",
-                            DayOfWeek.SUNDAY,
-                            "Test 4",
-                            Color.RED
-                        ),
-                        Schedule(
-                            6,
-                            LocalTime.of(12, 30),
-                            LocalTime.of(15, 0),
-                            "sdf",
-                            DayOfWeek.MONDAY,
-                            "Test 5",
-                            Color.BLUE
-                        )
-                    )
-                )*/
             }
             drawView = false
         }
@@ -688,21 +601,25 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
     }
 
     fun showScheduleInGrid(schedules: List<ScheduleView>) {
-        schedules.groupByDayOfWeek().forEach { (dayOfWeek, schedulesForOneDayOfWeek) ->
+        if (schedules != schedulesViewsList) {
+            schedulesViewsList = schedules
+            binding.scheduleContainer.removeAllViews()
+            schedules.groupByDayOfWeek().forEach { (dayOfWeek, schedulesForOneDayOfWeek) ->
 
-            if ((dayOfWeek != DayOfWeek.SUNDAY || showSunday) && (dayOfWeek != DayOfWeek.SATURDAY || showSaturday)) {
-                val scheduleCrossing = schedulesForOneDayOfWeek.getCrossSchedules()
-                val uniqueSchedules = schedulesForOneDayOfWeek.getUniqueSchedules()
+                if ((dayOfWeek != DayOfWeek.SUNDAY || showSunday) && (dayOfWeek != DayOfWeek.SATURDAY || showSaturday)) {
+                    val scheduleCrossing = schedulesForOneDayOfWeek.getCrossSchedules()
+                    val uniqueSchedules = schedulesForOneDayOfWeek.getUniqueSchedules()
 
-                scheduleCrossing.forEach { crossSchedules ->
-                    crossSchedules.forEachIndexed { index, schedule ->
-                        val crossedSchedulesCount = crossSchedules.size
-                        addScheduleToGrid(schedule, crossedSchedulesCount, index)
+                    scheduleCrossing.forEach { crossSchedules ->
+                        crossSchedules.forEachIndexed { index, schedule ->
+                            val crossedSchedulesCount = crossSchedules.size
+                            addScheduleToGrid(schedule, crossedSchedulesCount, index)
+                        }
                     }
-                }
 
-                uniqueSchedules.forEach { uniqueSchedule ->
-                    addScheduleToGrid(uniqueSchedule)
+                    uniqueSchedules.forEach { uniqueSchedule ->
+                        addScheduleToGrid(uniqueSchedule)
+                    }
                 }
             }
         }
@@ -719,12 +636,12 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
                 courseName,
                 startTime,
                 endTime,
-                day,
+                dayOfWeek,
                 color,
                 crossedSchedulesCount,
                 index
             )
-            binding.scheduleContainerAndGrid.addView(scheduleView)
+            binding.scheduleContainer.addView(scheduleView)
         }
     }
 
@@ -967,109 +884,4 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
         private const val ROWS_NUMBER = 24
         private const val NUM_HORIZONTAL_GRID_LINES = 24
     }
-}
-
-data class ScheduleView(
-    val id: Int,
-    val startTime: LocalTime,
-    val endTime: LocalTime,
-    val classPlace: String?,
-    val day: DayOfWeek,
-    val courseName: String,
-    val color: Int
-)
-
-fun ScheduleDetails.asScheduleView() =
-    ScheduleView(
-        id = scheduleId,
-        startTime = startTime,
-        endTime = endTime,
-        classPlace = classPlace,
-        day = dayOfWeek,
-        courseName = courseName,
-        color = courseColor,
-    )
-
-fun List<ScheduleView>.groupByDayOfWeek(): Map<DayOfWeek, List<ScheduleView>> {
-    return groupBy { it.day }
-}
-
-fun List<ScheduleView>.getCrossSchedules(): List<List<ScheduleView>> {
-    val list1 = mutableListOf<MutableList<ScheduleView>>()
-    for (i in 0 until size - 1) {
-        val schedule = this[i]
-        val list2 = mutableListOf<ScheduleView>()
-        if (!list1.scheduleContains(schedule))
-            list2.add(schedule)
-
-        for (j in i + 1 until size) {
-            val scheduleToCompare = this[j]
-            if (schedule.isCrossingSchedules(scheduleToCompare)) {
-                if (!list1.scheduleContains(schedule))
-                    list2.add(scheduleToCompare)
-                /*else
-                    list1.addScheduleToList(schedule, scheduleToCompare)*/
-            }
-        }
-
-        if (list2.isNotEmpty())
-            list1.add(list2)
-    }
-
-    for (list in list1) {
-        list.sortBy {
-            it.startTime
-        }
-    }
-
-    return list1
-}
-
-fun List<ScheduleView>.getUniqueSchedules(): List<ScheduleView> {
-    return if (count() == 1)
-        this
-    else {
-        val uniqueSchedules = mutableListOf<ScheduleView>()
-        for (i in 0 until size - 1) {
-            val schedule = this[i]
-            var isUnique = true
-            for (j in i + 1 until size) {
-                val scheduleToCompare = this[j]
-                if (schedule.isCrossingSchedules(scheduleToCompare)) {
-                    isUnique = false
-                    break
-                }
-            }
-            if (isUnique) uniqueSchedules.add(schedule)
-        }
-        uniqueSchedules
-    }
-}
-
-fun List<List<ScheduleView>>.scheduleContains(schedule: ScheduleView): Boolean {
-    for (list in this) {
-        if (schedule in list)
-            return true
-    }
-    return false
-}
-
-/*fun List<MutableList<ScheduleView>>.addScheduleToList(
-    scheduleToCompare: ScheduleView,
-    scheduleToAdd: ScheduleView
-) {
-    for (list in this) {
-        if (scheduleToCompare in list) {
-            list.add(scheduleToAdd)
-            break
-        }
-    }
-}*/
-
-fun ScheduleView.isCrossingSchedules(scheduleToCompare: ScheduleView): Boolean {
-    val startHourSchedule = this.startTime
-    val endHourSchedule = this.endTime
-    val startHourScheduleCompare = scheduleToCompare.startTime
-    val endHourScheduleCompare = scheduleToCompare.endTime
-    return startHourSchedule < endHourScheduleCompare && endHourSchedule > startHourScheduleCompare
 }

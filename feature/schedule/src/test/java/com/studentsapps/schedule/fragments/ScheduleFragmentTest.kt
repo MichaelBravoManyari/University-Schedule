@@ -149,6 +149,7 @@ class ScheduleFragmentTest {
         onView(withContentDescription("8")).perform(scrollTo()).check(matches(isDisplayed()))
         onView(withContentDescription("9")).perform(scrollTo()).check(matches(isDisplayed()))
         onView(withContentDescription("10")).perform(scrollTo()).check(matches(isDisplayed()))
+        onView(withContentDescription("11")).check(doesNotExist())
     }
 
     @Test
@@ -156,17 +157,17 @@ class ScheduleFragmentTest {
         mockUtilsGetCurrentDate(LocalDate.of(2023, 11, 20))
         createScheduleFragment()
         onView(withId(R.id.timetable)).perform(swipeRight())
-        onView(withContentDescription("11")).perform(scrollTo()).check(matches(isDisplayed()))
-        onView(withContentDescription("1")).check(doesNotExist())
-        onView(withContentDescription("2")).check(doesNotExist())
-        onView(withContentDescription("3")).check(doesNotExist())
-        onView(withContentDescription("4")).check(doesNotExist())
-        onView(withContentDescription("5")).check(doesNotExist())
-        onView(withContentDescription("6")).check(doesNotExist())
-        onView(withContentDescription("7")).check(doesNotExist())
+        onView(withContentDescription("1")).perform(scrollTo()).check(matches(isDisplayed()))
+        onView(withContentDescription("2")).perform(scrollTo()).check(matches(isDisplayed()))
+        onView(withContentDescription("3")).perform(scrollTo()).check(matches(isDisplayed()))
+        onView(withContentDescription("4")).perform(scrollTo()).check(matches(isDisplayed()))
+        onView(withContentDescription("5")).perform(scrollTo()).check(matches(isDisplayed()))
+        onView(withContentDescription("6")).perform(scrollTo()).check(matches(isDisplayed()))
+        onView(withContentDescription("7")).perform(scrollTo()).check(matches(isDisplayed()))
         onView(withContentDescription("8")).check(doesNotExist())
         onView(withContentDescription("9")).check(doesNotExist())
         onView(withContentDescription("10")).check(doesNotExist())
+        onView(withContentDescription("11")).perform(scrollTo()).check(matches(isDisplayed()))
     }
 
     private fun createScheduleFragment() {

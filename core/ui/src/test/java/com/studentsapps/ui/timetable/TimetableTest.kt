@@ -34,6 +34,7 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.BoundedMatcher
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.studentsapps.model.ScheduleView
 import com.studentsapps.model.TimetableUserPreferences
 import com.studentsapps.testing.getOrAwaitValue
 import com.studentsapps.testing.launchFragmentInHiltContainer
@@ -392,7 +393,7 @@ class TimetableTest {
             .check(matches(withXYCoordinates(expectedMath2XCoordinate, expectedMath2YCoordinate)))
             .check(matches(withMeasures(expectedMath2Width, expectedMath2Height)))
             .check(matches(withBackground(R.drawable.background_schedule_view)))
-            .check(matches(withBackgroundTintList(Color.BLUE)))
+            .check(matches(withBackgroundTintList()))
             .check(matches(withTypeface(expectedTypeface)))
             .check(matches(withTextSize(expectedTextSize)))
     }
@@ -483,7 +484,7 @@ class TimetableTest {
     @Test
     fun showSchedulesInGrid_notShowSunday() {
         val scheduleId = 1
-        val schedule = listOf(uniqueSchedule.copy(id = scheduleId, day = DayOfWeek.SUNDAY))
+        val schedule = listOf(uniqueSchedule.copy(id = scheduleId, dayOfWeek = DayOfWeek.SUNDAY))
         val timetable = createTimetable().apply {
             setTimetableUserPreferences(
                 baseTimetableUserPreferences.copy(showSunday = false)
@@ -497,7 +498,7 @@ class TimetableTest {
     @Test
     fun showSchedulesInGrid_notShowSaturday() {
         val scheduleId = 1
-        val schedule = listOf(uniqueSchedule.copy(id = scheduleId, day = DayOfWeek.SATURDAY))
+        val schedule = listOf(uniqueSchedule.copy(id = scheduleId, dayOfWeek = DayOfWeek.SATURDAY))
         val timetable = createTimetable().apply {
             setTimetableUserPreferences(
                 baseTimetableUserPreferences.copy(showSaturday = false)
@@ -513,8 +514,8 @@ class TimetableTest {
         val saturdayScheduleId = 1
         val sundayScheduleId = 2
         val schedules = listOf(
-            uniqueSchedule.copy(id = saturdayScheduleId, day = DayOfWeek.SATURDAY),
-            uniqueSchedule.copy(id = sundayScheduleId, day = DayOfWeek.SUNDAY)
+            uniqueSchedule.copy(id = saturdayScheduleId, dayOfWeek = DayOfWeek.SATURDAY),
+            uniqueSchedule.copy(id = sundayScheduleId, dayOfWeek = DayOfWeek.SUNDAY)
         )
         val timetable = createTimetable().apply {
             setTimetableUserPreferences(
@@ -535,8 +536,8 @@ class TimetableTest {
         val mondayScheduleId = 1
         val sundayScheduleId = 2
         val schedules = listOf(
-            uniqueSchedule.copy(id = mondayScheduleId, day = DayOfWeek.MONDAY),
-            uniqueSchedule.copy(id = sundayScheduleId, day = DayOfWeek.SUNDAY)
+            uniqueSchedule.copy(id = mondayScheduleId, dayOfWeek = DayOfWeek.MONDAY),
+            uniqueSchedule.copy(id = sundayScheduleId, dayOfWeek = DayOfWeek.SUNDAY)
         )
 
         val hourCellWidth = getDimensionPixelSizeById(R.dimen.timetable_hours_cell_width)
@@ -1101,7 +1102,7 @@ class TimetableTest {
         }
     }
 
-    private fun withBackgroundTintList(@ColorInt color: Int): Matcher<View> {
+    private fun withBackgroundTintList(@ColorInt color: Int = Color.BLUE): Matcher<View> {
         return object : BoundedMatcher<View, TextView>(TextView::class.java) {
             override fun describeTo(description: Description?) {
                 description?.appendText("with backgroundTint: ")
