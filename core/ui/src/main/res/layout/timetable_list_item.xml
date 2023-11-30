@@ -1,14 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/timetable_list_item_text"
+        android:id="@+id/timetable_list_item_course_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Math" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/timetable_list_item_course_hour"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/timetable_list_item_course_name"
+        tools:text="9:00 AM -> 10:00 AM" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/timetable_list_item_classroom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/ic_classroom"
+        android:drawablePadding="10dp"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/timetable_list_item_course_hour"
+        tools:text="Ed. Ancient 506" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

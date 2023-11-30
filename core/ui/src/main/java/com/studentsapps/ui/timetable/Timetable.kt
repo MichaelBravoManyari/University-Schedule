@@ -440,7 +440,6 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
             if (!wasViewDrawn || remakeTheView) {
                 selectDayOfMonth()
                 drawGridsAndHours()
-                provisionalListView()
                 wasViewDrawn = true
                 remakeTheView = false
             }
@@ -468,13 +467,6 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
             scheduleListContainer.visibility = GONE
             scheduleContainerAndGrid.visibility = VISIBLE
         }
-    }
-
-    private fun provisionalListView() {
-        val adapter = TimetableListAdapter()
-        binding.scheduleListContainer.adapter = adapter
-        val listString = mutableListOf("df", "hello")
-        adapter.submitList(listString)
     }
 
     private fun createBitmapGridAndHours(bitmapWidth: Int, hoursCellWidth: Int): Bitmap {
@@ -604,7 +596,7 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
         if (schedules != schedulesViewsList) {
             schedulesViewsList = schedules
             binding.scheduleContainer.removeAllViews()
-            schedules.groupByDayOfWeek().forEach { (dayOfWeek, schedulesForOneDayOfWeek) ->
+            schedulesViewsList.groupByDayOfWeek().forEach { (dayOfWeek, schedulesForOneDayOfWeek) ->
 
                 if ((dayOfWeek != DayOfWeek.SUNDAY || showSunday) && (dayOfWeek != DayOfWeek.SATURDAY || showSaturday)) {
                     val scheduleCrossing = schedulesForOneDayOfWeek.getCrossSchedules()
@@ -622,6 +614,15 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
                     }
                 }
             }
+        }
+    }
+
+    fun showScheduleInList(schedules: List<ScheduleView>) {
+        if (schedules != schedulesViewsList) {
+            schedulesViewsList = schedules
+            val adapter = TimetableListAdapter(is12HoursFormat)
+            binding.scheduleListContainer.adapter = adapter
+            adapter.submitList(schedulesViewsList)
         }
     }
 

@@ -5,11 +5,16 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.studentsapps.model.ScheduleView
+import com.studentsapps.ui.R
 import com.studentsapps.ui.databinding.TimetableListItemBinding
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
-internal class TimetableListAdapter : ListAdapter<String, TimetableListAdapter.TimetableListViewHolder>(
-    DiffCallback
-) {
+internal class TimetableListAdapter(private val is12HoursFormat: Boolean) :
+    ListAdapter<ScheduleView, TimetableListAdapter.TimetableListViewHolder>(
+        DiffCallback
+    ) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TimetableListViewHolder {
         return TimetableListViewHolder(
@@ -22,25 +27,41 @@ internal class TimetableListAdapter : ListAdapter<String, TimetableListAdapter.T
     }
 
     override fun onBindViewHolder(holder: TimetableListViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(getItem(position), is12HoursFormat)
     }
 
-    class TimetableListViewHolder(private var binding: TimetableListItemBinding) :
+    class TimetableListViewHolder(
+        private val binding: TimetableListItemBinding
+    ) :
         RecyclerView.ViewHolder(binding.root) {
 
-            fun bind(string: String) {
-                binding.timetableListItemText.text = string
+        fun bind(scheduleView: ScheduleView, is12HoursFormat: Boolean) {
+            with(binding) {
+                timetableListItemCourseName.text = scheduleView.courseName
+                timetableListItemCourseHour.text = itemView.context.getString(
+                    R.string.course_time,
+                    if (is12HoursFormat) formatLocalTime(scheduleView.startTime) else scheduleView.startTime,
+                    if (is12HoursFormat) formatLocalTime(scheduleView.endTime) else scheduleView.endTime,
+                )
+                timetableListItemClassroom.text = scheduleView.classPlace
+                root.tag = scheduleView.id
             }
+        }
+
+        private fun formatLocalTime(localTime: LocalTime): String {
+            val formatter = DateTimeFormatter.ofPattern("h:mm a")
+            return localTime.format(formatter)
+        }
     }
 
     companion object {
-        private val DiffCallback = object : DiffUtil.ItemCallback<String>() {
-            override fun areItemsTheSame(oldItem: String, newItem: String): Boolean {
-                return oldItem == newItem
+        private val DiffCallback = object : DiffUtil.ItemCallback<ScheduleView>() {
+            override fun areItemsTheSame(oldItem: ScheduleView, newItem: ScheduleView): Boolean {
+                return oldItem.id == newItem.id
             }
 
-            override fun areContentsTheSame(oldItem: String, newItem: String): Boolean {
-                return oldItem.contentEquals(newItem)
+            override fun areContentsTheSame(oldItem: ScheduleView, newItem: ScheduleView): Boolean {
+                return oldItem == newItem
             }
 
         }

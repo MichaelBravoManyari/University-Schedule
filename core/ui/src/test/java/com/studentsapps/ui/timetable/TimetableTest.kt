@@ -50,6 +50,7 @@ import io.mockk.spyk
 import io.mockk.verify
 import org.hamcrest.Description
 import org.hamcrest.Matcher
+import org.hamcrest.Matchers.allOf
 import org.hamcrest.Matchers.`is`
 import org.hamcrest.Matchers.not
 import org.junit.Rule
@@ -893,6 +894,53 @@ class TimetableTest {
         assertThat(timetable.getEndDate(), `is`(expectedEndDate))
     }
 
+    @Test
+    fun testSchedulesDisplayedInListModeForSpecificDate() {
+        val scheduleViewList = listOf(uniqueSchedule)
+        val timetable = createTimetable().apply {
+            setTimetableUserPreferences(baseTimetableUserPreferences.copy(showAsGrid = false))
+        }
+        timetable.showScheduleInList(scheduleViewList)
+        onView(
+            allOf(
+                withId(R.id.timetable_list_item_course_name),
+                withParent(withTagValue(`is`(2)))
+            )
+        ).check(matches(withText("Math 2")))
+        onView(
+            allOf(
+                withId(R.id.timetable_list_item_course_hour),
+                withParent(withTagValue(`is`(2)))
+            )
+        ).check(matches(withText("1:00 PM -> 2:00 PM")))
+        onView(
+            allOf(
+                withId(R.id.timetable_list_item_classroom),
+                withParent(withTagValue(`is`(2)))
+            )
+        ).check(matches(withText("classroom 2")))
+    }
+
+    @Test
+    fun testCheckTimeFormatInListModeIs24HourFormat() {
+        val scheduleViewList = listOf(uniqueSchedule)
+        val timetable = createTimetable().apply {
+            setTimetableUserPreferences(
+                baseTimetableUserPreferences.copy(
+                    showAsGrid = false,
+                    is12HoursFormat = false
+                )
+            )
+        }
+        timetable.showScheduleInList(scheduleViewList)
+        onView(
+            allOf(
+                withId(R.id.timetable_list_item_course_hour),
+                withParent(withTagValue(`is`(2)))
+            )
+        ).check(matches(withText("13:00 -> 14:00")))
+    }
+
     private fun createTimetable(
         attr: AttributeSet? = null
     ): Timetable {
@@ -1197,12 +1245,11 @@ class TimetableTest {
     }
 
     private fun verifyTimetableListViewIsDisplayed() {
-        onView(withId(R.id.schedule_list_container))
-            .check(matches(isDisplayed())).check(
-                matches(
-                    withEffectiveVisibility(Visibility.VISIBLE)
-                )
+        onView(withId(R.id.schedule_list_container)).check(
+            matches(
+                withEffectiveVisibility(Visibility.VISIBLE)
             )
+        )
         onView(withId(R.id.schedule_container_and_grid))
             .check(matches(not(isDisplayed())))
             .check(

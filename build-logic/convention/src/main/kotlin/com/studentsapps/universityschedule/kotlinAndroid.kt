@@ -3,6 +3,7 @@ package com.studentsapps.universityschedule
 import com.android.build.api.dsl.CommonExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
+import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -44,5 +45,8 @@ private fun Project.configureKotlin() {
             jvmTarget = JavaVersion.VERSION_1_8.toString()
             languageVersion = "1.9"
         }
+    }
+    tasks.withType<Test> {
+        maxHeapSize = "2048m"
     }
 }
