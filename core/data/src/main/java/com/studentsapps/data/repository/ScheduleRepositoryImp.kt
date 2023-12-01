@@ -23,4 +23,9 @@ class ScheduleRepositoryImp @Inject constructor(
             endDate
         ).map(ScheduleDetailsView::asExternalModel)
     }
+
+    override suspend fun getSchedulesForTimetableInListMode(date: LocalDate): List<ScheduleDetails> {
+        return scheduleLocalDataSource.getSchedulesForTimetableInListMode(date.dayOfWeek, date)
+            .map(ScheduleDetailsView::asExternalModel)
+    }
 }

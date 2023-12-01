@@ -13,7 +13,6 @@ import dagger.Provides
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import javax.inject.Singleton
 
@@ -24,7 +23,6 @@ import javax.inject.Singleton
 )
 object TestDataStoreModule {
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Provides
     @Singleton
     fun providesUserPreferencesDataStore(@ApplicationContext context: Context, testCoroutineScope: TestScope): DataStore<Preferences> {

@@ -385,7 +385,7 @@ class TimetableTest {
 
         val timetable = createTimetable()
         onView(withId(R.id.schedule_container_and_grid)).check(matches(isDisplayed()))
-        timetable.showScheduleInGrid(schedules)
+        timetable.showSchedules(schedules)
 
         onView(withContentDescription(scheduleId.toString()))
             .perform(scrollTo())
@@ -420,7 +420,7 @@ class TimetableTest {
 
         val timetable = createTimetable()
         onView(withId(R.id.schedule_container_and_grid)).check(matches(isDisplayed()))
-        timetable.showScheduleInGrid(schedules)
+        timetable.showSchedules(schedules)
 
         onView(withContentDescription(scheduleId1.toString()))
             .perform(scrollTo())
@@ -454,7 +454,7 @@ class TimetableTest {
         val expectedColor = getColorById(R.color.timetable_schedule_view_light_text_color)
         val timetable = createTimetable()
         onView(withId(R.id.schedule_container_and_grid)).check(matches(isDisplayed()))
-        timetable.showScheduleInGrid(schedules)
+        timetable.showSchedules(schedules)
         onView(withContentDescription(scheduleId.toString())).check(
             matches(
                 withTextColor(
@@ -472,7 +472,7 @@ class TimetableTest {
         val expectedColor = getColorById(R.color.timetable_schedule_view_dark_text_color)
         val timetable = createTimetable()
         onView(withId(R.id.schedule_container_and_grid)).check(matches(isDisplayed()))
-        timetable.showScheduleInGrid(uniqueScheduleColorLight)
+        timetable.showSchedules(uniqueScheduleColorLight)
         onView(withContentDescription(scheduleId.toString())).check(
             matches(
                 withTextColor(
@@ -492,7 +492,7 @@ class TimetableTest {
             )
         }
         onView(withId(R.id.schedule_container_and_grid)).check(matches(isDisplayed()))
-        timetable.showScheduleInGrid(schedule)
+        timetable.showSchedules(schedule)
         onView(withContentDescription(scheduleId.toString())).check(doesNotExist())
     }
 
@@ -506,7 +506,7 @@ class TimetableTest {
             )
         }
         onView(withId(R.id.schedule_container_and_grid)).check(matches(isDisplayed()))
-        timetable.showScheduleInGrid(schedule)
+        timetable.showSchedules(schedule)
         onView(withContentDescription(scheduleId.toString())).check(doesNotExist())
     }
 
@@ -524,7 +524,7 @@ class TimetableTest {
             )
         }
         onView(withId(R.id.schedule_container_and_grid)).check(matches(isDisplayed()))
-        timetable.showScheduleInGrid(schedules)
+        timetable.showSchedules(schedules)
         onView(withContentDescription(saturdayScheduleId.toString())).check(doesNotExist())
         onView(withContentDescription(sundayScheduleId.toString())).perform(scrollTo()).check(
             matches(isDisplayed())
@@ -556,7 +556,7 @@ class TimetableTest {
             )
         }
         onView(withId(R.id.schedule_container_and_grid)).check(matches(isDisplayed()))
-        timetable.showScheduleInGrid(schedules)
+        timetable.showSchedules(schedules)
 
         onView(withContentDescription(mondayScheduleId.toString()))
             .perform(scrollTo())
@@ -900,7 +900,7 @@ class TimetableTest {
         val timetable = createTimetable().apply {
             setTimetableUserPreferences(baseTimetableUserPreferences.copy(showAsGrid = false))
         }
-        timetable.showScheduleInList(scheduleViewList)
+        timetable.showSchedules(scheduleViewList)
         onView(
             allOf(
                 withId(R.id.timetable_list_item_course_name),
@@ -932,7 +932,7 @@ class TimetableTest {
                 )
             )
         }
-        timetable.showScheduleInList(scheduleViewList)
+        timetable.showSchedules(scheduleViewList)
         onView(
             allOf(
                 withId(R.id.timetable_list_item_course_hour),

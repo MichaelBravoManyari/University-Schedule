@@ -65,6 +65,19 @@ class ScheduleViewModel @Inject constructor(
             }
         }
     }
+
+    fun updateScheduleDetailsListInListMode(date: LocalDate) {
+        viewModelScope.launch {
+            _uiState.update { currentState ->
+                if (currentState is ScheduleUiState.Success) {
+                    val scheduleDetails =
+                        scheduleRepository.getSchedulesForTimetableInListMode(date)
+                    currentState.copy(scheduleDetailsList = scheduleDetails)
+                } else
+                    ScheduleUiState.Loading
+            }
+        }
+    }
 }
 
 sealed interface ScheduleUiState {

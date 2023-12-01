@@ -1,7 +1,6 @@
 package com.studentsapps.schedule.viewmodels
 
 import com.studentsapps.data.repository.ScheduleRepository
-import com.studentsapps.data.repository.TimetableUserPreferencesRepository
 import com.studentsapps.data.repository.fake.FakeScheduleRepository
 import com.studentsapps.data.repository.fake.FakeTimetableUserPreferencesRepository
 import com.studentsapps.model.ScheduleDetails
@@ -26,7 +25,7 @@ class ScheduleViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private lateinit var timetableUserPreferencesRepository: TimetableUserPreferencesRepository
+    private lateinit var timetableUserPreferencesRepository: FakeTimetableUserPreferencesRepository
     private lateinit var scheduleRepository: ScheduleRepository
     private lateinit var subject: ScheduleViewModel
 
@@ -39,6 +38,7 @@ class ScheduleViewModelTest {
 
     @Test
     fun stateIsInitiallyLoading() = runTest {
+        timetableUserPreferencesRepository.init()
         assertEquals(
             ScheduleUiState.Success(
                 TimetableUserPreferences(
@@ -54,6 +54,7 @@ class ScheduleViewModelTest {
 
     @Test
     fun setShowAsGrid_trueAndFalse() = runTest {
+        timetableUserPreferencesRepository.init()
         val collectJob1 = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
 
         subject.setShowAsGrid()
@@ -75,6 +76,7 @@ class ScheduleViewModelTest {
 
     @Test
     fun updateScheduleListOnDateChangeDisplaySatSunInGridMode() = runTest {
+        timetableUserPreferencesRepository.init()
         val collectJob1 = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
         subject.updateScheduleDetailsListInGridMode(
             showSaturday = true,
@@ -94,26 +96,53 @@ class ScheduleViewModelTest {
                 ),
                 scheduleDetailsList = listOf(
                     createTestSchedule(scheduleId = 1, dayOfWeek = DayOfWeek.MONDAY),
-                    createTestSchedule(scheduleId = 2, dayOfWeek = DayOfWeek.TUESDAY),
-                    createTestSchedule(scheduleId = 3, dayOfWeek = DayOfWeek.WEDNESDAY),
-                    createTestSchedule(scheduleId = 4, dayOfWeek = DayOfWeek.THURSDAY),
-                    createTestSchedule(scheduleId = 5, dayOfWeek = DayOfWeek.FRIDAY),
-                    createTestSchedule(scheduleId = 6, dayOfWeek = DayOfWeek.SATURDAY),
-                    createTestSchedule(scheduleId = 7, dayOfWeek = DayOfWeek.SUNDAY),
+                    createTestSchedule(
+                        scheduleId = 2,
+                        dayOfWeek = DayOfWeek.TUESDAY,
+                        courseName = "Math1"
+                    ),
+                    createTestSchedule(
+                        scheduleId = 3,
+                        dayOfWeek = DayOfWeek.WEDNESDAY,
+                        courseName = "Math2"
+                    ),
+                    createTestSchedule(
+                        scheduleId = 4,
+                        dayOfWeek = DayOfWeek.THURSDAY,
+                        courseName = "Math3"
+                    ),
+                    createTestSchedule(
+                        scheduleId = 5,
+                        dayOfWeek = DayOfWeek.FRIDAY,
+                        courseName = "Math4"
+                    ),
+                    createTestSchedule(
+                        scheduleId = 6,
+                        dayOfWeek = DayOfWeek.SATURDAY,
+                        courseName = "Math5"
+                    ),
+                    createTestSchedule(
+                        scheduleId = 7,
+                        dayOfWeek = DayOfWeek.SUNDAY,
+                        courseName = "Math6"
+                    ),
                     createTestSchedule(
                         scheduleId = 8,
                         dayOfWeek = DayOfWeek.MONDAY,
-                        specificDate = LocalDate.of(2023, 11, 20)
+                        specificDate = LocalDate.of(2023, 11, 20),
+                        courseName = "Math7"
                     ),
                     createTestSchedule(
                         scheduleId = 9,
                         dayOfWeek = DayOfWeek.MONDAY,
-                        specificDate = LocalDate.of(2023, 11, 20)
+                        specificDate = LocalDate.of(2023, 11, 20),
+                        courseName = "Math8"
                     ),
                     createTestSchedule(
                         scheduleId = 10,
                         dayOfWeek = DayOfWeek.THURSDAY,
-                        specificDate = LocalDate.of(2023, 11, 23)
+                        specificDate = LocalDate.of(2023, 11, 23),
+                        courseName = "Math9"
                     ),
                 )
             ), subject.uiState.value
@@ -122,10 +151,52 @@ class ScheduleViewModelTest {
         collectJob1.cancel()
     }
 
+    @Test
+    fun testCheckScheduleListUpdatesForSpecificDateInListMode() = runTest {
+        timetableUserPreferencesRepository.run {
+            setShowAsGrid(false)
+            init()
+        }
+        val date = LocalDate.of(2023, 11, 20)
+        val collectJob1 = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
+        subject.updateScheduleDetailsListInListMode(date)
+
+        assertEquals(
+            ScheduleUiState.Success(
+                timetableUserPreferences = TimetableUserPreferences(
+                    showAsGrid = false,
+                    is12HoursFormat = true,
+                    showSaturday = true,
+                    showSunday = true,
+                    isMondayFirstDayOfWeek = true
+                ),
+                scheduleDetailsList = listOf(
+                    createTestSchedule(scheduleId = 1, dayOfWeek = DayOfWeek.MONDAY),
+                    createTestSchedule(
+                        scheduleId = 8,
+                        dayOfWeek = DayOfWeek.MONDAY,
+                        courseName = "Math7",
+                        specificDate = date
+                    ),
+                    createTestSchedule(
+                        scheduleId = 9,
+                        dayOfWeek = DayOfWeek.MONDAY,
+                        courseName = "Math8",
+                        specificDate = date
+                    ),
+                )
+            ),
+            subject.uiState.value
+        )
+
+        collectJob1.cancel()
+    }
+
     private fun createTestSchedule(
         scheduleId: Int,
         dayOfWeek: DayOfWeek,
-        specificDate: LocalDate? = null
+        specificDate: LocalDate? = null,
+        courseName: String = "Math"
     ) =
         ScheduleDetails(
             scheduleId = scheduleId,
@@ -135,7 +206,7 @@ class ScheduleViewModelTest {
             dayOfWeek = dayOfWeek,
             specificDate = specificDate,
             courseId = 1,
-            courseName = "Math",
+            courseName = courseName,
             courseColor = 1234
         )
 }

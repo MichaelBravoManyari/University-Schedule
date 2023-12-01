@@ -29,6 +29,7 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
     testImplementation(libs.espresso.core)
+    testImplementation(libs.espresso.contrib)
     testImplementation(libs.androidx.test.ext.junit)
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)

@@ -25,4 +25,9 @@ class FakeScheduleRepository @Inject constructor() : ScheduleRepository {
             endDate
         ).map(ScheduleDetailsView::asExternalModel)
     }
+
+    override suspend fun getSchedulesForTimetableInListMode(date: LocalDate): List<ScheduleDetails> {
+        return scheduleDao.getSchedulesForTimetableInListMode(date.dayOfWeek, date)
+            .map(ScheduleDetailsView::asExternalModel)
+    }
 }

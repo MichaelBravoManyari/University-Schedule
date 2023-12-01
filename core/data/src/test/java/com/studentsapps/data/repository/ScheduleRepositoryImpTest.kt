@@ -11,6 +11,7 @@ import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
 import org.junit.Test
+import java.time.DayOfWeek
 import java.time.LocalDate
 
 @ExperimentalCoroutinesApi
@@ -40,6 +41,20 @@ class ScheduleRepositoryImpTest {
                     showSunday = true,
                     startDate = LocalDate.of(2023, 11, 20),
                     endDate = LocalDate.of(2023, 11, 26)
+                ).map(ScheduleDetailsView::asExternalModel)
+            )
+        )
+    }
+
+    @Test
+    fun getSchedulesForTimetableInListMode_returnsScheduleDetails() = runTest(testDispatcher) {
+        val date = LocalDate.of(2023, 11, 20)
+        assertThat(
+            subject.getSchedulesForTimetableInListMode(date),
+            `is`(
+                scheduleLocalDataSource.getSchedulesForTimetableInListMode(
+                    dayOfWeek = DayOfWeek.MONDAY,
+                    date = date
                 ).map(ScheduleDetailsView::asExternalModel)
             )
         )

@@ -33,7 +33,10 @@ class TestScheduleDao : ScheduleDao() {
         dayOfWeek: DayOfWeek,
         specificDate: LocalDate
     ): List<ScheduleDetailsView> {
-        TODO("Not yet implemented")
+        return scheduleDetailsList.filter {
+            (it.dayOfWeek == dayOfWeek && it.specificDate == null) ||
+                    it.specificDate == specificDate
+        }
     }
 
     override suspend fun insert(obj: ScheduleEntity): Long {

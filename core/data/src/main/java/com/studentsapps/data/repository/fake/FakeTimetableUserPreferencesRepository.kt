@@ -19,6 +19,8 @@ val baseTimetableUserPreferencesData = TimetableUserPreferences(
 class FakeTimetableUserPreferencesRepository @Inject constructor() :
     TimetableUserPreferencesRepository {
 
+    private var showAsGrid = true
+
     private val _userData = MutableSharedFlow<TimetableUserPreferences>(
         replay = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
@@ -29,8 +31,17 @@ class FakeTimetableUserPreferencesRepository @Inject constructor() :
 
     override val userData: Flow<TimetableUserPreferences> = _userData.filterNotNull()
 
-    init {
-        _userData.tryEmit(baseTimetableUserPreferencesData)
+    fun init() {
+        _userData.tryEmit(
+            if (showAsGrid)
+                baseTimetableUserPreferencesData
+            else
+                baseTimetableUserPreferencesData.copy(showAsGrid = false)
+        )
+    }
+
+    fun setShowAsGrid(value: Boolean) {
+        showAsGrid = value
     }
 
     override suspend fun updateShowAsGrid() {

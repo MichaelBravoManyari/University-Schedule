@@ -43,4 +43,21 @@ class ScheduleLocalDataSourceTest {
             )
         )
     }
+
+    @Test
+    fun getSchedulesForTimetableInListMode_returnScheduleDetailsView() = runTest(testDispatcher) {
+        val date = LocalDate.of(2023, 11, 20)
+        assertThat(
+            subject.getSchedulesForTimetableInListMode(
+                date = date,
+                dayOfWeek = date.dayOfWeek
+            ),
+            `is`(
+                scheduleDao.getSchedulesForTimetableInListMode(
+                    specificDate = date,
+                    dayOfWeek = date.dayOfWeek
+                )
+            )
+        )
+    }
 }

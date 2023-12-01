@@ -16,7 +16,7 @@ robolectric = "4.10.3"
 hamcrest = "2.2"
 fragment-testing = "1.6.2"
 kotlin = "1.9.20"
-room = "2.6.0"
+room = "2.6.1"
 hilt = "2.47"
 kotlinxCoroutines = "1.7.1"
 mockk = "1.13.7"
@@ -48,6 +48,7 @@ junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-ext-junit" }
 androidx-arch-core-testing = { group = "androidx.arch.core", name = "core-testing", version.ref = "androidx-arch-core-testing" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso-core" }
+espresso-contrib = { group = "androidx.test.espresso", name = "espresso-contrib", version.ref = "espresso-core" }
 hamcrest = { group = "org.hamcrest", name = "hamcrest", version.ref = "hamcrest" }
 robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
 fragment-testing = { group = "androidx.fragment", name = "fragment-testing", version.ref = "fragment-testing" }

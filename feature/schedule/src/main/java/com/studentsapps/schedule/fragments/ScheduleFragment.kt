@@ -48,27 +48,33 @@ class ScheduleFragment : Fragment() {
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.uiState.collect { currentState ->
-                    if (currentState is ScheduleUiState.Success) {
-                        with(binding.timetable) {
-                            setTimetableUserPreferences(currentState.timetableUserPreferences)
-                            if (currentState.scheduleDetailsList != null)
-                                showScheduleInGrid(currentState.scheduleDetailsList.map { it.asScheduleView() })
+                launch {
+                    viewModel.uiState.collect { currentState ->
+                        if (currentState is ScheduleUiState.Success) {
+                            with(binding.timetable) {
+                                setTimetableUserPreferences(currentState.timetableUserPreferences)
+                                if (currentState.scheduleDetailsList != null)
+                                    showSchedules(currentState.scheduleDetailsList.map { it.asScheduleView() })
+                            }
                         }
                     }
                 }
-            }
-        }
 
-        with(binding.timetable) {
-            date.observe(viewLifecycleOwner) {
-                if (isDisplayedAsGrid()) {
-                    viewModel.updateScheduleDetailsListInGridMode(
-                        displaySaturday(),
-                        displaySunday(),
-                        getStartDate(),
-                        getEndDate()
-                    )
+                launch {
+                    with(binding.timetable) {
+                        date.observe(viewLifecycleOwner) { selectedDate ->
+                            if (isDisplayedAsGrid()) {
+                                viewModel.updateScheduleDetailsListInGridMode(
+                                    displaySaturday(),
+                                    displaySunday(),
+                                    getStartDate(),
+                                    getEndDate()
+                                )
+                            } else {
+                                viewModel.updateScheduleDetailsListInListMode(selectedDate)
+                            }
+                        }
+                    }
                 }
             }
         }

@@ -6,6 +6,7 @@ import com.studentsapps.database.dao.ScheduleDao
 import com.studentsapps.database.model.ScheduleDetailsView
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import java.time.DayOfWeek
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -27,5 +28,13 @@ class ScheduleLocalDataSource @Inject constructor(
                 startDate,
                 endDate
             )
+        }
+
+    suspend fun getSchedulesForTimetableInListMode(
+        dayOfWeek: DayOfWeek,
+        date: LocalDate
+    ): List<ScheduleDetailsView> =
+        withContext(ioDispatcher) {
+            scheduleDao.getSchedulesForTimetableInListMode(dayOfWeek, date)
         }
 }

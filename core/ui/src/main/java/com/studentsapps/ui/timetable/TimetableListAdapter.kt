@@ -11,10 +11,16 @@ import com.studentsapps.ui.databinding.TimetableListItemBinding
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-internal class TimetableListAdapter(private val is12HoursFormat: Boolean) :
+class TimetableListAdapter :
     ListAdapter<ScheduleView, TimetableListAdapter.TimetableListViewHolder>(
         DiffCallback
     ) {
+
+    private var is12HoursFormat = true
+
+    fun set12HoursFormat(value: Boolean) {
+        is12HoursFormat = value
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TimetableListViewHolder {
         return TimetableListViewHolder(

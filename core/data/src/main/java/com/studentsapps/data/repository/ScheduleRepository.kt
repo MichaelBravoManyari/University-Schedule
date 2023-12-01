@@ -11,4 +11,8 @@ interface ScheduleRepository {
         startDate: LocalDate,
         endDate: LocalDate
     ): List<ScheduleDetails>
+
+    suspend fun getSchedulesForTimetableInListMode(
+        date: LocalDate
+    ): List<ScheduleDetails>
 }

@@ -66,7 +66,7 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
     private val gestureDetector = GestureDetectorCompat(context, MyGestureListener())
     private val mTouchSlop = ViewConfiguration.get(context).scaledTouchSlop
     private var mDownX = 0f
-    private var _date = MutableLiveData(utils.getCurrentDate())
+    private val _date = MutableLiveData(utils.getCurrentDate())
     val date = _date as LiveData<LocalDate>
     private var redrawGridsAndHours = false
     private var wasViewDrawn = false
@@ -74,6 +74,7 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
     private var drawView = false
     private var timetableUserPreferences: TimetableUserPreferences? = null
     private var schedulesViewsList = emptyList<ScheduleView>()
+    private val adapter = TimetableListAdapter()
 
     @Inject
     lateinit var utils: TimetableUtils
@@ -90,6 +91,7 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
         inflateView()
         getAttrs(attrs)
         configureDayViews()
+        configureScheduleListAdapter()
     }
 
     private fun inflateView() {
@@ -150,6 +152,10 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
                 recycle()
             }
         }
+    }
+
+    private fun configureScheduleListAdapter() {
+        binding.scheduleListContainer.adapter = adapter
     }
 
     fun isDisplayedAsGrid() = showAsGrid
@@ -592,37 +598,34 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
         return resources.getDimension(dimenId)
     }
 
-    fun showScheduleInGrid(schedules: List<ScheduleView>) {
+    fun showSchedules(schedules: List<ScheduleView>) {
         if (schedules != schedulesViewsList) {
             schedulesViewsList = schedules
-            binding.scheduleContainer.removeAllViews()
-            schedulesViewsList.groupByDayOfWeek().forEach { (dayOfWeek, schedulesForOneDayOfWeek) ->
 
-                if ((dayOfWeek != DayOfWeek.SUNDAY || showSunday) && (dayOfWeek != DayOfWeek.SATURDAY || showSaturday)) {
-                    val scheduleCrossing = schedulesForOneDayOfWeek.getCrossSchedules()
-                    val uniqueSchedules = schedulesForOneDayOfWeek.getUniqueSchedules()
+            if (showAsGrid) {
+                binding.scheduleContainer.removeAllViews()
+                schedulesViewsList.groupByDayOfWeek().forEach { (dayOfWeek, schedulesForOneDayOfWeek) ->
 
-                    scheduleCrossing.forEach { crossSchedules ->
-                        crossSchedules.forEachIndexed { index, schedule ->
-                            val crossedSchedulesCount = crossSchedules.size
-                            addScheduleToGrid(schedule, crossedSchedulesCount, index)
+                    if ((dayOfWeek != DayOfWeek.SUNDAY || showSunday) && (dayOfWeek != DayOfWeek.SATURDAY || showSaturday)) {
+                        val scheduleCrossing = schedulesForOneDayOfWeek.getCrossSchedules()
+                        val uniqueSchedules = schedulesForOneDayOfWeek.getUniqueSchedules()
+
+                        scheduleCrossing.forEach { crossSchedules ->
+                            crossSchedules.forEachIndexed { index, schedule ->
+                                val crossedSchedulesCount = crossSchedules.size
+                                addScheduleToGrid(schedule, crossedSchedulesCount, index)
+                            }
+                        }
+
+                        uniqueSchedules.forEach { uniqueSchedule ->
+                            addScheduleToGrid(uniqueSchedule)
                         }
                     }
-
-                    uniqueSchedules.forEach { uniqueSchedule ->
-                        addScheduleToGrid(uniqueSchedule)
-                    }
                 }
+            } else {
+                adapter.set12HoursFormat(is12HoursFormat)
+                adapter.submitList(schedulesViewsList)
             }
-        }
-    }
-
-    fun showScheduleInList(schedules: List<ScheduleView>) {
-        if (schedules != schedulesViewsList) {
-            schedulesViewsList = schedules
-            val adapter = TimetableListAdapter(is12HoursFormat)
-            binding.scheduleListContainer.adapter = adapter
-            adapter.submitList(schedulesViewsList)
         }
     }
 
