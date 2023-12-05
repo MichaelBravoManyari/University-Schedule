@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="schedule_register_container_padding">10dp</dimen>
+    <dimen name="schedule_register_options_padding">8dp</dimen>
+    <dimen name="options_container_margin">8dp</dimen>
+    <dimen name="section_options_container_margin">2dp</dimen>
+    <dimen name="hour_option_container_padding">8dp</dimen>
+    <dimen name="different_section_options_container_margin">20dp</dimen>
+</resources>

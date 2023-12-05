@@ -1,5 +1,7 @@
 package com.studentsapps.data.di
 
+import com.studentsapps.data.repository.CourseRepository
+import com.studentsapps.data.repository.CourseRepositoryImp
 import com.studentsapps.data.repository.ScheduleRepository
 import com.studentsapps.data.repository.ScheduleRepositoryImp
 import com.studentsapps.data.repository.TimetableUserPreferencesRepository
@@ -23,4 +25,8 @@ interface DataModule {
     @Binds
     @Singleton
     fun bindScheduleRepository(scheduleRepository: ScheduleRepositoryImp): ScheduleRepository
+
+    @Binds
+    @Singleton
+    fun bindsCourseRepository(courseRepositoryImp: CourseRepositoryImp): CourseRepository
 }

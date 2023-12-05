@@ -5,3 +5,7 @@ plugins {
 android {
     namespace = "com.studentsapps.designsystem"
 }
+
+dependencies {
+    implementation(libs.material)
+}

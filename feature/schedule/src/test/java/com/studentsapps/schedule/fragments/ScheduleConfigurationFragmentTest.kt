@@ -8,9 +8,9 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.studentsapps.data.repository.fake.FakeTimetableUserPreferencesRepository
+import com.studentsapps.schedule.R
 import com.studentsapps.testing.launchFragmentInHiltContainer
 import com.studentsapps.testing.util.MainDispatcherRule
-import com.studentsapps.schedule.R
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest

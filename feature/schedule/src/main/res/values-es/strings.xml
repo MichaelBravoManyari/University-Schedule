@@ -18,4 +18,14 @@
     <string name="twenty_four_hours">24 horas</string>
     <string name="configuration">Configuración</string>
     <string name="today">Hoy</string>
+    <string name="add_schedule_scroll">Scroll de añadir  horario</string>
+    <string name="day">Día</string>
+    <string name="hour">Hora</string>
+    <string name="course">Curso</string>
+    <string name="existing_courses">Seleccionar cursos existentes</string>
+    <string name="classroom">Aula</string>
+    <string name="course_name_input">Ingresar el nombre del curso</string>
+    <string name="switch_existing_courses">switch de cursos existentes</string>
+    <string name="select_course">Selecciona un curso</string>
+    <string name="add_course">Añade un nuevo curso</string>
 </resources>

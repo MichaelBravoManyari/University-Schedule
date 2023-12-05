@@ -18,4 +18,15 @@
     <string name="twenty_four_hours">24 hours</string>
     <string name="configuration">Configuration</string>
     <string name="today">Today</string>
+    <string name="add_schedule_scroll">Scroll for adding schedule</string>
+    <string name="day">Day</string>
+    <string name="hour">Hour</string>
+    <string name="course">Course</string>
+    <string name="color" translatable="false">Color</string>
+    <string name="existing_courses">Select existing courses</string>
+    <string name="classroom">Classroom</string>
+    <string name="course_name_input">Course name input</string>
+    <string name="switch_existing_courses">switch existing courses</string>
+    <string name="select_course">Select a course</string>
+    <string name="add_course">Add a new course</string>
 </resources>
