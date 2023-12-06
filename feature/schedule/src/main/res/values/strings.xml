@@ -29,4 +29,6 @@
     <string name="switch_existing_courses">switch existing courses</string>
     <string name="select_course">Select a course</string>
     <string name="add_course">Add a new course</string>
+    <string name="enter_course_name">Enter course name</string>
+    <string name="hour_error">Start time is greater than or equal to end time</string>
 </resources>

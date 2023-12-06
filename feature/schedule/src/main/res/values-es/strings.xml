@@ -28,4 +28,6 @@
     <string name="switch_existing_courses">switch de cursos existentes</string>
     <string name="select_course">Selecciona un curso</string>
     <string name="add_course">Añade un nuevo curso</string>
+    <string name="enter_course_name">Ingrese el nombre del curso</string>
+    <string name="hour_error">La hora de inicio es mayor o igual a la hora final</string>
 </resources>

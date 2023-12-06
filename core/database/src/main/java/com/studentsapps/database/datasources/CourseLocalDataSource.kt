@@ -9,11 +9,14 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class CourseLocalDataSource @Inject constructor(
-    private val courseDao: CourseDao,
-    @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher
+    private val courseDao: CourseDao, @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher
 ) {
 
     suspend fun getCourse(courseId: Int): CourseEntity = withContext(ioDispatcher) {
         courseDao.getCourseById(courseId)
+    }
+
+    suspend fun insert(course: CourseEntity): Long = withContext(ioDispatcher) {
+        courseDao.insert(course)
     }
 }
