@@ -11,6 +11,9 @@
         <action
             android:id="@+id/action_scheduleFragment_to_scheduleConfigurationFragment"
             app:destination="@id/scheduleConfigurationFragment" />
+        <action
+            android:id="@+id/action_scheduleFragment_to_registerScheduleFragment"
+            app:destination="@id/registerScheduleFragment" />
     </fragment>
     <fragment
         android:id="@+id/scheduleConfigurationFragment"
@@ -20,4 +23,44 @@
             android:id="@+id/action_scheduleConfigurationFragment_to_scheduleFragment"
             app:destination="@id/scheduleFragment" />
     </fragment>
+    <dialog
+        android:id="@+id/modalBottomSheetDay"
+        android:name="com.studentsapps.schedule.dialogs.ModalBottomSheetDay"
+        android:label="ModalBottomSheetDay" />
+    <fragment
+        android:id="@+id/registerScheduleFragment"
+        android:name="com.studentsapps.schedule.fragments.RegisterScheduleFragment"
+        android:label="RegisterScheduleFragment" >
+        <action
+            android:id="@+id/action_registerScheduleFragment_to_scheduleFragment"
+            app:destination="@id/scheduleFragment" />
+        <action
+            android:id="@+id/action_registerScheduleFragment_to_modalBottomSheetDay"
+            app:destination="@id/modalBottomSheetDay" />
+        <action
+            android:id="@+id/action_registerScheduleFragment_to_modalBottomSheetCourse"
+            app:destination="@id/modalBottomSheetCourse" />
+        <action
+            android:id="@+id/action_registerScheduleFragment_to_modalBottomSheetColor"
+            app:destination="@id/modalBottomSheetColor" />
+        <action
+            android:id="@+id/action_registerScheduleFragment_to_modalBottomSheetRepetition"
+            app:destination="@id/modalBottomSheetRepetition" />
+    </fragment>
+    <dialog
+        android:id="@+id/modalBottomSheetCourse"
+        android:name="com.studentsapps.schedule.dialogs.ModalBottomSheetCourse"
+        android:label="ModalBottomSheetCourse" />
+    <dialog
+        android:id="@+id/modalBottomSheetColor"
+        android:name="com.studentsapps.schedule.dialogs.ModalBottomSheetColor"
+        android:label="ModalBottomSheetColor" >
+        <argument
+            android:name="colorCourse"
+            app:argType="integer" />
+    </dialog>
+    <dialog
+        android:id="@+id/modalBottomSheetRepetition"
+        android:name="com.studentsapps.schedule.dialogs.ModalBottomSheetRepetition"
+        android:label="ModalBottomSheetRepetition" />
 </navigation>

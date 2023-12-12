@@ -91,6 +91,12 @@ class RegisterScheduleViewModel @Inject constructor(
         }
     }
 
+    fun setRecurrentOption(recurrenceOption: RecurrenceOption) {
+        _uiState.update {
+            it.copy(repetition = recurrenceOption)
+        }
+    }
+
     fun registerSchedule() {
         if (startTimeIsLessThanEndTime()) {
             if (uiState.value.existingCourses) {
@@ -172,6 +178,7 @@ data class RegisterScheduleUiState(
     val visibilityColorSection: Boolean = false,
     val selectedCourse: Course? = null,
     val colorCourse: Int = 0xffffff00.toInt(),
+    val repetition: RecurrenceOption = RecurrenceOption.EVERY_WEEK,
     val classroom: String? = null,
     val courseName: String? = null,
     val noSelectCourse: Boolean = false,
@@ -180,3 +187,7 @@ data class RegisterScheduleUiState(
     val isScheduleRecorded: Boolean = false,
     val specificDate: LocalDate? = null,
 )
+
+enum class RecurrenceOption {
+    EVERY_WEEK, SPECIFIC_DATE
+}

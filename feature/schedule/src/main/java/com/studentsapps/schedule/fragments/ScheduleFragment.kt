@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupWithNavController
@@ -23,6 +24,7 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class ScheduleFragment : Fragment() {
 
+    private lateinit var navController: NavController
     private var _binding: FragmentScheduleBinding? = null
     private val binding get() = _binding!!
     private val viewModel: ScheduleViewModel by viewModels()
@@ -45,6 +47,7 @@ class ScheduleFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        navController = view.findNavController()
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -79,7 +82,7 @@ class ScheduleFragment : Fragment() {
             }
         }
 
-        binding.toolbar.setupWithNavController(view.findNavController())
+        binding.toolbar.setupWithNavController(navController)
         configureMenuOptionsInAppBar()
     }
 
@@ -102,6 +105,12 @@ class ScheduleFragment : Fragment() {
                 }
             }
         }
+    }
+
+    fun goToRegisterSchedule() {
+        navController.navigate(
+            ScheduleFragmentDirections.actionScheduleFragmentToRegisterScheduleFragment()
+        )
     }
 
     override fun onDestroyView() {

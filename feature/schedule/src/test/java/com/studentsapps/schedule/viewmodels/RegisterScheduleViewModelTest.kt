@@ -250,4 +250,20 @@ class RegisterScheduleViewModelTest {
         )
         collectJob.cancel()
     }
+
+    @Test
+    fun setRecurrentOption_everyWeekAndSpecificDate() = runTest {
+        val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
+        subject.setRecurrentOption(RecurrenceOption.SPECIFIC_DATE)
+        assertEquals(
+            RegisterScheduleUiState().copy(repetition = RecurrenceOption.SPECIFIC_DATE),
+            subject.uiState.value
+        )
+        subject.setRecurrentOption(RecurrenceOption.EVERY_WEEK)
+        assertEquals(
+            RegisterScheduleUiState().copy(repetition = RecurrenceOption.EVERY_WEEK),
+            subject.uiState.value
+        )
+        collectJob.cancel()
+    }
 }

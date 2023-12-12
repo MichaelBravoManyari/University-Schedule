@@ -10,6 +10,7 @@ class AndroidUiConventionPlugin : Plugin<Project> {
             with(pluginManager) {
                 apply("universityschedule.android.library")
                 apply("universityschedule.android.hilt")
+                apply("androidx.navigation.safeargs")
             }
 
             dependencies {

@@ -31,4 +31,15 @@
     <string name="add_course">Add a new course</string>
     <string name="enter_course_name">Enter course name</string>
     <string name="hour_error">Start time is greater than or equal to end time</string>
+    <string name="select_day">Select a day</string>
+    <string name="tuesday">Tuesday</string>
+    <string name="thursday">Thursday</string>
+    <string name="friday">Friday</string>
+    <string name="wednesday">Wednesday</string>
+    <string name="saturday">Saturday</string>
+    <string name="select_hour">Select time</string>
+    <string name="add_schedule">Add schedule</string>
+    <string name="repetition">Repetition</string>
+    <string name="every_week">Every week</string>
+    <string name="specific_date">Specific date</string>
 </resources>

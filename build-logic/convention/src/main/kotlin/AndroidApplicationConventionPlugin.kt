@@ -10,6 +10,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
             with(pluginManager) {
                 apply("com.android.application")
                 apply("org.jetbrains.kotlin.android")
+                apply("androidx.navigation.safeargs")
             }
 
             extensions.configure<ApplicationExtension> {
