@@ -16,6 +16,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.time.DayOfWeek
+import java.time.LocalDate
 import java.time.LocalTime
 import kotlin.test.assertEquals
 
@@ -256,13 +257,34 @@ class RegisterScheduleViewModelTest {
         val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
         subject.setRecurrentOption(RecurrenceOption.SPECIFIC_DATE)
         assertEquals(
-            RegisterScheduleUiState().copy(repetition = RecurrenceOption.SPECIFIC_DATE),
-            subject.uiState.value
+            RegisterScheduleUiState().copy(
+                repetition = RecurrenceOption.SPECIFIC_DATE,
+                specificDate = LocalDate.now(),
+                day = LocalDate.now().dayOfWeek
+            ), subject.uiState.value
         )
         subject.setRecurrentOption(RecurrenceOption.EVERY_WEEK)
         assertEquals(
-            RegisterScheduleUiState().copy(repetition = RecurrenceOption.EVERY_WEEK),
-            subject.uiState.value
+            RegisterScheduleUiState().copy(
+                repetition = RecurrenceOption.EVERY_WEEK,
+                specificDate = null,
+                day = DayOfWeek.MONDAY
+            ), subject.uiState.value
+        )
+        collectJob.cancel()
+    }
+
+    @Test
+    fun setSpecificDate_dateAndNull() = runTest {
+        val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
+        val expectedDate = LocalDate.now()
+        subject.setSpecificDate(expectedDate)
+        assertEquals(
+            RegisterScheduleUiState().copy(specificDate = expectedDate), subject.uiState.value
+        )
+        subject.setSpecificDate(null)
+        assertEquals(
+            RegisterScheduleUiState(), subject.uiState.value
         )
         collectJob.cancel()
     }

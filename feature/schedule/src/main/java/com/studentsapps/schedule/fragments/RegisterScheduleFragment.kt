@@ -14,6 +14,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.datepicker.CalendarConstraints
+import com.google.android.material.datepicker.DateValidatorPointForward
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
@@ -24,7 +27,9 @@ import com.studentsapps.schedule.viewmodels.RegisterScheduleViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
+import java.time.Instant
 import java.time.LocalTime
+import java.time.ZoneId
 
 private const val TAG = "RegisterSchedule"
 
@@ -97,6 +102,12 @@ class RegisterScheduleFragment : Fragment() {
                         viewModel.setRecurrentOption(it)
                     }
                 }
+                navBackStackEntry.savedStateHandle.run {
+                    remove<Int>("day")
+                    remove<Int>("course")
+                    remove<Int>("color")
+                    remove<RecurrenceOption>("repetition")
+                }
             }
         }
         navBackStackEntry.lifecycle.addObserver(observer)
@@ -108,9 +119,29 @@ class RegisterScheduleFragment : Fragment() {
     }
 
     fun goToBottomSheetDay() {
-        navController.navigate(
+        if (viewModel.uiState.value.repetition == RecurrenceOption.EVERY_WEEK) navController.navigate(
             RegisterScheduleFragmentDirections.actionRegisterScheduleFragmentToModalBottomSheetDay()
         )
+        else {
+            val title = getString(R.string.select_date)
+            val instant =
+                viewModel.uiState.value.specificDate!!.atStartOfDay(ZoneId.systemDefault())
+                    .toInstant()
+            val constraintsBuilder =
+                CalendarConstraints.Builder().setValidator(DateValidatorPointForward.now())
+                    .setStart(MaterialDatePicker.todayInUtcMilliseconds()).build()
+            val datePicker = MaterialDatePicker.Builder.datePicker().setTitleText(title)
+                .setSelection(instant.toEpochMilli()).setCalendarConstraints(constraintsBuilder)
+                .build()
+
+            datePicker.addOnPositiveButtonClickListener {
+                val instants = Instant.ofEpochMilli(it)
+                val localDate = instants.atZone(ZoneId.systemDefault()).toLocalDate().plusDays(1)
+                viewModel.setSpecificDate(localDate)
+            }
+
+            datePicker.show(childFragmentManager, TAG)
+        }
     }
 
     fun goToBottomSheetCourse() {

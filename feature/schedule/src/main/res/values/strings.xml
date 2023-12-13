@@ -42,4 +42,5 @@
     <string name="repetition">Repetition</string>
     <string name="every_week">Every week</string>
     <string name="specific_date">Specific date</string>
+    <string name="select_date">Select a date</string>
 </resources>

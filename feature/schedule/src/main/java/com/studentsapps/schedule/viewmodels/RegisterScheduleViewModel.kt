@@ -93,7 +93,14 @@ class RegisterScheduleViewModel @Inject constructor(
 
     fun setRecurrentOption(recurrenceOption: RecurrenceOption) {
         _uiState.update {
-            it.copy(repetition = recurrenceOption)
+            if (recurrenceOption == RecurrenceOption.EVERY_WEEK) it.copy(
+                repetition = recurrenceOption, day = DayOfWeek.MONDAY, specificDate = null
+            )
+            else it.copy(
+                repetition = recurrenceOption,
+                day = LocalDate.now().dayOfWeek,
+                specificDate = LocalDate.now()
+            )
         }
     }
 
@@ -155,6 +162,12 @@ class RegisterScheduleViewModel @Inject constructor(
                     userMessage = R.string.hour_error, hourError = true
                 )
             }
+        }
+    }
+
+    fun setSpecificDate(date: LocalDate?) {
+        _uiState.update {
+            it.copy(specificDate = date)
         }
     }
 
