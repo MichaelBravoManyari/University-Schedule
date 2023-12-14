@@ -43,4 +43,5 @@
     <string name="every_week">Every week</string>
     <string name="specific_date">Specific date</string>
     <string name="select_date">Select a date</string>
+    <string name="add">Add</string>
 </resources>

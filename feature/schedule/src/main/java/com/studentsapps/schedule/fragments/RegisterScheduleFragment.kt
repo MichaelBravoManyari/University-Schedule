@@ -10,10 +10,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.onNavDestinationSelected
+import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -41,9 +45,10 @@ class RegisterScheduleFragment : Fragment() {
     private val binding get() = _binding!!
     private val viewModel: RegisterScheduleViewModel by viewModels()
 
-    val existingCoursesIsChecked = CompoundButton.OnCheckedChangeListener { _, isChecked ->
-        viewModel.existingCourseChecked(isChecked)
-    }
+    val onExistingCoursesCheckedChangeListener =
+        CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            viewModel.existingCourseChecked(isChecked)
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -83,33 +88,35 @@ class RegisterScheduleFragment : Fragment() {
             }
         }
 
-        val navBackStackEntry = navController.getBackStackEntry(R.id.registerScheduleFragment)
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                with(navBackStackEntry.savedStateHandle) {
-                    get<Int>("day")?.let {
-                        viewModel.selectDay(
-                            DayOfWeek.of(it)
-                        )
+        setupNavigationObservers()
+        configureMenuOptionsInAppBar()
+    }
+
+    private fun configureMenuOptionsInAppBar() {
+        binding.toolbar.run {
+            setupWithNavController(navController)
+            inflateMenu(R.menu.schedule_registration_menu)
+            setOnMenuItemClickListener { menuItem ->
+                when (menuItem.itemId) {
+                    R.id.menu_add_schedule -> {
+                        viewModel.registerSchedule()
+                        true
                     }
-                    get<Int>("course")?.let {
-                        viewModel.selectCourse(it)
-                    }
-                    get<Int>("color")?.let {
-                        viewModel.selectColorCourse(it)
-                    }
-                    get<RecurrenceOption>("repetition")?.let {
-                        viewModel.setRecurrentOption(it)
-                    }
-                }
-                navBackStackEntry.savedStateHandle.run {
-                    remove<Int>("day")
-                    remove<Int>("course")
-                    remove<Int>("color")
-                    remove<RecurrenceOption>("repetition")
+
+                    else -> menuItem.onNavDestinationSelected(findNavController())
                 }
             }
         }
+    }
+
+    private fun setupNavigationObservers() {
+        val navBackStackEntry = navController.getBackStackEntry(R.id.registerScheduleFragment)
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                handleSavedState(navBackStackEntry.savedStateHandle)
+            }
+        }
+
         navBackStackEntry.lifecycle.addObserver(observer)
         viewLifecycleOwner.lifecycle.addObserver(LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_DESTROY) {
@@ -118,30 +125,52 @@ class RegisterScheduleFragment : Fragment() {
         })
     }
 
+    private fun handleSavedState(savedStateHandle: SavedStateHandle) {
+        with(savedStateHandle) {
+            get<Int>("day")?.let { viewModel.selectDay(DayOfWeek.of(it)) }
+            get<Int>("course")?.let { viewModel.selectCourse(it) }
+            get<Int>("color")?.let { viewModel.selectColorCourse(it) }
+            get<RecurrenceOption>("repetition")?.let { viewModel.setRecurrentOption(it) }
+
+            remove<Int>("day")
+            remove<Int>("course")
+            remove<Int>("color")
+            remove<RecurrenceOption>("repetition")
+        }
+    }
+
     fun goToBottomSheetDay() {
         if (viewModel.uiState.value.repetition == RecurrenceOption.EVERY_WEEK) navController.navigate(
             RegisterScheduleFragmentDirections.actionRegisterScheduleFragmentToModalBottomSheetDay()
         )
-        else {
-            val title = getString(R.string.select_date)
-            val instant =
-                viewModel.uiState.value.specificDate!!.atStartOfDay(ZoneId.systemDefault())
-                    .toInstant()
-            val constraintsBuilder =
-                CalendarConstraints.Builder().setValidator(DateValidatorPointForward.now())
-                    .setStart(MaterialDatePicker.todayInUtcMilliseconds()).build()
-            val datePicker = MaterialDatePicker.Builder.datePicker().setTitleText(title)
-                .setSelection(instant.toEpochMilli()).setCalendarConstraints(constraintsBuilder)
-                .build()
+        showDatePicker()
+    }
 
-            datePicker.addOnPositiveButtonClickListener {
-                val instants = Instant.ofEpochMilli(it)
-                val localDate = instants.atZone(ZoneId.systemDefault()).toLocalDate().plusDays(1)
-                viewModel.setSpecificDate(localDate)
-            }
+    private fun showDatePicker() {
+        val title = getString(R.string.select_date)
+        val instant =
+            viewModel.uiState.value.specificDate!!.atStartOfDay(ZoneId.systemDefault()).toInstant()
+        val constraintsBuilder =
+            CalendarConstraints.Builder().setValidator(DateValidatorPointForward.now())
+                .setStart(MaterialDatePicker.todayInUtcMilliseconds()).build()
 
-            datePicker.show(childFragmentManager, TAG)
+        val datePicker = buildMaterialDatePicker(title, instant, constraintsBuilder)
+
+        datePicker.addOnPositiveButtonClickListener {
+            val instants = Instant.ofEpochMilli(it)
+            val localDate = instants.atZone(ZoneId.systemDefault()).toLocalDate().plusDays(1)
+            viewModel.setSpecificDate(localDate)
         }
+
+        datePicker.show(childFragmentManager, TAG)
+    }
+
+    private fun buildMaterialDatePicker(
+        title: String, selectionInstant: Instant, constraintsBuilder: CalendarConstraints
+    ): MaterialDatePicker<Long> {
+        return MaterialDatePicker.Builder.datePicker().setTitleText(title)
+            .setSelection(selectionInstant.toEpochMilli())
+            .setCalendarConstraints(constraintsBuilder).build()
     }
 
     fun goToBottomSheetCourse() {

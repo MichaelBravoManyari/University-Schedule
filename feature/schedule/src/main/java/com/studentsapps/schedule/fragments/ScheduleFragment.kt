@@ -30,8 +30,7 @@ class ScheduleFragment : Fragment() {
     private val viewModel: ScheduleViewModel by viewModels()
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentScheduleBinding.inflate(inflater, container, false)
 
@@ -56,8 +55,8 @@ class ScheduleFragment : Fragment() {
                         if (currentState is ScheduleUiState.Success) {
                             with(binding.timetable) {
                                 setTimetableUserPreferences(currentState.timetableUserPreferences)
-                                if (currentState.scheduleDetailsList != null)
-                                    showSchedules(currentState.scheduleDetailsList.map { it.asScheduleView() })
+                                if (currentState.scheduleDetailsList != null) showSchedules(
+                                    currentState.scheduleDetailsList.map { it.asScheduleView() })
                             }
                         }
                     }
@@ -68,10 +67,7 @@ class ScheduleFragment : Fragment() {
                         date.observe(viewLifecycleOwner) { selectedDate ->
                             if (isDisplayedAsGrid()) {
                                 viewModel.updateScheduleDetailsListInGridMode(
-                                    displaySaturday(),
-                                    displaySunday(),
-                                    getStartDate(),
-                                    getEndDate()
+                                    displaySaturday(), displaySunday(), getStartDate(), getEndDate()
                                 )
                             } else {
                                 viewModel.updateScheduleDetailsListInListMode(selectedDate)

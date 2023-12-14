@@ -42,4 +42,5 @@
     <string name="every_week">Cada semana</string>
     <string name="specific_date">Fecha especifica</string>
     <string name="select_date">Select a date</string>
+    <string name="add">Agregar</string>
 </resources>

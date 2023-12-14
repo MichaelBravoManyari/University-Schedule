@@ -6,10 +6,19 @@
         <item name="android:windowLightStatusBar">true</item>
         <item name="appBarLayoutStyle">@style/Widget.UniversitySchedule.AppBarLayout</item>
         <item name="toolbarStyle">@style/Widget.UniversitySchedule.Toolbar</item>
+        <item name="android:actionButtonStyle">@style/MyActionButtonStyle</item>
     </style>
 
     <style name="Widget.UniversitySchedule.AppBarLayout" parent="Widget.Material3.AppBarLayout">
         <item name="android:background">@color/primary_color</item>
+    </style>
+
+    <style name="MyActionButtonStyle" parent="Widget.AppCompat.ActionButton">
+        <!-- Cambiar el fondo del botón -->
+        <item name="android:background">
+            @drawable/background_rounded_bottom_schedule_registration_options
+        </item>
+        <!-- Otros atributos según tus necesidades -->
     </style>
 
     <style name="Widget.UniversitySchedule.Toolbar" parent="Widget.Material3.Toolbar">
