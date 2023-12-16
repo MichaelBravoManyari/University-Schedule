@@ -7,4 +7,6 @@ interface CourseRepository {
     suspend fun getCourse(courseId: Int): Course
 
     suspend fun registerCourse(course: Course): Long
+
+    suspend fun getAllCourse(): List<Course>
 }

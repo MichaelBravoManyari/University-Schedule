@@ -19,4 +19,8 @@ class CourseLocalDataSource @Inject constructor(
     suspend fun insert(course: CourseEntity): Long = withContext(ioDispatcher) {
         courseDao.insert(course)
     }
+
+    suspend fun getAllCourse(): List<CourseEntity> = withContext(ioDispatcher) {
+        courseDao.getAll()
+    }
 }

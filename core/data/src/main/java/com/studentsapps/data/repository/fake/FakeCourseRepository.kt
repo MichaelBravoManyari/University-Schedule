@@ -19,4 +19,8 @@ class FakeCourseRepository @Inject constructor() : CourseRepository {
             id, name, nameProfessor, color
         )
     })
+
+    override suspend fun getAllCourse(): List<Course> {
+        TODO("Not yet implemented")
+    }
 }

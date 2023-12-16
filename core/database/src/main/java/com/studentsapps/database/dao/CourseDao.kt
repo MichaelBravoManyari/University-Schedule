@@ -9,4 +9,7 @@ abstract class CourseDao : BaseDao<CourseEntity> {
 
     @Query("SELECT * FROM courses where id = :courseId")
     abstract suspend fun getCourseById(courseId: Int): CourseEntity
+
+    @Query("SELECT * FROM courses")
+    abstract suspend fun getAll(): List<CourseEntity>
 }

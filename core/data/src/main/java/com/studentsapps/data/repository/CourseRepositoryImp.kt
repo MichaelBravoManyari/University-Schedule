@@ -14,4 +14,7 @@ class CourseRepositoryImp @Inject constructor(
 
     override suspend fun registerCourse(course: Course): Long =
         courseLocalDataSource.insert(with(course) { CourseEntity(id, name, nameProfessor, color) })
+
+    override suspend fun getAllCourse(): List<Course> =
+        courseLocalDataSource.getAllCourse().map(CourseEntity::asExternalModel)
 }

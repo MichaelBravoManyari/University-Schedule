@@ -144,9 +144,12 @@ class RegisterScheduleFragment : Fragment() {
     }
 
     fun goToBottomSheetDay() {
-        if (viewModel.uiState.value.repetition == RecurrenceOption.EVERY_WEEK) navController.navigate(
-            RegisterScheduleFragmentDirections.actionRegisterScheduleFragmentToModalBottomSheetDay()
-        )
+        if (viewModel.uiState.value.repetition == RecurrenceOption.EVERY_WEEK) {
+            navController.navigate(
+                RegisterScheduleFragmentDirections.actionRegisterScheduleFragmentToModalBottomSheetDay()
+            )
+            return
+        }
         showDatePicker()
     }
 

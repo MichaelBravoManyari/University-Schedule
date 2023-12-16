@@ -5,6 +5,9 @@
 
     <data>
 
+        <variable
+            name="bottomSheetCourse"
+            type="com.studentsapps.schedule.dialogs.ModalBottomSheetCourse" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
