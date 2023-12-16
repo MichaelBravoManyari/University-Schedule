@@ -7,6 +7,8 @@
 
         <import type="android.view.View" />
 
+        <import type="android.content.res.ColorStateList" />
+
         <import type="com.studentsapps.schedule.viewmodels.RecurrenceOption" />
 
         <variable
@@ -210,7 +212,8 @@
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/edit_text_course"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        tools:ignore="DuplicateSpeakableTextCheck" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <RelativeLayout
@@ -283,12 +286,13 @@
                     android:layout_marginStart="8dp"
                     android:gravity="center_vertical"
                     android:text="@string/color"
-                    android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
+                    android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+                    tools:ignore="RelativeOverlap" />
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/color_course"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
                     android:layout_centerVertical="true"
                     android:layout_marginEnd="8dp"
                     android:layout_toStartOf="@id/icon_arrow"

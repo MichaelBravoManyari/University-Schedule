@@ -99,7 +99,11 @@ class RegisterScheduleFragment : Fragment() {
             setOnMenuItemClickListener { menuItem ->
                 when (menuItem.itemId) {
                     R.id.menu_add_schedule -> {
-                        viewModel.registerSchedule()
+                        viewModel.run {
+                            if (!uiState.value.existingCourses) setCourseName(binding.editTextCourse.text.toString())
+                            setClassroom(binding.editTextClassroom.text.toString())
+                            registerSchedule()
+                        }
                         true
                     }
 
