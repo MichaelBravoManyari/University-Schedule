@@ -2,6 +2,7 @@ package com.studentsapps.database.datasources
 
 import com.studentsapps.database.dao.CourseDao
 import com.studentsapps.database.model.CourseEntity
+import com.studentsapps.database.test.data.courseList
 import com.studentsapps.database.test.data.testdoubles.TestCourseDao
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -10,6 +11,7 @@ import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
 import org.junit.Test
+import kotlin.test.assertEquals
 
 @ExperimentalCoroutinesApi
 class CourseLocalDataSourceTest {
@@ -42,5 +44,12 @@ class CourseLocalDataSourceTest {
         assertThat(
             subject.insert(courseEntity), `is`(courseDao.insert(courseEntity))
         )
+    }
+
+    @Test
+    fun getAllCourses_returnCourses() = runTest {
+        val expectedCourseList = courseList
+        val actualCourseList = subject.getAllCourse()
+        assertEquals(actualCourseList, expectedCourseList)
     }
 }

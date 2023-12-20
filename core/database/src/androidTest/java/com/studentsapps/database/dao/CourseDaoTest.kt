@@ -6,6 +6,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.studentsapps.database.UniversityScheduleDatabase
 import com.studentsapps.database.model.CourseEntity
+import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.nullValue
@@ -70,6 +71,20 @@ class CourseDaoTest {
         courseDao.insert(expectedCourse)
         val actualCourse = courseDao.getCourseById(3)
         assertThat(actualCourse, `is`(expectedCourse))
+    }
+
+    @Test
+    fun getAllCourses_returnCourses() = runTest {
+        val expectedCourses = listOf(
+            testCourse(id = 1),
+            testCourse(id = 2),
+            testCourse(id = 3)
+        )
+        expectedCourses.forEach { expectedCourse ->
+            courseDao.insert(expectedCourse)
+        }
+        val actualCourses = courseDao.getAll()
+        assertTrue(actualCourses == expectedCourses)
     }
 
     private fun testCourse(id: Int) =

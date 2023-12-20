@@ -21,6 +21,6 @@ class FakeCourseRepository @Inject constructor() : CourseRepository {
     })
 
     override suspend fun getAllCourse(): List<Course> {
-        TODO("Not yet implemented")
+        return courseDao.getAll().map(CourseEntity::asExternalModel)
     }
 }

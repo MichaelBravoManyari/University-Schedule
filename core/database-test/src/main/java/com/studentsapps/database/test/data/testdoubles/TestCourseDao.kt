@@ -9,7 +9,7 @@ class TestCourseDao : CourseDao() {
         courseList.find { it.id == courseId }!!
 
     override suspend fun getAll(): List<CourseEntity> {
-        TODO("Not yet implemented")
+        return courseList
     }
 
     override suspend fun insert(obj: CourseEntity): Long = obj.id.toLong()
