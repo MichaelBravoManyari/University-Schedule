@@ -103,12 +103,12 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn"
+                    android:id="@+id/btn_end_hour"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
                     android:onClick='@{() -> registerScheduleFragment.showTimePicker(false, viewModel.uiState.endTime)}'
-                    android:text="@{viewModel.uiState.endTime.toString()}"
+                    app:hour="@{viewModel.uiState.endTime}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/icon_hour_error"
                     app:layout_constraintTop_toTopOf="parent"
@@ -122,16 +122,16 @@
                     android:background="@drawable/ic_arrow_left"
                     android:textSize="20sp"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/btn"
+                    app:layout_constraintEnd_toStartOf="@id/btn_end_hour"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn1"
+                    android:id="@+id/btn_start_hour"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="10dp"
                     android:onClick='@{() -> registerScheduleFragment.showTimePicker(true, viewModel.uiState.startTime)}'
-                    android:text="@{viewModel.uiState.startTime.toString()}"
+                    app:hour="@{viewModel.uiState.startTime}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/text_arrow"
                     app:layout_constraintTop_toTopOf="parent"
@@ -251,7 +251,7 @@
                         tools:ignore="RelativeOverlap" />
 
                     <com.google.android.material.textview.MaterialTextView
-                        android:id="@+id/error_icon"
+                        android:id="@+id/icon_course_error"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"

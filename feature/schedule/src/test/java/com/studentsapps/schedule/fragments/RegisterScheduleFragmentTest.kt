@@ -48,5 +48,12 @@ class RegisterScheduleFragmentTest {
             navController.setCurrentDestination(R.id.registerScheduleFragment)
         })
         onView(withId(R.id.btn_day)).check(matches(withText(R.string.monday)))
+        onView(withId(R.id.btn_start_hour)).check(matches(withText("9:00 AM")))
+        onView(withId(R.id.btn_end_hour)).check(matches(withText("10:00 AM")))
+        onView(withId(R.id.icon_hour_error)).check(matches(withEffectiveVisibility(Visibility.GONE)))
+        onView(withId(R.id.btn_repetition)).check(matches(withText(R.string.every_week)))
+        onView(withId(R.id.icon_course_error)).check(matches(withEffectiveVisibility(Visibility.GONE)))
+        onView(withId(R.id.relative_layout_color)).check(matches(withEffectiveVisibility(Visibility.GONE)))
+        onView(withId(R.id.switch_existing_courses)).check(matches(isChecked()))
     }
 }
