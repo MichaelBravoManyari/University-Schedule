@@ -12,7 +12,7 @@ import java.time.LocalTime
         SELECT s.id as schedule_id, s.start_time, s.end_time, s.class_place, s.day_of_week, 
         s.course_id, c.name as course_name, s.specific_date, c.color as course_color
         FROM schedules s INNER JOIN courses c 
-        ON s.course_id = course_id
+        ON s.course_id = c.id
     """,
     viewName = "schedule_details"
 )

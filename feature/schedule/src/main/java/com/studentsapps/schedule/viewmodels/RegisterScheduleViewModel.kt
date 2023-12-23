@@ -175,7 +175,10 @@ class RegisterScheduleViewModel @Inject constructor(
 
     fun setSpecificDate(date: LocalDate?) {
         _uiState.update { currentState ->
-            currentState.copy(specificDate = date)
+            currentState.copy(
+                specificDate = date,
+                day = date?.dayOfWeek ?: currentState.day
+            )
         }
     }
 

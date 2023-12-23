@@ -2,18 +2,15 @@ package com.studentsapps.database.util
 
 import androidx.room.TypeConverter
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class LocalDateConverter {
 
-    @TypeConverter
-    fun localDateToString(localDate: LocalDate): String =
-        with(localDate) {
-            "$dayOfMonth/$monthValue/$year"
-        }
+    private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
     @TypeConverter
-    fun stringToLocalDate(string: String): LocalDate {
-        val (dayOfMonth, month, year) = string.split("/").map { it.toInt() }
-        return LocalDate.of(year, month, dayOfMonth)
-    }
+    fun localDateToString(localDate: LocalDate): String = localDate.format(formatter)
+
+    @TypeConverter
+    fun stringToLocalDate(string: String): LocalDate = LocalDate.parse(string, formatter)
 }

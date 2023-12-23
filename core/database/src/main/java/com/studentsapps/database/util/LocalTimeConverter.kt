@@ -2,18 +2,15 @@ package com.studentsapps.database.util
 
 import androidx.room.TypeConverter
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 class LocalTimeConverter {
 
-    @TypeConverter
-    fun localTimeToString(localTime: LocalTime): String =
-        with(localTime) {
-            "$hour:$minute"
-        }
+    private val formatter = DateTimeFormatter.ofPattern("HH:mm")
 
     @TypeConverter
-    fun stringToLocalTime(string: String): LocalTime {
-        val (hour, minute) = string.split(":").map { it.toInt() }
-        return LocalTime.of(hour, minute)
-    }
+    fun localTimeToString(localTime: LocalTime): String = localTime.format(formatter)
+
+    @TypeConverter
+    fun stringToLocalTime(string: String): LocalTime = LocalTime.parse(string, formatter)
 }

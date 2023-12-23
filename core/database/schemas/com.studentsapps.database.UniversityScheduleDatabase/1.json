@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "cfa7ed8a35d4d727aafb4bf5688dd006",
+    "identityHash": "e087b652e574f13e01df351bb5c8518f",
     "entities": [
       {
         "tableName": "schedules",
@@ -114,12 +114,12 @@
     "views": [
       {
         "viewName": "schedule_details",
-        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT s.id as schedule_id, s.start_time, s.end_time, s.class_place, s.day_of_week, \n        s.course_id, c.name as course_name, s.specific_date, c.color as course_color\n        FROM schedules s INNER JOIN courses c \n        ON s.course_id = course_id"
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT s.id as schedule_id, s.start_time, s.end_time, s.class_place, s.day_of_week, \n        s.course_id, c.name as course_name, s.specific_date, c.color as course_color\n        FROM schedules s INNER JOIN courses c \n        ON s.course_id = c.id"
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cfa7ed8a35d4d727aafb4bf5688dd006')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e087b652e574f13e01df351bb5c8518f')"
     ]
   }
 }
