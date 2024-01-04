@@ -148,7 +148,7 @@ class RegisterScheduleFragmentTest {
         onView(withText("OK")).inRoot(isDialog()).perform(click())
         // In this fragment
         onView(withId(R.id.toolbar)).perform(click())
-        onView(withId(R.id.menu_add_schedule)).perform(click())
+        onView(withId(com.studentsapps.ui.R.id.menu_add)).perform(click())
         onView(withId(R.id.icon_hour_error)).check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
     }
 
@@ -156,7 +156,7 @@ class RegisterScheduleFragmentTest {
     fun testClickAddScheduleButtonNavigatesToScheduleFragment() {
         onView(withId(R.id.switch_existing_courses)).perform(click())
         onView(withId(R.id.edit_text_course)).perform(typeText("Math"))
-        onView(withId(R.id.menu_add_schedule)).perform(click())
+        onView(withId(com.studentsapps.ui.R.id.menu_add)).perform(click())
         assertEquals(R.id.scheduleFragment, navController.currentDestination?.id)
     }
 }

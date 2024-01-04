@@ -59,4 +59,5 @@
         <item>10 pm</item>
         <item>11 pm</item>
     </string-array>
+    <string name="add">Add</string>
 </resources>

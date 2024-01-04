@@ -1,4 +1,4 @@
-package com.studentsapps.schedule.adapters
+package com.studentsapps.ui
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.studentsapps.model.Course
-import com.studentsapps.schedule.databinding.ItemCourseBinding
+import com.studentsapps.ui.databinding.ItemCourseBinding
 
 class CourseAdapter(private val onItemClicked: (Course) -> Unit) :
     ListAdapter<Course, CourseAdapter.CourseViewHolder>(DiffCallback) {

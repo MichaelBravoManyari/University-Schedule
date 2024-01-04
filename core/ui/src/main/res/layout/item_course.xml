@@ -17,8 +17,8 @@
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/color_course"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:background="@drawable/color_circle"
             android:backgroundTint="@{course.color}"
             app:layout_constraintStart_toStartOf="parent"

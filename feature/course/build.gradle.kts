@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.studentsapps.schedule"
+    namespace = "com.studentsapps.course"
 
     buildFeatures {
         dataBinding = true
@@ -13,19 +13,17 @@ android {
 
 dependencies {
 
-    implementation(project(":core:ui"))
-    implementation(project(":core:designsystem"))
-    implementation(project(":core:data"))
-    implementation(project(":core:model"))
     implementation(project(":core:common"))
+    implementation(project(":core:designsystem"))
+    implementation(project(":core:ui"))
+    implementation(libs.navigation.fragment.ktx)
+    implementation(libs.navigation.ui.ktx)
     testImplementation(project(":core:testing"))
     testImplementation(project(":core:data-test"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-    implementation(libs.androidx.fragment.ktx)
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
 
     // Local test
     testImplementation(libs.junit)
@@ -41,5 +39,4 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.navigation.dynamic.features.fragment)
-
 }

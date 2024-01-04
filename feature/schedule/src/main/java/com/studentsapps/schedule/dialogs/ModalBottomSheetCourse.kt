@@ -12,7 +12,7 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.studentsapps.schedule.adapters.CourseAdapter
+import com.studentsapps.ui.CourseAdapter
 import com.studentsapps.schedule.databinding.ModalBottomSheetCourseBinding
 import com.studentsapps.schedule.viewmodels.BottomSheetCourseViewModel
 import dagger.hilt.android.AndroidEntryPoint

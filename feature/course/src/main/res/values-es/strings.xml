@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="add_course">Añadir curso</string>
+    <string name="course_name">Nombre de curso</string>
+    <string name="course_color">Color del curso</string>
+    <string name="teacher_name">Nombre de profesor</string>
+</resources>

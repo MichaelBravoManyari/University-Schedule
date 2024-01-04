@@ -94,11 +94,11 @@ class RegisterScheduleFragment : Fragment() {
 
     private fun configureMenuOptionsInAppBar() {
         binding.toolbar.run {
+            //inflateMenu(com.studentsapps.ui.R.menu.registration_menu)
             setupWithNavController(navController)
-            inflateMenu(R.menu.schedule_registration_menu)
             setOnMenuItemClickListener { menuItem ->
                 when (menuItem.itemId) {
-                    R.id.menu_add_schedule -> {
+                    com.studentsapps.ui.R.id.menu_add -> {
                         viewModel.run {
                             if (!uiState.value.existingCourses) setCourseName(binding.editTextCourse.text.toString())
                             setClassroom(binding.editTextClassroom.text.toString())

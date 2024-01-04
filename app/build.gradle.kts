@@ -21,6 +21,7 @@ android {
 dependencies {
 
     implementation(project(":feature:schedule"))
+    implementation(project(":feature:course"))
     implementation(project(":core:designsystem"))
 
     implementation(libs.androidx.appcompat)

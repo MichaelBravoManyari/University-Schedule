@@ -9,4 +9,5 @@
     <string name="sunday_abbr">Do</string>
     <string name="gridded_timetable_scrollable_container">Contenedor scrollable de horario cuadriculado</string>
     <string name="drawing_container_for_grid_and_time">Contenedor de dibujos para rejilla y hora</string>
+    <string name="add">Agregar</string>
 </resources>

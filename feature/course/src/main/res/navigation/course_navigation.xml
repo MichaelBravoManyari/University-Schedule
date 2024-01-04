@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/course_navigation"
+    app:startDestination="@id/courseFragment">
+
+    <fragment
+        android:id="@+id/courseFragment"
+        android:name="com.studentsapps.course.CourseFragment"
+        android:label="fragment_course"
+        tools:layout="@layout/fragment_course" >
+        <action
+            android:id="@+id/action_courseFragment_to_registerCourseFragment"
+            app:destination="@id/registerCourseFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/registerCourseFragment"
+        android:name="com.studentsapps.course.RegisterCourseFragment"
+        android:label="fragment_register_course"
+        tools:layout="@layout/fragment_register_course" >
+        <action
+            android:id="@+id/action_registerCourseFragment_to_courseFragment"
+            app:destination="@id/courseFragment" />
+    </fragment>
+</navigation>
