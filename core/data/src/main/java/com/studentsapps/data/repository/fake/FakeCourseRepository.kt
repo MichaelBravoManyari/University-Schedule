@@ -5,14 +5,16 @@ import com.studentsapps.database.model.CourseEntity
 import com.studentsapps.database.model.asExternalModel
 import com.studentsapps.database.test.data.testdoubles.TestCourseDao
 import com.studentsapps.model.Course
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class FakeCourseRepository @Inject constructor() : CourseRepository {
 
     private val courseDao = TestCourseDao()
 
-    override suspend fun getCourse(courseId: Int): Course =
-        courseDao.getCourseById(courseId).asExternalModel()
+    override fun getCourse(courseId: Int): Flow<Course> =
+        courseDao.getCourseById(courseId).map(CourseEntity::asExternalModel)
 
     override suspend fun registerCourse(course: Course): Long = courseDao.insert(with(course) {
         CourseEntity(
@@ -20,7 +22,7 @@ class FakeCourseRepository @Inject constructor() : CourseRepository {
         )
     })
 
-    override suspend fun getAllCourse(): List<Course> {
-        return courseDao.getAll().map(CourseEntity::asExternalModel)
+    override fun getAllCourse(): Flow<List<Course>> {
+        return courseDao.getAll().map { it.map(CourseEntity::asExternalModel) }
     }
 }

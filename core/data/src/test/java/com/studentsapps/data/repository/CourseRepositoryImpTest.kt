@@ -7,6 +7,8 @@ import com.studentsapps.database.test.data.courseList
 import com.studentsapps.database.test.data.testdoubles.TestCourseDao
 import com.studentsapps.model.Course
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.`is`
@@ -31,7 +33,8 @@ class CourseRepositoryImpTest {
     @Test
     fun getCourse_returnSchedule() = runTest(testDispatcher) {
         assertThat(
-            subject.getCourse(1), `is`(dataSource.getCourse(1).asExternalModel())
+            subject.getCourse(1).first(),
+            `is`(dataSource.getCourse(1).map(CourseEntity::asExternalModel).first())
         )
     }
 
@@ -44,6 +47,6 @@ class CourseRepositoryImpTest {
     @Test
     fun getAllCourse_returnCourses() = runTest(testDispatcher) {
         val expectedCourseList = courseList.map(CourseEntity::asExternalModel)
-        assertEquals(expectedCourseList, subject.getAllCourse())
+        assertEquals(expectedCourseList, subject.getAllCourse().first())
     }
 }

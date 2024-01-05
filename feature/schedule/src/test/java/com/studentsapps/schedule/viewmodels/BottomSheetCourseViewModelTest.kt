@@ -4,6 +4,7 @@ import com.studentsapps.data.repository.CourseRepository
 import com.studentsapps.data.repository.fake.FakeCourseRepository
 import com.studentsapps.testing.util.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -27,7 +28,7 @@ class BottomSheetCourseViewModelTest {
 
     @Test
     fun testInitialStateOfBottomSheetCourseUiStateWithLoadedCourses() = runTest {
-        val expectedCourseList = courseRepository.getAllCourse()
-        assertEquals(BottomSheetCourseUiState(expectedCourseList), subject.uiState.value)
+        val expectedCourseList = courseRepository.getAllCourse().first()
+        assertEquals(BottomSheetCourseUiState.Success(expectedCourseList), subject.uiState.value)
     }
 }

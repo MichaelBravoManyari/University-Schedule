@@ -1,4 +1,4 @@
-package com.studentsapps.schedule.viewmodels
+package com.studentsapps.course.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,23 +12,23 @@ import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
-class BottomSheetCourseViewModel @Inject constructor(
+class CourseViewModel @Inject constructor(
     courseRepository: CourseRepository
 ) : ViewModel() {
 
-    val uiState: StateFlow<BottomSheetCourseUiState> =
-        courseRepository.getAllCourse().map(BottomSheetCourseUiState::Success).stateIn(
+    val uiState: StateFlow<CourseUiState> =
+        courseRepository.getAllCourse().map(CourseUiState::Success).stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = BottomSheetCourseUiState.Loading
+            initialValue = CourseUiState.Loading
         )
 }
 
-sealed interface BottomSheetCourseUiState {
+sealed interface CourseUiState {
 
-    data object Loading : BottomSheetCourseUiState
+    data object Loading : CourseUiState
 
     data class Success(
         val courseList: List<Course>
-    ) : BottomSheetCourseUiState
+    ) : CourseUiState
 }

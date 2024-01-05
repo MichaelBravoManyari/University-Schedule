@@ -3,14 +3,14 @@ package com.studentsapps.database.test.data.testdoubles
 import com.studentsapps.database.dao.CourseDao
 import com.studentsapps.database.model.CourseEntity
 import com.studentsapps.database.test.data.courseList
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 class TestCourseDao : CourseDao() {
-    override suspend fun getCourseById(courseId: Int): CourseEntity =
-        courseList.find { it.id == courseId }!!
+    override fun getCourseById(courseId: Int): Flow<CourseEntity> =
+        flowOf(courseList.find { it.id == courseId }!!)
 
-    override suspend fun getAll(): List<CourseEntity> {
-        return courseList
-    }
+    override fun getAll(): Flow<List<CourseEntity>> = flowOf(courseList)
 
     override suspend fun insert(obj: CourseEntity): Long = obj.id.toLong()
 

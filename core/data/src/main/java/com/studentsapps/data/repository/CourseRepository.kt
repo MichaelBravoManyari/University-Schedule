@@ -1,12 +1,13 @@
 package com.studentsapps.data.repository
 
 import com.studentsapps.model.Course
+import kotlinx.coroutines.flow.Flow
 
 interface CourseRepository {
 
-    suspend fun getCourse(courseId: Int): Course
+    fun getCourse(courseId: Int): Flow<Course>
 
     suspend fun registerCourse(course: Course): Long
 
-    suspend fun getAllCourse(): List<Course>
+    fun getAllCourse(): Flow<List<Course>>
 }

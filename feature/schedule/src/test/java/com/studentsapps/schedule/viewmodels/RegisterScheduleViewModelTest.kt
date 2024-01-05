@@ -9,6 +9,7 @@ import com.studentsapps.model.Course
 import com.studentsapps.testing.util.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -79,7 +80,7 @@ class RegisterScheduleViewModelTest {
 
     @Test
     fun selectCourse_courseId1() = runTest {
-        val expectedCourse = courseRepository.getCourse(1)
+        val expectedCourse = courseRepository.getCourse(1).first()
         val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
         subject.selectCourse(1)
         assertEquals(
@@ -280,11 +281,14 @@ class RegisterScheduleViewModelTest {
         val expectedDate = LocalDate.now()
         subject.setSpecificDate(expectedDate)
         assertEquals(
-            RegisterScheduleUiState().copy(specificDate = expectedDate), subject.uiState.value
+            RegisterScheduleUiState().copy(
+                specificDate = expectedDate,
+                day = expectedDate.dayOfWeek
+            ), subject.uiState.value
         )
         subject.setSpecificDate(null)
         assertEquals(
-            RegisterScheduleUiState(), subject.uiState.value
+            RegisterScheduleUiState(day = expectedDate.dayOfWeek), subject.uiState.value
         )
         collectJob.cancel()
     }

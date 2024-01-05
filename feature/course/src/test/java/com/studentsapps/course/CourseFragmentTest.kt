@@ -8,6 +8,7 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.studentsapps.course.fragments.CourseFragment
 import com.studentsapps.testing.launchFragmentInHiltContainer
 import com.studentsapps.testing.util.MainDispatcherRule
 import com.studentsapps.ui.CourseAdapter

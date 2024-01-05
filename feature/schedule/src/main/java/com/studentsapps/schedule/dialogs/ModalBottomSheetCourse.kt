@@ -12,9 +12,10 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.studentsapps.ui.CourseAdapter
 import com.studentsapps.schedule.databinding.ModalBottomSheetCourseBinding
+import com.studentsapps.schedule.viewmodels.BottomSheetCourseUiState
 import com.studentsapps.schedule.viewmodels.BottomSheetCourseViewModel
+import com.studentsapps.ui.CourseAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -50,8 +51,10 @@ class ModalBottomSheetCourse : BottomSheetDialogFragment() {
         binding.recyclerViewCourses.layoutManager = LinearLayoutManager(context)
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect {
-                    courseAdapter.submitList(it.coursesItems)
+                viewModel.uiState.collect { currentState ->
+                    if (currentState is BottomSheetCourseUiState.Success) {
+                        courseAdapter.submitList(currentState.courseList)
+                    }
                 }
             }
         }

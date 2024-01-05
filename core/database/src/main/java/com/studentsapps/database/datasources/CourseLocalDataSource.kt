@@ -5,6 +5,7 @@ import com.studentsapps.common.Dispatchers.IO
 import com.studentsapps.database.dao.CourseDao
 import com.studentsapps.database.model.CourseEntity
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -12,15 +13,11 @@ class CourseLocalDataSource @Inject constructor(
     private val courseDao: CourseDao, @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher
 ) {
 
-    suspend fun getCourse(courseId: Int): CourseEntity = withContext(ioDispatcher) {
-        courseDao.getCourseById(courseId)
-    }
+    fun getCourse(courseId: Int): Flow<CourseEntity> = courseDao.getCourseById(courseId)
 
     suspend fun insert(course: CourseEntity): Long = withContext(ioDispatcher) {
         courseDao.insert(course)
     }
 
-    suspend fun getAllCourse(): List<CourseEntity> = withContext(ioDispatcher) {
-        courseDao.getAll()
-    }
+    fun getAllCourse(): Flow<List<CourseEntity>> = courseDao.getAll()
 }

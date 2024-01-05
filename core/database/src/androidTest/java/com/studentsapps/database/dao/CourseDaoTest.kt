@@ -7,6 +7,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.studentsapps.database.UniversityScheduleDatabase
 import com.studentsapps.database.model.CourseEntity
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.nullValue
@@ -40,7 +41,7 @@ class CourseDaoTest {
     fun insert_course_returnCourseId() = runTest {
         val expectedCourse = testCourse(id = 1)
         val expectedCourseId = courseDao.insert(expectedCourse)
-        val actualCourse = courseDao.getCourseById(expectedCourseId.toInt())
+        val actualCourse = courseDao.getCourseById(expectedCourseId.toInt()).first()
         assertThat(1L, `is`(expectedCourseId))
         assertThat(actualCourse, `is`(expectedCourse))
     }
@@ -51,7 +52,7 @@ class CourseDaoTest {
         courseDao.insert(expectedCourse)
         val updateCourse = expectedCourse.copy(nameProfessor = "Miguel")
         courseDao.update(updateCourse)
-        val actualCourse = courseDao.getCourseById(2)
+        val actualCourse = courseDao.getCourseById(2).first()
         assertThat(actualCourse, `is`(updateCourse))
     }
 
@@ -61,7 +62,7 @@ class CourseDaoTest {
         val expectedCourseId = courseDao.insert(expectedCourse)
         assertThat(1L, `is`(expectedCourseId))
         courseDao.delete(expectedCourse)
-        val actualCourse = courseDao.getCourseById(expectedCourseId.toInt())
+        val actualCourse = courseDao.getCourseById(expectedCourseId.toInt()).first()
         assertThat(actualCourse, `is`(nullValue()))
     }
 
@@ -69,7 +70,7 @@ class CourseDaoTest {
     fun get_schedule_by_id() = runTest {
         val expectedCourse = testCourse(id = 3)
         courseDao.insert(expectedCourse)
-        val actualCourse = courseDao.getCourseById(3)
+        val actualCourse = courseDao.getCourseById(3).first()
         assertThat(actualCourse, `is`(expectedCourse))
     }
 
@@ -84,7 +85,7 @@ class CourseDaoTest {
             courseDao.insert(expectedCourse)
         }
         val actualCourses = courseDao.getAll()
-        assertTrue(actualCourses == expectedCourses)
+        assertTrue(actualCourses.first() == expectedCourses)
     }
 
     private fun testCourse(id: Int) =

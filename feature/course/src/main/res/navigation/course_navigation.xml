@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/courseFragment"
-        android:name="com.studentsapps.course.CourseFragment"
+        android:name="com.studentsapps.course.fragments.CourseFragment"
         android:label="fragment_course"
         tools:layout="@layout/fragment_course" >
         <action
@@ -16,7 +16,7 @@
     </fragment>
     <fragment
         android:id="@+id/registerCourseFragment"
-        android:name="com.studentsapps.course.RegisterCourseFragment"
+        android:name="com.studentsapps.course.fragments.RegisterCourseFragment"
         android:label="fragment_register_course"
         tools:layout="@layout/fragment_register_course" >
         <action
