@@ -22,5 +22,9 @@
         <action
             android:id="@+id/action_registerCourseFragment_to_courseFragment"
             app:destination="@id/courseFragment" />
+        <argument
+            android:name="courseId"
+            app:argType="integer"
+            android:defaultValue="0" />
     </fragment>
 </navigation>

@@ -10,7 +10,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
-import androidx.navigation.fragment.findNavController
+import androidx.navigation.findNavController
 import com.studentsapps.course.databinding.FragmentCourseBinding
 import com.studentsapps.course.viewmodels.CourseUiState
 import com.studentsapps.course.viewmodels.CourseViewModel
@@ -31,15 +31,23 @@ class CourseFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentCourseBinding.inflate(inflater, container, false)
-        navController = findNavController()
-        binding.lifecycleOwner = viewLifecycleOwner
+        binding.apply {
+            lifecycleOwner = viewLifecycleOwner
+            courseFragment = this@CourseFragment
+        }
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        navController = view.findNavController()
+
         val courseAdapter = CourseAdapter {
-            navController.navigate(CourseFragmentDirections.actionCourseFragmentToRegisterCourseFragment())
+            navController.navigate(
+                CourseFragmentDirections.actionCourseFragmentToRegisterCourseFragment(
+                    it.id
+                )
+            )
         }
         binding.recyclerViewCourse.adapter = courseAdapter
         lifecycleScope.launch {
@@ -51,6 +59,10 @@ class CourseFragment : Fragment() {
                 }
             }
         }
+    }
+
+    fun navigateToCourseRegistrationFragment() {
+        navController.navigate(CourseFragmentDirections.actionCourseFragmentToRegisterCourseFragment())
     }
 
     override fun onDestroy() {
