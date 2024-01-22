@@ -2,7 +2,6 @@ package com.studentsapps.ui.timetable
 
 import android.app.Application
 import android.content.Context
-import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Typeface
@@ -12,7 +11,6 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.annotation.ArrayRes
-import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
@@ -38,6 +36,7 @@ import com.studentsapps.model.ScheduleView
 import com.studentsapps.model.TimetableUserPreferences
 import com.studentsapps.testing.getOrAwaitValue
 import com.studentsapps.testing.launchFragmentInHiltContainer
+import com.studentsapps.testing.util.withBackgroundTintList
 import com.studentsapps.testing.util.withTextColor
 import com.studentsapps.ui.R
 import com.studentsapps.ui_test_hilt_manifest.FragmentTest
@@ -1146,21 +1145,6 @@ class TimetableTest {
                 val bitmap1 = item.background.toBitmap(1, 1)
                 val bitmap = expectedDrawable.toBitmap(1, 1)
                 return bitmap1.sameAs(bitmap)
-            }
-        }
-    }
-
-    private fun withBackgroundTintList(@ColorInt color: Int = Color.BLUE): Matcher<View> {
-        return object : BoundedMatcher<View, TextView>(TextView::class.java) {
-            override fun describeTo(description: Description?) {
-                description?.appendText("with backgroundTint: ")
-                description?.appendValue(color)
-            }
-
-            override fun matchesSafely(item: TextView): Boolean {
-                val expectedTintList = ColorStateList.valueOf(color)
-                val realTintList = item.backgroundTintList
-                return expectedTintList == realTintList
             }
         }
     }

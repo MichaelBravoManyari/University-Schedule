@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModelStore
 import androidx.navigation.Navigation
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.*
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.typeText
@@ -26,12 +27,17 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
+import org.robolectric.annotation.LooperMode
+import org.robolectric.shadows.ShadowChoreographer
 import org.robolectric.shadows.ShadowDialog
+import org.robolectric.shadows.ShadowLooper
+import java.util.concurrent.TimeUnit
 
 @Config(application = HiltTestApplication::class, sdk = [33])
 @HiltAndroidTest
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
+@LooperMode(LooperMode.Mode.PAUSED)
 class RegisterScheduleFragmentTest {
 
     @get:Rule(order = 0)
@@ -49,7 +55,6 @@ class RegisterScheduleFragmentTest {
         navController.setGraph(R.navigation.schedule_navigation)
         launchFragmentInHiltContainer<RegisterScheduleFragment>(navigation = {
             Navigation.setViewNavController(requireView(), navController)
-            navController.setLifecycleOwner(this)
             navController.setCurrentDestination(R.id.registerScheduleFragment)
         })
     }
