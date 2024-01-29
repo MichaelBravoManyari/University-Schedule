@@ -3,6 +3,7 @@ package com.studentsapps.course.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.studentsapps.data.repository.CourseRepository
+import com.studentsapps.model.Course
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,11 +27,50 @@ class RegisterCourseViewModel @Inject constructor(
             val course = courseRepository.getCourse(courseId).first()
             _uiState.update {
                 RegisterCourseUiState(
-                    name = course.name,
-                    nameProfessor = course.nameProfessor,
-                    color = course.color
+                    name = course.name, nameProfessor = course.nameProfessor, color = course.color
                 )
             }
+        }
+    }
+
+    fun registerCourse() {
+        viewModelScope.launch {
+            if (validateCourseFields()) {
+                val course =
+                    Course(0, uiState.value.name, uiState.value.nameProfessor, uiState.value.color)
+                courseRepository.registerCourse(course)
+                _uiState.update { currentState ->
+                    currentState.copy(isCourseRecorded = true)
+                }
+            }
+        }
+    }
+
+    private fun validateCourseFields(): Boolean {
+        val hasNameError = uiState.value.name.isEmpty()
+
+        _uiState.update { currentState ->
+            currentState.copy(courseNameError = hasNameError)
+        }
+
+        return !hasNameError
+    }
+
+    fun selectColorCourse(colorCourse: Int) {
+        _uiState.update { currentState ->
+            currentState.copy(color = colorCourse)
+        }
+    }
+
+    fun setCourseName(courseName: String) {
+        _uiState.update { currentState ->
+            currentState.copy(name = courseName)
+        }
+    }
+
+    fun setNameProfessor(nameProfessor: String?) {
+        _uiState.update { currentState ->
+            currentState.copy(nameProfessor = nameProfessor)
         }
     }
 }
@@ -38,5 +78,7 @@ class RegisterCourseViewModel @Inject constructor(
 data class RegisterCourseUiState(
     val name: String = "",
     val nameProfessor: String? = "",
-    val color: Int = 0
+    val color: Int = 0xffffff00.toInt(),
+    val isCourseRecorded: Boolean = false,
+    val courseNameError: Boolean = false,
 )

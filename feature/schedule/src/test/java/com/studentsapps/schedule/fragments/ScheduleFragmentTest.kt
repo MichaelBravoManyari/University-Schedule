@@ -46,7 +46,7 @@ import org.robolectric.annotation.Config
 import java.time.LocalDate
 
 
-@Config(application = HiltTestApplication::class, sdk = [33])
+@Config(application = HiltTestApplication::class)
 @HiltAndroidTest
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)

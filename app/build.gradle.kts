@@ -23,6 +23,7 @@ dependencies {
     implementation(project(":feature:schedule"))
     implementation(project(":feature:course"))
     implementation(project(":core:designsystem"))
+    implementation(project(":core:ui"))
 
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)

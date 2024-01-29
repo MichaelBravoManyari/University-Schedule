@@ -60,4 +60,6 @@
         <item>11 pm</item>
     </string-array>
     <string name="add">Add</string>
+    <string name="select_color">Select a color</string>
+    <string name="accept">Accept</string>
 </resources>

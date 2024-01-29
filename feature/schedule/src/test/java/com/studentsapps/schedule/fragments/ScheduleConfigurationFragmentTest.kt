@@ -23,7 +23,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 
-@Config(application = HiltTestApplication::class, sdk = [33])
+@Config(application = HiltTestApplication::class)
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class ScheduleConfigurationFragmentTest {

@@ -1,4 +1,4 @@
-package com.studentsapps.schedule.dialogs
+package com.studentsapps.ui.dialogs
 
 import android.annotation.SuppressLint
 import android.content.res.ColorStateList
@@ -12,16 +12,14 @@ import android.view.ViewTreeObserver
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.studentsapps.schedule.databinding.ModalBottomSheetColorBinding
+import com.studentsapps.ui.databinding.ModalBottomSheetColorBinding
 import kotlin.math.floor
 
 class ModalBottomSheetColor : BottomSheetDialogFragment() {
     private var _binding: ModalBottomSheetColorBinding? = null
     private val binding get() = _binding!!
     private lateinit var navController: NavController
-    private val args: ModalBottomSheetColorArgs by navArgs()
 
     private var color = 0xffffff00.toInt()
     private var currentColorHsv = FloatArray(3)
@@ -41,7 +39,7 @@ class ModalBottomSheetColor : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         dialog?.setCancelable(false)
-        color = args.colorCourse
+        color = arguments?.getInt("colorCourse") ?: 0
         Color.colorToHSV(color, currentColorHsv)
         binding.colorPicker.setHue(getHue())
         binding.selectedColor.backgroundTintList = ColorStateList.valueOf(getColor())

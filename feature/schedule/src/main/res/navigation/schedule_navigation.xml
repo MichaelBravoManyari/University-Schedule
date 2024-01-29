@@ -41,9 +41,6 @@
             android:id="@+id/action_registerScheduleFragment_to_modalBottomSheetCourse"
             app:destination="@id/modalBottomSheetCourse" />
         <action
-            android:id="@+id/action_registerScheduleFragment_to_modalBottomSheetColor"
-            app:destination="@id/modalBottomSheetColor" />
-        <action
             android:id="@+id/action_registerScheduleFragment_to_modalBottomSheetRepetition"
             app:destination="@id/modalBottomSheetRepetition" />
     </fragment>
@@ -51,14 +48,6 @@
         android:id="@+id/modalBottomSheetCourse"
         android:name="com.studentsapps.schedule.dialogs.ModalBottomSheetCourse"
         android:label="ModalBottomSheetCourse" />
-    <dialog
-        android:id="@+id/modalBottomSheetColor"
-        android:name="com.studentsapps.schedule.dialogs.ModalBottomSheetColor"
-        android:label="ModalBottomSheetColor" >
-        <argument
-            android:name="colorCourse"
-            app:argType="integer" />
-    </dialog>
     <dialog
         android:id="@+id/modalBottomSheetRepetition"
         android:name="com.studentsapps.schedule.dialogs.ModalBottomSheetRepetition"

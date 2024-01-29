@@ -27,7 +27,7 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import kotlin.test.assertEquals
 
-@Config(application = HiltTestApplication::class, sdk = [33])
+@Config(application = HiltTestApplication::class)
 @ExperimentalCoroutinesApi
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)

@@ -1,5 +1,6 @@
 package com.studentsapps.course.viewmodels
 
+import android.graphics.Color
 import com.studentsapps.data.repository.CourseRepository
 import com.studentsapps.data.repository.fake.FakeCourseRepository
 import com.studentsapps.testing.util.MainDispatcherRule
@@ -43,6 +44,52 @@ class RegisterCourseViewModelTest {
         assertEquals(
             RegisterCourseUiState(name = "Math", nameProfessor = null, color = 1234),
             subject.uiState.value
+        )
+        collectJob.cancel()
+    }
+
+    @Test
+    fun registerCourse_courseSuccessfullyRegistered() = runTest {
+        val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
+        subject.setCourseName("TestCourse")
+        subject.registerCourse()
+        assertEquals(RegisterCourseUiState().copy(name = "TestCourse",isCourseRecorded = true), subject.uiState.value)
+        collectJob.cancel()
+    }
+
+    @Test
+    fun registerCourse_courseNameError() = runTest {
+        val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
+        subject.registerCourse()
+        assertEquals(RegisterCourseUiState().copy(courseNameError = true), subject.uiState.value)
+        collectJob.cancel()
+    }
+
+    @Test
+    fun selectColorCourse_colorRed() = runTest {
+        val courseColor = Color.RED
+        val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
+        subject.selectColorCourse(courseColor)
+        assertEquals(RegisterCourseUiState().copy(color = courseColor), subject.uiState.value)
+        collectJob.cancel()
+    }
+
+    @Test
+    fun setCourseName_courseNameTest() = runTest {
+        val courseName = "courseNameTest"
+        val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
+        subject.setCourseName(courseName)
+        assertEquals(RegisterCourseUiState().copy(name = courseName), subject.uiState.value)
+        collectJob.cancel()
+    }
+
+    @Test
+    fun setNameProfessor_nameProfessorTest() = runTest {
+        val nameProfessor = "nameProfessorTest"
+        val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
+        subject.setNameProfessor(nameProfessor)
+        assertEquals(
+            RegisterCourseUiState().copy(nameProfessor = nameProfessor), subject.uiState.value
         )
         collectJob.cancel()
     }

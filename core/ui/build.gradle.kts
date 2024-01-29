@@ -19,6 +19,8 @@ dependencies {
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.material)
+    implementation(libs.navigation.fragment.ktx)
+    implementation(libs.navigation.ui.ktx)
 
     // Local test
     testImplementation(libs.junit)
@@ -27,4 +29,5 @@ dependencies {
     testImplementation(libs.mockk)
     testImplementation(libs.androidx.arch.core.testing)
     testImplementation(libs.espresso.core)
+
 }

@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -14,6 +15,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.findNavController
 import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupWithNavController
@@ -187,11 +189,10 @@ class RegisterScheduleFragment : Fragment() {
     }
 
     fun goToBottomSheetColor(colorCourse: Int) {
-        navController.navigate(
-            RegisterScheduleFragmentDirections.actionRegisterScheduleFragmentToModalBottomSheetColor(
-                colorCourse
-            )
-        )
+        val request =
+            NavDeepLinkRequest.Builder.fromUri("android-app://studentsapps.app/modalBottomSheetColor/$colorCourse".toUri())
+                .build()
+        navController.navigate(request)
     }
 
     fun goToBottomSheetRepetition() {

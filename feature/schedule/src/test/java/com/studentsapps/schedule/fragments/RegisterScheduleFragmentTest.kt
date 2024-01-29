@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModelStore
 import androidx.navigation.Navigation
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.*
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.typeText
@@ -28,12 +27,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.LooperMode
-import org.robolectric.shadows.ShadowChoreographer
 import org.robolectric.shadows.ShadowDialog
-import org.robolectric.shadows.ShadowLooper
-import java.util.concurrent.TimeUnit
 
-@Config(application = HiltTestApplication::class, sdk = [33])
+@Config(application = HiltTestApplication::class)
 @HiltAndroidTest
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
@@ -84,10 +80,16 @@ class RegisterScheduleFragmentTest {
         assertTrue(dialog.isShowing)
     }
 
+    /*The default device configuration of Robolectric has a smaller screen, hiding the buttons of the dialogs*/
     @Test
+    @Config(qualifiers = "w360dp-h640dp-xhdpi")
     fun testEndTimeButtonShowsTimePicker() {
         onView(withId(R.id.btn_end_hour)).perform(click())
-        onView(withText(R.string.select_hour)).inRoot(isDialog()).check(matches(isDisplayed()))
+        onView(withText(R.string.select_hour)).inRoot(isDialog()).check(
+            matches(
+                isCompletelyDisplayed()
+            )
+        )
         onView(withText("OK")).inRoot(isDialog()).perform(click())
     }
 
@@ -137,7 +139,9 @@ class RegisterScheduleFragmentTest {
         )
     }
 
+    /*The default device configuration of Robolectric has a smaller screen, hiding the buttons of the dialogs*/
     @Test
+    @Config(qualifiers = "w360dp-h640dp-xhdpi")
     fun testShowErrorIconForTimeError() {
         onView(withId(R.id.btn_end_hour)).perform(click())
         // In the timepicker

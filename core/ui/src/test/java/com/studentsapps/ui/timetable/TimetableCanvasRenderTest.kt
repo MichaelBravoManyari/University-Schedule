@@ -14,10 +14,8 @@ import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
 import org.junit.Assert.assertThrows
 
-@Config(sdk = [33])
 @RunWith(AndroidJUnit4::class)
 class TimetableCanvasRenderTest {
 

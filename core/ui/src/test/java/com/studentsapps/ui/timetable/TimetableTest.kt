@@ -61,7 +61,7 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
 
-@Config(application = HiltTestApplication::class, sdk = [33])
+@Config(application = HiltTestApplication::class)
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class TimetableTest {

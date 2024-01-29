@@ -6,4 +6,15 @@
 
     <include app:graph="@navigation/schedule_navigation" />
     <include app:graph="@navigation/course_navigation" />
+    <dialog
+        android:id="@+id/modalBottomSheetColor"
+        android:name="com.studentsapps.ui.dialogs.ModalBottomSheetColor"
+        android:label="ModalBottomSheetColor" >
+
+        <argument
+            android:name="colorCourse"
+            app:argType="integer" />
+
+        <deepLink app:uri="android-app://studentsapps.app/modalBottomSheetColor/{colorCourse}" />
+    </dialog>
 </navigation>
