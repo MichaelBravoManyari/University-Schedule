@@ -19,4 +19,11 @@ class CourseRepositoryImp @Inject constructor(
 
     override fun getAllCourse(): Flow<List<Course>> =
         courseLocalDataSource.getAllCourse().map { it.map(CourseEntity::asExternalModel) }
+
+    override suspend fun updateCourse(course: Course) =
+        courseLocalDataSource.updateCourse(with(course) {
+            CourseEntity(
+                id, name, nameProfessor, color
+            )
+        })
 }

@@ -53,6 +53,7 @@ class RegisterCourseFragmentTest {
         onView(withId(R.id.edit_text_course_name)).check(matches(withText("")))
         onView(withId(R.id.color_course)).check(matches(withBackgroundTintList(0xffffff00.toInt())))
         onView(withId(R.id.edit_text_teacher_course)).check(matches(withText("")))
+        onView(withId(com.studentsapps.ui.R.id.menu_add)).check(matches(withText(com.studentsapps.ui.R.string.add)))
     }
 
     @Test
@@ -61,6 +62,7 @@ class RegisterCourseFragmentTest {
         onView(withId(R.id.edit_text_course_name)).check(matches(withText("Math")))
         onView(withId(R.id.color_course)).check(matches(withBackgroundTintList(1234)))
         onView(withId(R.id.edit_text_teacher_course)).check(matches(withText("")))
+        onView(withId(com.studentsapps.ui.R.id.menu_add)).check(matches(withText(com.studentsapps.ui.R.string.update)))
     }
 
     @Test

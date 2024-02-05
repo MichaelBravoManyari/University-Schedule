@@ -20,6 +20,7 @@ import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupWithNavController
 import com.studentsapps.course.R
 import com.studentsapps.course.databinding.FragmentRegisterCourseBinding
+import com.studentsapps.course.viewmodels.RegisterCourseUiState
 import com.studentsapps.course.viewmodels.RegisterCourseViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -60,15 +61,33 @@ class RegisterCourseFragment : Fragment() {
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { uiState ->
-                    if (uiState.isCourseRecorded) navController.navigate(
-                        RegisterCourseFragmentDirections.actionRegisterCourseFragmentToCourseFragment()
-                    )
+                    handleUiState(uiState)
                 }
             }
         }
 
         configureMenuOptionsInAppBar()
         setupNavigationObservers()
+    }
+
+    private fun handleUiState(uiState: RegisterCourseUiState) {
+        if (uiState.isCourseRecorded) {
+            navigateToCourseFragment()
+        }
+
+        if (uiState.name.isNotEmpty()) {
+            binding.editTextCourseName.setText(uiState.name)
+        }
+
+        if (!uiState.nameProfessor.isNullOrEmpty()) {
+            binding.editTextTeacherCourse.setText(uiState.nameProfessor)
+        }
+    }
+
+    private fun navigateToCourseFragment() {
+        navController.navigate(
+            RegisterCourseFragmentDirections.actionRegisterCourseFragmentToCourseFragment()
+        )
     }
 
     fun goToBottomSheetColor(colorCourse: Int) {
@@ -103,8 +122,11 @@ class RegisterCourseFragment : Fragment() {
 
     private fun configureMenuOptionsInAppBar() {
         binding.toolbar.run {
-            //inflateMenu(com.studentsapps.ui.R.menu.registration_menu)
             setupWithNavController(navController)
+            if (courseId > 0) {
+                val menuAdd = menu.findItem(com.studentsapps.ui.R.id.menu_add)
+                menuAdd.title = getText(com.studentsapps.ui.R.string.update)
+            }
             setOnMenuItemClickListener { menuItem ->
                 when (menuItem.itemId) {
                     com.studentsapps.ui.R.id.menu_add -> {

@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -29,6 +30,11 @@ class RegisterCourseViewModelTest {
         subject = RegisterCourseViewModel(courseRepository)
     }
 
+    @After
+    fun clear() {
+        (courseRepository as FakeCourseRepository).restoreDatabase()
+    }
+
     @Test
     fun stateIsInitiallyUiState() = runTest {
         assertEquals(
@@ -42,8 +48,9 @@ class RegisterCourseViewModelTest {
         val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
         subject.displayCourseData(courseId)
         assertEquals(
-            RegisterCourseUiState(name = "Math", nameProfessor = null, color = 1234),
-            subject.uiState.value
+            RegisterCourseUiState(
+                courseId = courseId, name = "Math", nameProfessor = null, color = 1234
+            ), subject.uiState.value
         )
         collectJob.cancel()
     }
@@ -53,7 +60,10 @@ class RegisterCourseViewModelTest {
         val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
         subject.setCourseName("TestCourse")
         subject.registerCourse()
-        assertEquals(RegisterCourseUiState().copy(name = "TestCourse",isCourseRecorded = true), subject.uiState.value)
+        assertEquals(
+            RegisterCourseUiState().copy(name = "TestCourse", isCourseRecorded = true),
+            subject.uiState.value
+        )
         collectJob.cancel()
     }
 
@@ -62,6 +72,46 @@ class RegisterCourseViewModelTest {
         val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
         subject.registerCourse()
         assertEquals(RegisterCourseUiState().copy(courseNameError = true), subject.uiState.value)
+        collectJob.cancel()
+    }
+
+    @Test
+    fun updateCourse_courseSuccessfullyUpdated() = runTest {
+        val courseId = 1
+        val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
+        subject.displayCourseData(courseId)
+        subject.setCourseName("Math 1")
+        subject.setNameProfessor("Professor 1")
+        subject.updateCourse()
+        assertEquals(
+            RegisterCourseUiState().copy(
+                courseId = courseId,
+                name = "Math 1",
+                nameProfessor = "Professor 1",
+                color = 1234,
+                isCourseRecorded = true
+            ), subject.uiState.value
+        )
+        collectJob.cancel()
+    }
+
+    @Test
+    fun updateCourse_courseNameError() = runTest {
+        val courseId = 1
+        val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
+        subject.displayCourseData(courseId)
+        subject.setCourseName("")
+        subject.updateCourse()
+        assertEquals(
+            RegisterCourseUiState().copy(
+                courseId = courseId,
+                name = "",
+                nameProfessor = null,
+                color = 1234,
+                isCourseRecorded = false,
+                courseNameError = true
+            ), subject.uiState.value
+        )
         collectJob.cancel()
     }
 

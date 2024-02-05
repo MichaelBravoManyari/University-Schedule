@@ -25,4 +25,12 @@ class FakeCourseRepository @Inject constructor() : CourseRepository {
     override fun getAllCourse(): Flow<List<Course>> {
         return courseDao.getAll().map { it.map(CourseEntity::asExternalModel) }
     }
+
+    override suspend fun updateCourse(course: Course) = courseDao.update(with(course) {
+        CourseEntity(
+            id, name, nameProfessor, color
+        )
+    })
+
+    fun restoreDatabase() = courseDao.restoreDatabase()
 }

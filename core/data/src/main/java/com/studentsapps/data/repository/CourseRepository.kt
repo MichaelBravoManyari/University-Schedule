@@ -10,4 +10,6 @@ interface CourseRepository {
     suspend fun registerCourse(course: Course): Long
 
     fun getAllCourse(): Flow<List<Course>>
+
+    suspend fun updateCourse(course: Course)
 }

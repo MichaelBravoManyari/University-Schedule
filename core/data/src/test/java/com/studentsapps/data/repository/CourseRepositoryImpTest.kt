@@ -49,4 +49,11 @@ class CourseRepositoryImpTest {
         val expectedCourseList = courseList.map(CourseEntity::asExternalModel)
         assertEquals(expectedCourseList, subject.getAllCourse().first())
     }
+
+    @Test
+    fun updateCourse_course() = runTest(testDispatcher) {
+        val expectedCourse = Course(1, "Math 1", "Professor 1", 1234)
+        subject.updateCourse(expectedCourse)
+        assertEquals(expectedCourse, subject.getCourse(1).first())
+    }
 }

@@ -50,8 +50,7 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edit_text_course_name"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@{viewModel.uiState.name}"/>
+                android:layout_height="wrap_content" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <RelativeLayout
@@ -60,8 +59,8 @@
             android:layout_height="60dp"
             android:layout_marginTop="5dp"
             android:background="@drawable/background_rounded_bottom_schedule_registration_options"
-            android:padding="8dp"
             android:onClick="@{() -> registerCourseFragment.goToBottomSheetColor(viewModel.uiState.color)}"
+            android:padding="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/text_input_layout_course_name">
@@ -113,8 +112,7 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edit_text_teacher_course"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@{viewModel.uiState.nameProfessor}"/>
+                android:layout_height="wrap_content" />
         </com.google.android.material.textfield.TextInputLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

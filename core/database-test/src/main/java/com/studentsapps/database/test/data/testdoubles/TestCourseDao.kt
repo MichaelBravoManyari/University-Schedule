@@ -3,6 +3,7 @@ package com.studentsapps.database.test.data.testdoubles
 import com.studentsapps.database.dao.CourseDao
 import com.studentsapps.database.model.CourseEntity
 import com.studentsapps.database.test.data.courseList
+import com.studentsapps.database.test.data.restoreCoursesBackup
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
@@ -15,10 +16,13 @@ class TestCourseDao : CourseDao() {
     override suspend fun insert(obj: CourseEntity): Long = obj.id.toLong()
 
     override suspend fun update(obj: CourseEntity) {
-        TODO("Not yet implemented")
+        val index = courseList.indexOfFirst { it.id == obj.id }
+        if (index != -1) courseList[index] = obj
     }
 
     override suspend fun delete(obj: CourseEntity) {
         TODO("Not yet implemented")
     }
+
+    fun restoreDatabase() = restoreCoursesBackup()
 }

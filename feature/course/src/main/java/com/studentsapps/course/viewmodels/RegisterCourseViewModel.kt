@@ -27,7 +27,10 @@ class RegisterCourseViewModel @Inject constructor(
             val course = courseRepository.getCourse(courseId).first()
             _uiState.update {
                 RegisterCourseUiState(
-                    name = course.name, nameProfessor = course.nameProfessor, color = course.color
+                    courseId = course.id,
+                    name = course.name,
+                    nameProfessor = course.nameProfessor,
+                    color = course.color
                 )
             }
         }
@@ -35,13 +38,31 @@ class RegisterCourseViewModel @Inject constructor(
 
     fun registerCourse() {
         viewModelScope.launch {
-            if (validateCourseFields()) {
-                val course =
-                    Course(0, uiState.value.name, uiState.value.nameProfessor, uiState.value.color)
-                courseRepository.registerCourse(course)
-                _uiState.update { currentState ->
-                    currentState.copy(isCourseRecorded = true)
-                }
+            performCourseOperation {
+                courseRepository.registerCourse(it)
+            }
+        }
+    }
+
+    fun updateCourse() {
+        viewModelScope.launch {
+            performCourseOperation {
+                courseRepository.updateCourse(it)
+            }
+        }
+    }
+
+    private suspend fun performCourseOperation(courseOperation: suspend (Course) -> Unit) {
+        if (validateCourseFields()) {
+            val course = Course(
+                uiState.value.courseId,
+                uiState.value.name,
+                uiState.value.nameProfessor,
+                uiState.value.color
+            )
+            courseOperation(course)
+            _uiState.update { currentState ->
+                currentState.copy(isCourseRecorded = true)
             }
         }
     }
@@ -76,6 +97,7 @@ class RegisterCourseViewModel @Inject constructor(
 }
 
 data class RegisterCourseUiState(
+    val courseId: Int = 0,
     val name: String = "",
     val nameProfessor: String? = "",
     val color: Int = 0xffffff00.toInt(),
