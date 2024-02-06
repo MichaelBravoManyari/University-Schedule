@@ -72,7 +72,7 @@ class RegisterScheduleFragment : Fragment() {
                 viewModel.uiState.collect { uiState ->
                     if (uiState.noSelectCourse) binding.textInputLayoutCourse.endIconDrawable =
                         ResourcesCompat.getDrawable(
-                            resources, R.drawable.ic_error, context?.theme
+                            resources, com.studentsapps.ui.R.drawable.ic_error, context?.theme
                         )
 
                     uiState.userMessage?.let { id ->

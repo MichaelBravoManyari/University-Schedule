@@ -133,7 +133,7 @@ class RegisterCourseFragment : Fragment() {
                         viewModel.run {
                             setCourseName(binding.editTextCourseName.text.toString())
                             setNameProfessor(binding.editTextTeacherCourse.text.toString())
-                            registerCourse()
+                            if (courseId > 0) updateCourse() else registerCourse()
                         }
                         true
                     }

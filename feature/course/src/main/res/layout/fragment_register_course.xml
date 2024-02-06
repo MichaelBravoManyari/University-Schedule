@@ -42,6 +42,7 @@
             android:layout_height="wrap_content"
             android:hint="@string/course_name"
             app:endIconMode="custom"
+            app:endIconDrawable="@{viewModel.uiState.courseNameError ? @drawable/ic_error : null}"
             app:hintTextColor="@color/text_color"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
