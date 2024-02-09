@@ -69,4 +69,13 @@ class ScheduleLocalDataSourceTest {
             subject.insert(scheduleEntity), `is`(scheduleDao.insert(scheduleEntity))
         )
     }
+
+    @Test
+    fun get_scheduleDetailsView_by_scheduleId_returnsScheduleDetails() = runTest(testDispatcher) {
+        val scheduleId = 1
+        assertThat(
+            subject.getScheduleDetailsView(scheduleId),
+            `is`(scheduleDao.getScheduleDetailsById(scheduleId))
+        )
+    }
 }

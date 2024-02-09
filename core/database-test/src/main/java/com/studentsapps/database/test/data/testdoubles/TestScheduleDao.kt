@@ -12,6 +12,8 @@ class TestScheduleDao : ScheduleDao() {
         TODO("Not yet implemented")
     }
 
+    override suspend fun getScheduleDetailsById(scheduleId: Int): ScheduleDetailsView = scheduleDetailsList.find { it.scheduleId == scheduleId }!!
+
     override suspend fun getSchedulesForTimetableInGridMode(
         showSaturday: Boolean,
         showSunday: Boolean,

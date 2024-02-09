@@ -59,4 +59,13 @@ class ScheduleRepositoryImpTest {
             )
         )
     }
+
+    @Test
+    fun getScheduleDetailsById_returnsScheduleDetails() = runTest(testDispatcher) {
+        val scheduleId = 1
+        assertThat(
+            subject.getScheduleDetailsById(scheduleId),
+            `is`(scheduleLocalDataSource.getScheduleDetailsView(scheduleId).asExternalModel())
+        )
+    }
 }

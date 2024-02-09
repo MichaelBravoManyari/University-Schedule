@@ -46,4 +46,7 @@ class ScheduleRepositoryImp @Inject constructor(
             }
         )
     }
+
+    override suspend fun getScheduleDetailsById(scheduleId: Int): ScheduleDetails =
+        scheduleLocalDataSource.getScheduleDetailsView(scheduleId).asExternalModel()
 }

@@ -43,4 +43,9 @@ class ScheduleLocalDataSource @Inject constructor(
         withContext(ioDispatcher) {
             scheduleDao.insert(schedule)
         }
+
+    suspend fun getScheduleDetailsView(scheduleId: Int): ScheduleDetailsView =
+        withContext(ioDispatcher) {
+            scheduleDao.getScheduleDetailsById(scheduleId)
+        }
 }

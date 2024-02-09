@@ -44,4 +44,6 @@
     <string name="select_date">Select a date</string>
     <string name="select_color">Seleccionar un color</string>
     <string name="accept">Aceptar</string>
+    <string name="edit">Editar</string>
+    <string name="delete">Eliminar</string>
 </resources>

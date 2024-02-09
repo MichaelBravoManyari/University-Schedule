@@ -552,7 +552,7 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
         return resources.getDimension(dimenId)
     }
 
-    fun showSchedules(schedules: List<ScheduleView>) {
+    fun showSchedules(schedules: List<ScheduleView>, onItemClicked: (Int) -> Unit) {
         if (showAsGrid) {
             post { binding.scheduleContainer.removeAllViews() }
             schedules.groupByDayOfWeek().forEach { (dayOfWeek, schedulesForOneDayOfWeek) ->
@@ -564,23 +564,27 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
                     scheduleCrossing.forEach { crossSchedules ->
                         crossSchedules.forEachIndexed { index, schedule ->
                             val crossedSchedulesCount = crossSchedules.size
-                            addScheduleToGrid(schedule, crossedSchedulesCount, index)
+                            addScheduleToGrid(schedule, crossedSchedulesCount, index, onItemClicked)
                         }
                     }
 
                     uniqueSchedules.forEach { uniqueSchedule ->
-                        addScheduleToGrid(uniqueSchedule)
+                        addScheduleToGrid(uniqueSchedule, onItemClicked = onItemClicked)
                     }
                 }
             }
         } else {
             adapter.set12HoursFormat(is12HoursFormat)
+            adapter.onItemClicked = onItemClicked
             adapter.submitList(schedules)
         }
     }
 
     private fun addScheduleToGrid(
-        schedule: ScheduleView, crossedSchedulesCount: Int = 1, index: Int = 0
+        schedule: ScheduleView,
+        crossedSchedulesCount: Int = 1,
+        index: Int = 0,
+        onItemClicked: (Int) -> Unit
     ) {
         post {
             with(schedule) {
@@ -593,7 +597,8 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
                     dayOfWeek,
                     color,
                     crossedSchedulesCount,
-                    index
+                    index,
+                    onItemClicked
                 )
                 binding.scheduleContainer.addView(scheduleView)
             }
@@ -609,7 +614,8 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
         day: DayOfWeek,
         color: Int,
         crossedSchedulesCount: Int = 1,
-        crossScheduleIndex: Int = 0
+        crossScheduleIndex: Int = 0,
+        onItemClicked: (Int) -> Unit
     ): LinearLayout {
         val layoutParams = getScheduleViewLayoutParams(
             startTime, endTime, day, crossedSchedulesCount, crossScheduleIndex
@@ -644,6 +650,7 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
             backgroundTintList = ColorStateList.valueOf(color)
             addView(materialTextView1)
             addView(materialTextView2)
+            setOnClickListener { onItemClicked(id) }
         }
     }
 

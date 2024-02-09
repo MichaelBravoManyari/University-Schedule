@@ -34,4 +34,7 @@ class FakeScheduleRepository @Inject constructor() : ScheduleRepository {
             )
         })
     }
+
+    override suspend fun getScheduleDetailsById(scheduleId: Int): ScheduleDetails =
+        scheduleDao.getScheduleDetailsById(scheduleId).asExternalModel()
 }

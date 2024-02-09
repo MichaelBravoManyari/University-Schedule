@@ -18,18 +18,25 @@ class TimetableListAdapter :
 
     private var is12HoursFormat = true
 
+    var onItemClicked: ((Int) -> Unit)? = null
+
     fun set12HoursFormat(value: Boolean) {
         is12HoursFormat = value
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TimetableListViewHolder {
-        return TimetableListViewHolder(
+        val viewHolder = TimetableListViewHolder(
             TimetableListItemBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
             )
         )
+        viewHolder.itemView.setOnClickListener {
+            val position = viewHolder.adapterPosition
+            onItemClicked?.let { it1 -> it1(getItem(position).id) }
+        }
+        return  viewHolder
     }
 
     override fun onBindViewHolder(holder: TimetableListViewHolder, position: Int) {

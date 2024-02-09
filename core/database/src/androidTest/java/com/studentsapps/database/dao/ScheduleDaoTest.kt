@@ -169,6 +169,15 @@ class ScheduleDaoTest {
         assertThat(actualScheduleList, `is`(expectedScheduleList))
     }
 
+    @Test
+    fun get_scheduleDetailsView_by_scheduleId_returns_scheduleDetailsView() = runTest {
+        val scheduleDetailsViewId = 1
+        val expectedScheduleDetailsView = scheduleDetailsList.find { it.scheduleId == 1 }
+        insertSchedules()
+        val actualScheduleDetailsView = scheduleDao.getScheduleDetailsById(scheduleDetailsViewId)
+        assertThat(actualScheduleDetailsView, `is`(expectedScheduleDetailsView))
+    }
+
     private suspend fun insertSchedules() {
         scheduleDetailsList.forEach {
             scheduleDao.insert(it.toScheduleEntity())

@@ -18,4 +18,6 @@ interface ScheduleRepository {
     ): List<ScheduleDetails>
 
     suspend fun registerSchedule(schedule: Schedule, specificDate: LocalDate?)
+
+    suspend fun getScheduleDetailsById(scheduleId: Int): ScheduleDetails
 }

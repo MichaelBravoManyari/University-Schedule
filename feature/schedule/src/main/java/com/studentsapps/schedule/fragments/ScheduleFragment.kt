@@ -55,8 +55,14 @@ class ScheduleFragment : Fragment() {
                         if (currentState is ScheduleUiState.Success) {
                             with(binding.timetable) {
                                 setTimetableUserPreferences(currentState.timetableUserPreferences)
-                                if (currentState.scheduleDetailsList != null) showSchedules(
-                                    currentState.scheduleDetailsList.map { it.asScheduleView() })
+                                if (currentState.scheduleDetailsList != null)
+                                    showSchedules(currentState.scheduleDetailsList.map { it.asScheduleView() }) { scheduleId ->
+                                        navController.navigate(
+                                            ScheduleFragmentDirections.actionScheduleFragmentToModalBottomSheetSchedule(
+                                                scheduleId
+                                            )
+                                        )
+                                    }
                             }
                         }
                     }
