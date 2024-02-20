@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.navigation.NavController
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.studentsapps.schedule.databinding.ModalBottomSheetScheduleBinding
@@ -15,6 +17,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class ModalBottomSheetSchedule : BottomSheetDialogFragment() {
 
     private var _binding: ModalBottomSheetScheduleBinding? = null
+    private lateinit var navController: NavController
     private val binding get() = _binding!!
     private val args: ModalBottomSheetScheduleArgs by navArgs()
     private val viewModel: BottomSheetScheduleViewModel by viewModels()
@@ -34,8 +37,12 @@ class ModalBottomSheetSchedule : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        navController = findNavController()
         val scheduleId = args.scheduleId
         viewModel.setScheduleDetails(scheduleId)
+        binding.btnEditSchedule.setOnClickListener {
+            navController.navigate(ModalBottomSheetScheduleDirections.actionModalBottomSheetScheduleToRegisterScheduleFragment(scheduleId))
+        }
     }
 
     override fun onDestroy() {

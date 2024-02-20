@@ -369,7 +369,8 @@
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/edit_text_classroom"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:text="@{viewModel.uiState.classroom}"/>
                 </com.google.android.material.textfield.TextInputLayout>
             </RelativeLayout>
 

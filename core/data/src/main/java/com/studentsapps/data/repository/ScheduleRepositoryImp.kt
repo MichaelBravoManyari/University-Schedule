@@ -13,16 +13,10 @@ class ScheduleRepositoryImp @Inject constructor(
     private val scheduleLocalDataSource: ScheduleLocalDataSource
 ) : ScheduleRepository {
     override suspend fun getSchedulesForTimetableInGridMode(
-        showSaturday: Boolean,
-        showSunday: Boolean,
-        startDate: LocalDate,
-        endDate: LocalDate
+        showSaturday: Boolean, showSunday: Boolean, startDate: LocalDate, endDate: LocalDate
     ): List<ScheduleDetails> {
         return scheduleLocalDataSource.getSchedulesForTimetableInGridMode(
-            showSaturday,
-            showSunday,
-            startDate,
-            endDate
+            showSaturday, showSunday, startDate, endDate
         ).map(ScheduleDetailsView::asExternalModel)
     }
 
@@ -32,21 +26,27 @@ class ScheduleRepositoryImp @Inject constructor(
     }
 
     override suspend fun registerSchedule(schedule: Schedule, specificDate: LocalDate?) {
-        scheduleLocalDataSource.insert(
-            with(schedule) {
-                ScheduleEntity(
-                    id,
-                    startTime,
-                    endTime,
-                    classPlace,
-                    dayOfWeek,
-                    specificDate,
-                    courseId
-                )
-            }
-        )
+        scheduleLocalDataSource.insert(with(schedule) {
+            ScheduleEntity(
+                id, startTime, endTime, classPlace, dayOfWeek, specificDate, courseId
+            )
+        })
     }
 
     override suspend fun getScheduleDetailsById(scheduleId: Int): ScheduleDetails =
         scheduleLocalDataSource.getScheduleDetailsView(scheduleId).asExternalModel()
+
+    override suspend fun updateSchedule(schedule: Schedule, specificDate: LocalDate?) {
+        scheduleLocalDataSource.updateSchedule(with(schedule) {
+            ScheduleEntity(
+                id = id,
+                startTime = startTime,
+                endTime = endTime,
+                classPlace = classPlace,
+                dayOfWeek = dayOfWeek,
+                specificDate = specificDate,
+                courseId = courseId
+            )
+        })
+    }
 }

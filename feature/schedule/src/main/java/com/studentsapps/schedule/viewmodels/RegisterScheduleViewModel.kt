@@ -121,6 +121,43 @@ class RegisterScheduleViewModel @Inject constructor(
         }
     }
 
+    fun displayScheduleData(scheduleId: Int) {
+        viewModelScope.launch {
+            val schedule = scheduleRepository.getScheduleDetailsById(scheduleId)
+            val course = courseRepository.getCourse(schedule.courseId).first()
+            _uiState.update { currentState ->
+                with(schedule) {
+                    currentState.copy(
+                        scheduleId = scheduleId,
+                        day = dayOfWeek,
+                        startTime = startTime,
+                        endTime = endTime,
+                        selectedCourse = course,
+                        repetition = if (specificDate != null) RecurrenceOption.SPECIFIC_DATE else RecurrenceOption.EVERY_WEEK,
+                        specificDate = specificDate,
+                        classroom = classPlace
+                    )
+                }
+            }
+        }
+    }
+
+    fun updateSchedule() {
+        if (startTimeIsLessThanEndTime()) {
+            if (uiState.value.existingCourses) {
+                updateScheduleWithExistingCourse()
+            } else {
+                updateScheduleWithNewCourse()
+            }
+        } else {
+            _uiState.update { currentState ->
+                currentState.copy(
+                    userMessage = R.string.hour_error, hourError = true
+                )
+            }
+        }
+    }
+
     private fun registerScheduleWithExistingCourse() {
         if (uiState.value.selectedCourse != null) {
             val schedule = createSchedule(uiState.value.selectedCourse!!.id)
@@ -134,6 +171,44 @@ class RegisterScheduleViewModel @Inject constructor(
             _uiState.update { currentState ->
                 currentState.copy(
                     noSelectCourse = true, userMessage = R.string.select_course
+                )
+            }
+        }
+    }
+
+    private fun updateScheduleWithExistingCourse() {
+        if (uiState.value.selectedCourse != null) {
+            val schedule = createSchedule(uiState.value.selectedCourse!!.id)
+            viewModelScope.launch {
+                scheduleRepository.updateSchedule(schedule, uiState.value.specificDate)
+                _uiState.update { currentState ->
+                    currentState.copy(isScheduleRecorded = true)
+                }
+            }
+        } else {
+            _uiState.update { currentState ->
+                currentState.copy(
+                    noSelectCourse = true, userMessage = R.string.select_course
+                )
+            }
+        }
+    }
+
+    private fun updateScheduleWithNewCourse() {
+        if (!uiState.value.courseName.isNullOrBlank()) {
+            val course = createCourse()
+            viewModelScope.launch {
+                val courseId = courseRepository.registerCourse(course).toInt()
+                val schedule = createSchedule(courseId)
+                scheduleRepository.updateSchedule(schedule, uiState.value.specificDate)
+                _uiState.update { currentState ->
+                    currentState.copy(isScheduleRecorded = true)
+                }
+            }
+        } else {
+            _uiState.update { currentState ->
+                currentState.copy(
+                    noSelectCourse = true, userMessage = R.string.enter_course_name
                 )
             }
         }
@@ -161,7 +236,7 @@ class RegisterScheduleViewModel @Inject constructor(
 
     private fun createSchedule(courseId: Int): Schedule {
         return Schedule(
-            0,
+            uiState.value.scheduleId,
             uiState.value.startTime,
             uiState.value.endTime,
             uiState.value.classroom,
@@ -177,8 +252,7 @@ class RegisterScheduleViewModel @Inject constructor(
     fun setSpecificDate(date: LocalDate?) {
         _uiState.update { currentState ->
             currentState.copy(
-                specificDate = date,
-                day = date?.dayOfWeek ?: currentState.day
+                specificDate = date, day = date?.dayOfWeek ?: currentState.day
             )
         }
     }
@@ -194,6 +268,7 @@ class RegisterScheduleViewModel @Inject constructor(
 }
 
 data class RegisterScheduleUiState(
+    val scheduleId: Int = 0,
     val day: DayOfWeek = DayOfWeek.MONDAY,
     val startTime: LocalTime = LocalTime.of(9, 0),
     val endTime: LocalTime = LocalTime.of(10, 0),

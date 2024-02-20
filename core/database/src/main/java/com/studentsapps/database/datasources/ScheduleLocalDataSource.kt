@@ -17,35 +17,29 @@ class ScheduleLocalDataSource @Inject constructor(
 ) {
 
     suspend fun getSchedulesForTimetableInGridMode(
-        showSaturday: Boolean,
-        showSunday: Boolean,
-        startDate: LocalDate,
-        endDate: LocalDate
-    ): List<ScheduleDetailsView> =
-        withContext(ioDispatcher) {
-            scheduleDao.getSchedulesForTimetableInGridMode(
-                showSaturday,
-                showSunday,
-                startDate,
-                endDate
-            )
-        }
+        showSaturday: Boolean, showSunday: Boolean, startDate: LocalDate, endDate: LocalDate
+    ): List<ScheduleDetailsView> = withContext(ioDispatcher) {
+        scheduleDao.getSchedulesForTimetableInGridMode(
+            showSaturday, showSunday, startDate, endDate
+        )
+    }
 
     suspend fun getSchedulesForTimetableInListMode(
-        dayOfWeek: DayOfWeek,
-        date: LocalDate
-    ): List<ScheduleDetailsView> =
-        withContext(ioDispatcher) {
-            scheduleDao.getSchedulesForTimetableInListMode(dayOfWeek, date)
-        }
+        dayOfWeek: DayOfWeek, date: LocalDate
+    ): List<ScheduleDetailsView> = withContext(ioDispatcher) {
+        scheduleDao.getSchedulesForTimetableInListMode(dayOfWeek, date)
+    }
 
-    suspend fun insert(schedule: ScheduleEntity): Long =
-        withContext(ioDispatcher) {
-            scheduleDao.insert(schedule)
-        }
+    suspend fun insert(schedule: ScheduleEntity): Long = withContext(ioDispatcher) {
+        scheduleDao.insert(schedule)
+    }
 
     suspend fun getScheduleDetailsView(scheduleId: Int): ScheduleDetailsView =
         withContext(ioDispatcher) {
             scheduleDao.getScheduleDetailsById(scheduleId)
         }
+
+    suspend fun updateSchedule(schedule: ScheduleEntity) = withContext(ioDispatcher) {
+        scheduleDao.update(schedule)
+    }
 }

@@ -35,7 +35,7 @@ class ScheduleDaoTest {
         db = Room.inMemoryDatabaseBuilder(context, UniversityScheduleDatabase::class.java).build()
         scheduleDao = db.scheduleDao()
         courseDao = db.courseDao()
-        courseDao.insert(CourseEntity(id = 1, name = "Math", nameProfessor = "", 1234))
+        insertCourses()
     }
 
     @After
@@ -181,6 +181,19 @@ class ScheduleDaoTest {
     private suspend fun insertSchedules() {
         scheduleDetailsList.forEach {
             scheduleDao.insert(it.toScheduleEntity())
+        }
+    }
+
+    private suspend fun insertCourses() {
+        for (i in 1..12) {
+            courseDao.insert(
+                CourseEntity(
+                    id = i,
+                    name = "Math${if (i == 1) "" else i-1}",
+                    nameProfessor = "",
+                    1234
+                )
+            )
         }
     }
 

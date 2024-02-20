@@ -46,6 +46,10 @@
         <action
             android:id="@+id/action_registerScheduleFragment_to_modalBottomSheetRepetition"
             app:destination="@id/modalBottomSheetRepetition" />
+        <argument
+            android:name="scheduleId"
+            app:argType="integer"
+            android:defaultValue="0" />
     </fragment>
     <dialog
         android:id="@+id/modalBottomSheetCourse"
@@ -62,5 +66,8 @@
         <argument
             android:name="scheduleId"
             app:argType="integer" />
+        <action
+            android:id="@+id/action_modalBottomSheetSchedule_to_registerScheduleFragment"
+            app:destination="@id/registerScheduleFragment" />
     </dialog>
 </navigation>

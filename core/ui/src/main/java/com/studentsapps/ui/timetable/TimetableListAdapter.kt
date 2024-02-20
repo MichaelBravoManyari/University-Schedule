@@ -32,6 +32,7 @@ class TimetableListAdapter :
                 false
             )
         )
+
         viewHolder.itemView.setOnClickListener {
             val position = viewHolder.adapterPosition
             onItemClicked?.let { it1 -> it1(getItem(position).id) }

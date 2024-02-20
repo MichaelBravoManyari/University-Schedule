@@ -207,6 +207,15 @@ class ScheduleFragmentTest {
         onView(withText("Math8")).check(matches(isDisplayed()))
     }
 
+    @Test
+    fun testNavigateToScheduleDetailsDialogOnClickInGridMode() = runTest {
+        mockUtilsGetCurrentDate(LocalDate.of(2023, 11, 20))
+        fakeTimetableUserPreferencesRepository.init()
+        createScheduleFragment()
+        onView(withContentDescription("1")).perform(scrollTo(), click())
+        assertThat(navController.currentDestination?.id, `is`(R.id.modalBottomSheetSchedule))
+    }
+
     private fun createScheduleFragment() {
         launchFragmentInHiltContainer<ScheduleFragment>(navigation = {
             Navigation.setViewNavController(requireView(), navController)

@@ -17,6 +17,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.datepicker.CalendarConstraints
@@ -43,8 +44,10 @@ class RegisterScheduleFragment : Fragment() {
 
     private lateinit var navController: NavController
     private var _binding: FragmentRegisterScheduleBinding? = null
+    private val args: RegisterScheduleFragmentArgs by navArgs()
     private val binding get() = _binding!!
     private val viewModel: RegisterScheduleViewModel by viewModels()
+    private var scheduleId = 0
 
     val onExistingCoursesCheckedChangeListener =
         CompoundButton.OnCheckedChangeListener { _, isChecked ->
@@ -66,6 +69,9 @@ class RegisterScheduleFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         navController = view.findNavController()
+
+        scheduleId = args.scheduleId
+        if (scheduleId != 0) viewModel.displayScheduleData(scheduleId)
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -96,15 +102,18 @@ class RegisterScheduleFragment : Fragment() {
 
     private fun configureMenuOptionsInAppBar() {
         binding.toolbar.run {
-            //inflateMenu(com.studentsapps.ui.R.menu.registration_menu)
             setupWithNavController(navController)
+            if (scheduleId > 0) {
+                val menuAdd = menu.findItem(com.studentsapps.ui.R.id.menu_add)
+                menuAdd.title = getText(com.studentsapps.ui.R.string.update)
+            }
             setOnMenuItemClickListener { menuItem ->
                 when (menuItem.itemId) {
                     com.studentsapps.ui.R.id.menu_add -> {
                         viewModel.run {
                             if (!uiState.value.existingCourses) setCourseName(binding.editTextCourse.text.toString())
                             setClassroom(binding.editTextClassroom.text.toString())
-                            registerSchedule()
+                            if(scheduleId > 0) updateSchedule() else registerSchedule()
                         }
                         true
                     }
