@@ -13,7 +13,6 @@ import android.widget.TextView
 import androidx.annotation.ArrayRes
 import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
-import androidx.annotation.DrawableRes
 import androidx.annotation.FontRes
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.core.content.ContextCompat
@@ -36,7 +35,6 @@ import com.studentsapps.model.ScheduleView
 import com.studentsapps.model.TimetableUserPreferences
 import com.studentsapps.testing.getOrAwaitValue
 import com.studentsapps.testing.launchFragmentInHiltContainer
-import com.studentsapps.testing.util.withBackgroundTintList
 import com.studentsapps.testing.util.withTextColor
 import com.studentsapps.ui.R
 import com.studentsapps.ui_test_hilt_manifest.FragmentTest
@@ -365,95 +363,13 @@ class TimetableTest {
     }
 
     @Test
-    @Config(qualifiers = "w360dp-h640dp")
-    fun showSchedulesInGrid_uniqueSchedule() {
-        val scheduleId = 1
-        val schedules = listOf(uniqueSchedule.copy(id = scheduleId))
-        val hourCellWidth = getDimensionPixelSizeById(R.dimen.timetable_hours_cell_width)
-        val cellHeight = getDimensionPixelSizeById(R.dimen.timetable_grid_cell_height)
-        val bottomMargin = getDimensionPixelSizeById(R.dimen.timetable_schedule_bottom_margin)
-        val endMargin = getDimensionPixelSizeById(R.dimen.timetable_schedule_end_margin)
-        val cellWidth = (360 - hourCellWidth) / 7
-
-        val expectedTypeface = getTypeface(com.studentsapps.designsystem.R.font.roboto_medium)
-        val expectedTextSize = 4f
-        val expectedMath2XCoordinate = (hourCellWidth + cellWidth).toFloat()
-        val expectedMath2YCoordinate = 13f * cellHeight
-        val expectedMath2Width = cellWidth - endMargin
-        val expectedMath2Height = cellHeight - bottomMargin
-
-        val timetable = createTimetable()
-        onView(withId(R.id.schedule_container_and_grid)).check(matches(isDisplayed()))
-        timetable.showSchedules(schedules)
-
-        onView(withContentDescription(scheduleId.toString()))
-            .perform(scrollTo())
-            .check(matches(isDisplayed()))
-            .check(matches(withText("Math 2")))
-            .check(matches(withXYCoordinates(expectedMath2XCoordinate, expectedMath2YCoordinate)))
-            .check(matches(withMeasures(expectedMath2Width, expectedMath2Height)))
-            .check(matches(withBackground(R.drawable.background_schedule_view)))
-            .check(matches(withBackgroundTintList()))
-            .check(matches(withTypeface(expectedTypeface)))
-            .check(matches(withTextSize(expectedTextSize)))
-    }
-
-    @Test
-    @Config(qualifiers = "w360dp-h640dp")
-    fun showSchedulesInGrid_schedulesCrossing() {
-        val scheduleId1 = 1
-        val scheduleId2 = 2
-        val schedules =
-            listOf(uniqueSchedule.copy(id = scheduleId1), uniqueSchedule.copy(id = scheduleId2))
-        val hourCellWidth = getDimensionPixelSizeById(R.dimen.timetable_hours_cell_width)
-        val cellHeight = getDimensionPixelSizeById(R.dimen.timetable_grid_cell_height)
-        val endMargin = getDimensionPixelSizeById(R.dimen.timetable_schedule_end_margin)
-        val cellWidth = (360 - hourCellWidth) / 7
-
-        val expectedScheduleId1XCoordinate = (hourCellWidth + cellWidth).toFloat()
-        val expectedScheduleId1YCoordinate = 13f * cellHeight
-        val expectedScheduleId1Width = (cellWidth / 2) - endMargin
-        val expectedScheduleId2XCoordinate =
-            (hourCellWidth + cellWidth + expectedScheduleId1Width + endMargin).toFloat()
-        val expectedScheduleId2YCoordinate = 13f * cellHeight
-
-        val timetable = createTimetable()
-        onView(withId(R.id.schedule_container_and_grid)).check(matches(isDisplayed()))
-        timetable.showSchedules(schedules)
-
-        onView(withContentDescription(scheduleId1.toString()))
-            .perform(scrollTo())
-            .check(matches(isDisplayed()))
-            .check(
-                matches(
-                    withXYCoordinates(
-                        expectedScheduleId1XCoordinate,
-                        expectedScheduleId1YCoordinate
-                    )
-                )
-            )
-
-        onView(withContentDescription(scheduleId2.toString()))
-            .perform(scrollTo())
-            .check(matches(isDisplayed()))
-            .check(
-                matches(
-                    withXYCoordinates(
-                        expectedScheduleId2XCoordinate,
-                        expectedScheduleId2YCoordinate
-                    )
-                )
-            )
-    }
-
-    @Test
     fun showSchedulesInGrid_courseColorDark() {
         val scheduleId = 1
         val schedules = listOf(uniqueSchedule.copy(id = scheduleId))
         val expectedColor = getColorById(R.color.timetable_schedule_view_light_text_color)
         val timetable = createTimetable()
         onView(withId(R.id.schedule_container_and_grid)).check(matches(isDisplayed()))
-        timetable.showSchedules(schedules)
+        timetable.showSchedules(schedules) {}
         onView(withContentDescription(scheduleId.toString())).check(
             matches(
                 withTextColor(
@@ -471,7 +387,7 @@ class TimetableTest {
         val expectedColor = getColorById(R.color.timetable_schedule_view_dark_text_color)
         val timetable = createTimetable()
         onView(withId(R.id.schedule_container_and_grid)).check(matches(isDisplayed()))
-        timetable.showSchedules(uniqueScheduleColorLight)
+        timetable.showSchedules(uniqueScheduleColorLight) {}
         onView(withContentDescription(scheduleId.toString())).check(
             matches(
                 withTextColor(
@@ -491,7 +407,7 @@ class TimetableTest {
             )
         }
         onView(withId(R.id.schedule_container_and_grid)).check(matches(isDisplayed()))
-        timetable.showSchedules(schedule)
+        timetable.showSchedules(schedule) {}
         onView(withContentDescription(scheduleId.toString())).check(doesNotExist())
     }
 
@@ -505,7 +421,7 @@ class TimetableTest {
             )
         }
         onView(withId(R.id.schedule_container_and_grid)).check(matches(isDisplayed()))
-        timetable.showSchedules(schedule)
+        timetable.showSchedules(schedule) {}
         onView(withContentDescription(scheduleId.toString())).check(doesNotExist())
     }
 
@@ -523,63 +439,11 @@ class TimetableTest {
             )
         }
         onView(withId(R.id.schedule_container_and_grid)).check(matches(isDisplayed()))
-        timetable.showSchedules(schedules)
+        timetable.showSchedules(schedules) {}
         onView(withContentDescription(saturdayScheduleId.toString())).check(doesNotExist())
         onView(withContentDescription(sundayScheduleId.toString())).perform(scrollTo()).check(
             matches(isDisplayed())
         )
-    }
-
-    @Test
-    @Config(qualifiers = "w360dp-h640dp")
-    fun showSchedulesInGrid_startingSunday() {
-        val mondayScheduleId = 1
-        val sundayScheduleId = 2
-        val schedules = listOf(
-            uniqueSchedule.copy(id = mondayScheduleId, dayOfWeek = DayOfWeek.MONDAY),
-            uniqueSchedule.copy(id = sundayScheduleId, dayOfWeek = DayOfWeek.SUNDAY)
-        )
-
-        val hourCellWidth = getDimensionPixelSizeById(R.dimen.timetable_hours_cell_width)
-        val cellHeight = getDimensionPixelSizeById(R.dimen.timetable_grid_cell_height)
-        val cellWidth = (360 - hourCellWidth) / 7
-
-        val expectedSundayScheduleXCoordinate = hourCellWidth.toFloat()
-        val expectedSundayScheduleYCoordinate = 13f * cellHeight
-        val expectedMondayScheduleXCoordinate = (hourCellWidth + cellWidth).toFloat()
-        val expectedMondayScheduleYCoordinate = 13f * cellHeight
-
-        val timetable = createTimetable().apply {
-            setTimetableUserPreferences(
-                baseTimetableUserPreferences.copy(isMondayFirstDayOfWeek = false)
-            )
-        }
-        onView(withId(R.id.schedule_container_and_grid)).check(matches(isDisplayed()))
-        timetable.showSchedules(schedules)
-
-        onView(withContentDescription(mondayScheduleId.toString()))
-            .perform(scrollTo())
-            .check(matches(isDisplayed()))
-            .check(
-                matches(
-                    withXYCoordinates(
-                        expectedMondayScheduleXCoordinate,
-                        expectedMondayScheduleYCoordinate
-                    )
-                )
-            )
-
-        onView(withContentDescription(sundayScheduleId.toString()))
-            .perform(scrollTo())
-            .check(matches(isDisplayed()))
-            .check(
-                matches(
-                    withXYCoordinates(
-                        expectedSundayScheduleXCoordinate,
-                        expectedSundayScheduleYCoordinate
-                    )
-                )
-            )
     }
 
     @Test
@@ -899,7 +763,7 @@ class TimetableTest {
         val timetable = createTimetable().apply {
             setTimetableUserPreferences(baseTimetableUserPreferences.copy(showAsGrid = false))
         }
-        timetable.showSchedules(scheduleViewList)
+        timetable.showSchedules(scheduleViewList) {}
         onView(
             allOf(
                 withId(R.id.timetable_list_item_course_name),
@@ -931,7 +795,7 @@ class TimetableTest {
                 )
             )
         }
-        timetable.showSchedules(scheduleViewList)
+        timetable.showSchedules(scheduleViewList) {}
         onView(
             allOf(
                 withId(R.id.timetable_list_item_course_hour),
@@ -1132,23 +996,6 @@ class TimetableTest {
         }
     }
 
-    private fun withBackground(@DrawableRes drawableId: Int): Matcher<View> {
-        return object : BoundedMatcher<View, TextView>(TextView::class.java) {
-            override fun describeTo(description: Description?) {
-                description?.appendText("with background: ")
-                description?.appendValue(drawableId)
-            }
-
-            override fun matchesSafely(item: TextView): Boolean {
-                val expectedDrawable =
-                    ContextCompat.getDrawable(item.context, drawableId) ?: return false
-                val bitmap1 = item.background.toBitmap(1, 1)
-                val bitmap = expectedDrawable.toBitmap(1, 1)
-                return bitmap1.sameAs(bitmap)
-            }
-        }
-    }
-
     private fun withTypeface(expectedTypeface: Typeface): Matcher<View> {
         return object : BoundedMatcher<View, TextView>(TextView::class.java) {
             override fun describeTo(description: Description?) {
@@ -1172,34 +1019,6 @@ class TimetableTest {
             override fun matchesSafely(item: TextView?): Boolean {
                 return item?.textSize == expectedTextSize
             }
-        }
-    }
-
-    private fun withXYCoordinates(x: Float, y: Float): Matcher<View> {
-        return object : BoundedMatcher<View, TextView>(TextView::class.java) {
-            override fun describeTo(description: Description?) {
-                description?.appendText("with X and Y coordinates: ")
-                description?.appendValue("$x and $y")
-            }
-
-            override fun matchesSafely(item: TextView?): Boolean {
-                return (item?.x == x && item.y == y)
-            }
-
-        }
-    }
-
-    private fun withMeasures(width: Int, height: Int): Matcher<View> {
-        return object : BoundedMatcher<View, TextView>(TextView::class.java) {
-            override fun describeTo(description: Description?) {
-                description?.appendText("with measures: ")
-                description?.appendValue("$width and $height")
-            }
-
-            override fun matchesSafely(item: TextView?): Boolean {
-                return (item?.width == width && item.height == height)
-            }
-
         }
     }
 

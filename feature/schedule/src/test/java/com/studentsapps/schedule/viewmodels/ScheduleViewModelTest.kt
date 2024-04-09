@@ -99,50 +99,59 @@ class ScheduleViewModelTest {
                     createTestSchedule(
                         scheduleId = 2,
                         dayOfWeek = DayOfWeek.TUESDAY,
-                        courseName = "Math1"
+                        courseName = "Math1",
+                        courseId = 2
                     ),
                     createTestSchedule(
                         scheduleId = 3,
                         dayOfWeek = DayOfWeek.WEDNESDAY,
-                        courseName = "Math2"
+                        courseName = "Math2",
+                        courseId = 3
                     ),
                     createTestSchedule(
                         scheduleId = 4,
                         dayOfWeek = DayOfWeek.THURSDAY,
-                        courseName = "Math3"
+                        courseName = "Math3",
+                        courseId = 4
                     ),
                     createTestSchedule(
                         scheduleId = 5,
                         dayOfWeek = DayOfWeek.FRIDAY,
-                        courseName = "Math4"
+                        courseName = "Math4",
+                        courseId = 5
                     ),
                     createTestSchedule(
                         scheduleId = 6,
                         dayOfWeek = DayOfWeek.SATURDAY,
-                        courseName = "Math5"
+                        courseName = "Math5",
+                        courseId = 6
                     ),
                     createTestSchedule(
                         scheduleId = 7,
                         dayOfWeek = DayOfWeek.SUNDAY,
-                        courseName = "Math6"
+                        courseName = "Math6",
+                        courseId = 7
                     ),
                     createTestSchedule(
                         scheduleId = 8,
                         dayOfWeek = DayOfWeek.MONDAY,
                         specificDate = LocalDate.of(2023, 11, 20),
-                        courseName = "Math7"
+                        courseName = "Math7",
+                        courseId = 8
                     ),
                     createTestSchedule(
                         scheduleId = 9,
                         dayOfWeek = DayOfWeek.MONDAY,
                         specificDate = LocalDate.of(2023, 11, 20),
-                        courseName = "Math8"
+                        courseName = "Math8",
+                        courseId = 9
                     ),
                     createTestSchedule(
                         scheduleId = 10,
                         dayOfWeek = DayOfWeek.THURSDAY,
                         specificDate = LocalDate.of(2023, 11, 23),
-                        courseName = "Math9"
+                        courseName = "Math9",
+                        courseId = 10
                     ),
                 )
             ), subject.uiState.value
@@ -176,13 +185,15 @@ class ScheduleViewModelTest {
                         scheduleId = 8,
                         dayOfWeek = DayOfWeek.MONDAY,
                         courseName = "Math7",
-                        specificDate = date
+                        specificDate = date,
+                        courseId = 8
                     ),
                     createTestSchedule(
                         scheduleId = 9,
                         dayOfWeek = DayOfWeek.MONDAY,
                         courseName = "Math8",
-                        specificDate = date
+                        specificDate = date,
+                        courseId = 9
                     ),
                 )
             ),
@@ -196,7 +207,8 @@ class ScheduleViewModelTest {
         scheduleId: Int,
         dayOfWeek: DayOfWeek,
         specificDate: LocalDate? = null,
-        courseName: String = "Math"
+        courseName: String = "Math",
+        courseId: Int = 1
     ) =
         ScheduleDetails(
             scheduleId = scheduleId,
@@ -205,7 +217,7 @@ class ScheduleViewModelTest {
             classPlace = null,
             dayOfWeek = dayOfWeek,
             specificDate = specificDate,
-            courseId = 1,
+            courseId = courseId,
             courseName = courseName,
             courseColor = 1234
         )

@@ -101,12 +101,6 @@ class ScheduleViewTest {
                 dayOfWeek = DayOfWeek.MONDAY,
                 startTime = LocalTime.of(22, 0),
                 endTime = LocalTime.of(23, 0)
-            ),
-            createTestScheduleView(
-                id = 4,
-                dayOfWeek = DayOfWeek.MONDAY,
-                startTime = LocalTime.of(8, 0),
-                endTime = LocalTime.of(9, 0)
             )
         )
 

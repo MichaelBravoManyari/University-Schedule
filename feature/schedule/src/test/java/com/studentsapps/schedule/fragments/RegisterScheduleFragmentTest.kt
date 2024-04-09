@@ -1,5 +1,6 @@
 package com.studentsapps.schedule.fragments
 
+import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModelStore
 import androidx.navigation.Navigation
 import androidx.navigation.testing.TestNavHostController
@@ -49,10 +50,17 @@ class RegisterScheduleFragmentTest {
         navController = TestNavHostController(ApplicationProvider.getApplicationContext())
         navController.setViewModelStore(ViewModelStore())
         navController.setGraph(R.navigation.schedule_navigation)
-        launchFragmentInHiltContainer<RegisterScheduleFragment>(navigation = {
-            Navigation.setViewNavController(requireView(), navController)
-            navController.setCurrentDestination(R.id.registerScheduleFragment)
-        })
+        navController.setCurrentDestination(R.id.registerScheduleFragment)
+        createRegisterScheduleFragment()
+    }
+
+    private fun createRegisterScheduleFragment() {
+        val fragmentArgs = bundleOf("scheduleId" to 0)
+        launchFragmentInHiltContainer<RegisterScheduleFragment>(
+            fragmentArgs = fragmentArgs,
+            navigation = {
+                Navigation.setViewNavController(requireView(), navController)
+            })
     }
 
     @Test

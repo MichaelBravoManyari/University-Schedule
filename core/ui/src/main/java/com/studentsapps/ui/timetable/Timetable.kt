@@ -1,5 +1,9 @@
 package com.studentsapps.ui.timetable
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
@@ -39,6 +43,8 @@ import com.studentsapps.model.groupByDayOfWeek
 import com.studentsapps.ui.R
 import com.studentsapps.ui.databinding.TimetableBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
@@ -66,8 +72,8 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
     private val gestureDetector = GestureDetectorCompat(context, MyGestureListener())
     private val mTouchSlop = ViewConfiguration.get(context).scaledTouchSlop
     private var mDownX = 0f
-    private val _date = MutableLiveData(utils.getCurrentDate())
-    val date = _date as LiveData<LocalDate>
+    private val _date = MutableStateFlow(utils.getCurrentDate())
+    val date: StateFlow<LocalDate> = _date
     private var redrawGridsAndHours = false
     private var wasViewDrawn = false
     private var remakeTheView = false
@@ -161,31 +167,43 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
     fun displaySunday() = showSunday
 
     fun getStartDate(): LocalDate {
-        return binding.firstDay.tag as LocalDate
+        return utils.getDaysOfMonthOfWeek(
+            isMondayFirstDayOfWeek,
+            showSaturday,
+            showSunday,
+            date.value
+        ).first()
     }
 
     fun getEndDate(): LocalDate {
-        return getDaysOfMonthViews().last().tag as LocalDate
+        return utils.getDaysOfMonthOfWeek(
+            isMondayFirstDayOfWeek,
+            showSaturday,
+            showSunday,
+            date.value
+        ).last()
     }
 
     fun setTimetableUserPreferences(timetableUserPreferences: TimetableUserPreferences) {
-        if (timetableUserPreferences != this.timetableUserPreferences) {
-            this.timetableUserPreferences = timetableUserPreferences
-            drawView = true
+        animateTransition(date.value) {
+            if (timetableUserPreferences != this.timetableUserPreferences) {
+                this.timetableUserPreferences = timetableUserPreferences
+                drawView = true
 
-            setIs12HoursFormat(timetableUserPreferences.is12HoursFormat)
-            setShowSaturday(timetableUserPreferences.showSaturday)
-            setShowSunday(timetableUserPreferences.showSunday)
-            setIsMondayFirstDayOfWeek(timetableUserPreferences.isMondayFirstDayOfWeek)
-            setShowAsGrid(timetableUserPreferences.showAsGrid)
+                setIs12HoursFormat(timetableUserPreferences.is12HoursFormat)
+                setShowSaturday(timetableUserPreferences.showSaturday)
+                setShowSunday(timetableUserPreferences.showSunday)
+                setIsMondayFirstDayOfWeek(timetableUserPreferences.isMondayFirstDayOfWeek)
+                setShowAsGrid(timetableUserPreferences.showAsGrid)
 
-            if (!wasViewDrawn || remakeTheView) {
-                configureDayViews()
-                updateTextOfDayOfMonthViews()
-                updateTextOfDayOfWeekViews()
-                restartView()
-            } else if (redrawGridsAndHours) {
-                restartView()
+                if (!wasViewDrawn || remakeTheView) {
+                    configureDayViews()
+                    updateTextOfDayOfMonthViews()
+                    updateTextOfDayOfWeekViews()
+                    restartView()
+                } else if (redrawGridsAndHours) {
+                    restartView()
+                }
             }
         }
     }
@@ -212,10 +230,13 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
     }
 
     fun selectCurrentDay() {
-        _date.value = utils.getCurrentDate()
-        updateTextOfDayOfMonthViews()
-        post {
-            selectDayOfMonth()
+        animateTransition(utils.getCurrentDate()) {
+            _date.value = utils.getCurrentDate()
+            _currentMonth.value = date.value.let { utils.getMonth(it) }
+            updateTextOfDayOfMonthViews()
+            post {
+                selectDayOfMonth()
+            }
         }
     }
 
@@ -286,7 +307,7 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
 
     private fun configureDaysOfMonthViews() {
         val daysOfMonthCurrentWeek = utils.getDaysOfMonthOfWeek(
-            isMondayFirstDayOfWeek, showSaturday, showSunday, date.value!!
+            isMondayFirstDayOfWeek, showSaturday, showSunday, date.value
         )
         val daysOfMonthTextSize = getDimensionById(R.dimen.timetable_days_of_month_text_size)
         val daysOfMonthViews = getDaysOfMonthViews()
@@ -731,7 +752,7 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
 
     override fun onSaveInstanceState(): Parcelable {
         return SavedState(super.onSaveInstanceState()).apply {
-            date.value?.let {
+            date.value.let {
                 year = it.year
                 month = it.monthValue
                 day = it.dayOfMonth
@@ -794,30 +815,36 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
         override fun onFling(
             e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float
         ): Boolean {
-            val selectedDate = if (showAsGrid) {
-                if (isRightSwipe(e2)) date.value?.minusWeeks(1) else date.value?.plusWeeks(1)
+            val selectedDate = calculateSelectedDate(e2)
+            animateTransition(selectedDate) {
+                updateTextOfDayOfMonthViews(selectedDate)
+                _date.value = selectedDate
+                _currentMonth.value = date.value.let { utils.getMonth(it) }
+                selectDayOfMonth()
+            }
+            return true
+        }
+
+        private fun calculateSelectedDate(e2: MotionEvent): LocalDate {
+            return if (showAsGrid) {
+                if (isRightSwipe(e2)) date.value.minusWeeks(1) else date.value.plusWeeks(1)
             } else {
                 if (isRightSwipe(e2)) {
-                    var dateReturns = date.value?.minusDays(1)
-                    if (dateReturns?.dayOfWeek == DayOfWeek.SUNDAY && !showSunday) dateReturns =
+                    var dateReturns = date.value.minusDays(1)
+                    if (dateReturns.dayOfWeek == DayOfWeek.SUNDAY && !showSunday) dateReturns =
                         dateReturns.minusDays(1)
-                    if (dateReturns?.dayOfWeek == DayOfWeek.SATURDAY && !showSaturday) dateReturns =
+                    if (dateReturns.dayOfWeek == DayOfWeek.SATURDAY && !showSaturday) dateReturns =
                         dateReturns.minusDays(1)
                     dateReturns
                 } else {
-                    var dateReturns = date.value?.plusDays(1)
-                    if (dateReturns?.dayOfWeek == DayOfWeek.SATURDAY && !showSaturday) dateReturns =
+                    var dateReturns = date.value.plusDays(1)
+                    if (dateReturns.dayOfWeek == DayOfWeek.SATURDAY && !showSaturday) dateReturns =
                         dateReturns.plusDays(1)
-                    if (dateReturns?.dayOfWeek == DayOfWeek.SUNDAY && !showSunday) dateReturns =
+                    if (dateReturns.dayOfWeek == DayOfWeek.SUNDAY && !showSunday) dateReturns =
                         dateReturns.plusDays(1)
                     dateReturns
                 }
             }
-            updateTextOfDayOfMonthViews(selectedDate)
-            _date.value = selectedDate
-            _currentMonth.value = date.value?.let { utils.getMonth(it) }
-            selectDayOfMonth()
-            return true
         }
 
         private fun isRightSwipe(upEvent: MotionEvent): Boolean {
@@ -828,13 +855,73 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
 
     private fun updateTextOfDayOfMonthViews(selectedDate: LocalDate? = null) {
         val daysOfMonthOfWeek = utils.getDaysOfMonthOfWeek(
-            isMondayFirstDayOfWeek, showSaturday, showSunday, selectedDate ?: date.value!!
+            isMondayFirstDayOfWeek, showSaturday, showSunday, selectedDate ?: date.value
         )
         getDaysOfMonthViews().forEachIndexed { index, view ->
             val viewDate = daysOfMonthOfWeek[index]
             view.apply {
                 text = viewDate.dayOfMonth.toString()
                 tag = viewDate
+            }
+        }
+    }
+
+    private fun animateTransition(selectedDate: LocalDate? = null, action: () -> Unit) {
+
+        val fadeAnimListContainerAndScheduleGrid =
+            ObjectAnimator.ofFloat(binding.listContainerAndScheduleGrid, "alpha", 1f, 0f)
+                .apply {
+                    duration = 500
+                }
+
+        val appearAnimListContainerAndScheduleGrid =
+            ObjectAnimator.ofFloat(binding.listContainerAndScheduleGrid, "alpha", 0f, 1f)
+                .apply {
+                    duration = 500
+                    addListener(object : AnimatorListenerAdapter() {
+                        override fun onAnimationStart(animation: Animator) {
+                            super.onAnimationStart(animation)
+                            action()
+                        }
+                    })
+                }
+
+        val fadeAnimTimetableHead =
+            ObjectAnimator.ofFloat(binding.timetableHead, "alpha", 1f, 0f).apply {
+                duration = 500
+            }
+
+        val appearAnimTimetableHead =
+            ObjectAnimator.ofFloat(binding.timetableHead, "alpha", 0f, 1f).apply {
+                duration = 500
+            }
+
+        val daysOfWeek = utils.getDaysOfMonthOfWeek(
+            isMondayFirstDayOfWeek,
+            showSaturday,
+            showSunday,
+            date.value
+        )
+
+        if (showAsGrid) {
+            if (!daysOfWeek.contains(selectedDate)) {
+                AnimatorSet().apply {
+                    play(fadeAnimTimetableHead).with(fadeAnimListContainerAndScheduleGrid)
+                    play(appearAnimTimetableHead).with(appearAnimListContainerAndScheduleGrid)
+                    start()
+                }
+            } else {
+                action()
+            }
+        } else {
+            if (daysOfWeek.contains(selectedDate)) {
+                action()
+            } else {
+                AnimatorSet().apply {
+                    play(fadeAnimTimetableHead).with(fadeAnimListContainerAndScheduleGrid)
+                    play(appearAnimTimetableHead).with(appearAnimListContainerAndScheduleGrid)
+                    start()
+                }
             }
         }
     }
