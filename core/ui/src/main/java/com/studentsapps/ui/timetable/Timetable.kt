@@ -17,6 +17,7 @@ import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.MotionEvent
+import android.view.View
 import android.view.ViewConfiguration
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
@@ -26,6 +27,7 @@ import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
 import androidx.annotation.StringRes
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -594,6 +596,7 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
                     }
                 }
             }
+            createSelectorLine()
         } else {
             adapter.set12HoursFormat(is12HoursFormat)
             adapter.onItemClicked = onItemClicked
@@ -722,6 +725,65 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
         }
 
         return layoutParams
+    }
+
+    private fun createSelectorLine() {
+        val lineSelector = createLineSelectorView()
+        val circleSelector = createCircleSelectorView()
+        val marginLeft = getDimensionPixelSizeById(R.dimen.timetable_hours_cell_width)
+        val selectorTopMargin = calculateSelectorTopMargin()
+        val selectorCircleRadius =
+            getDimensionPixelSizeById(R.dimen.timetable_selector_circle_radius)
+
+        val lineParams = RelativeLayout.LayoutParams(
+            RelativeLayout.LayoutParams.MATCH_PARENT,
+            getDimensionPixelSizeById(R.dimen.timetable_selector_line_width)
+        ).apply {
+            addRule(RelativeLayout.ALIGN_PARENT_START)
+            addRule(RelativeLayout.ALIGN_PARENT_TOP)
+            setMargins(marginLeft + (selectorCircleRadius / 2), selectorTopMargin, 0, 0)
+        }
+        lineSelector.layoutParams = lineParams
+
+        val circleParams = RelativeLayout.LayoutParams(
+            selectorCircleRadius,
+            selectorCircleRadius
+        ).apply {
+            addRule(RelativeLayout.ALIGN_PARENT_START)
+            addRule(RelativeLayout.ALIGN_PARENT_TOP)
+            setMargins(marginLeft, selectorTopMargin - (selectorCircleRadius / 2), 0, 0)
+        }
+        circleSelector.layoutParams = circleParams
+
+        post {
+            binding.apply {
+                scheduleContainer.addView(lineSelector)
+                scheduleContainer.addView(circleSelector)
+                timetableScrollableContainer.scrollTo(0, selectorTopMargin)
+            }
+        }
+    }
+
+    private fun createLineSelectorView(): View {
+        val lineSelector = View(context)
+        lineSelector.setBackgroundColor(getColorById(R.color.timetable_current_month_day_background_color))
+        return lineSelector
+    }
+
+    private fun createCircleSelectorView(): View {
+        val circleSelector = View(context)
+        circleSelector.background = AppCompatResources.getDrawable(context, R.drawable.color_circle)
+        circleSelector.backgroundTintList = ColorStateList.valueOf(
+            getColorById(R.color.timetable_current_month_day_background_color)
+        )
+        return circleSelector
+    }
+
+    private fun calculateSelectorTopMargin(): Int {
+        val gridCellHeight = getDimensionPixelSizeById(R.dimen.timetable_grid_cell_height)
+        val currentHour = LocalTime.now().hour
+        val currentMinute = LocalTime.now().minute
+        return (gridCellHeight * currentHour) + (gridCellHeight * (currentMinute / 60f)).toInt()
     }
 
     private fun getTextColorBasedOnCourseColor(@ColorInt courseColor: Int): Int {
