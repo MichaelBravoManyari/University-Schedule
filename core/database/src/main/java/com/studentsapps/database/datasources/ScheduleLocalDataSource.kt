@@ -27,7 +27,7 @@ class ScheduleLocalDataSource @Inject constructor(
     suspend fun getSchedulesForTimetableInListMode(
         dayOfWeek: DayOfWeek, date: LocalDate
     ): List<ScheduleDetailsView> = withContext(ioDispatcher) {
-        scheduleDao.getSchedulesForTimetableInListMode(dayOfWeek, date)
+        scheduleDao.getSchedulesForTimetableInListMode(dayOfWeek, date).sortedBy { it.startTime }
     }
 
     suspend fun insert(schedule: ScheduleEntity): Long = withContext(ioDispatcher) {

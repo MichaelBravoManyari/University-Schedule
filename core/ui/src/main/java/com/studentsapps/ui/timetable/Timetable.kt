@@ -159,7 +159,9 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
     }
 
     private fun configureScheduleListAdapter() {
+        val space = getDimensionPixelSizeById(R.dimen.item_spacing)
         binding.scheduleListContainer.adapter = adapter
+        binding.scheduleListContainer.addItemDecoration(SpacesItemDecoration(space))
     }
 
     fun isDisplayedAsGrid() = showAsGrid
@@ -734,6 +736,7 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
         val selectorTopMargin = calculateSelectorTopMargin()
         val selectorCircleRadius =
             getDimensionPixelSizeById(R.dimen.timetable_selector_circle_radius)
+        val gridCellHeight = getDimensionPixelSizeById(R.dimen.timetable_grid_cell_height)
 
         val lineParams = RelativeLayout.LayoutParams(
             RelativeLayout.LayoutParams.MATCH_PARENT,
@@ -759,7 +762,7 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
             binding.apply {
                 scheduleContainer.addView(lineSelector)
                 scheduleContainer.addView(circleSelector)
-                timetableScrollableContainer.scrollTo(0, selectorTopMargin)
+                timetableScrollableContainer.scrollTo(0, selectorTopMargin - gridCellHeight * 4)
             }
         }
     }

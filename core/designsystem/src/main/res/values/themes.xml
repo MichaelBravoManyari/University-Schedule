@@ -16,6 +16,27 @@
         <item name="navigationRailStyle">
             @style/Widget.UniversitySchedule.NavigationRailView
         </item>
+        <item name="materialButtonStyle">@style/Widget.UniversitySchedule.Button</item>
+        <item name="materialSwitchStyle">@style/Widget.UniversitySchedule.Switch</item>
+    </style>
+
+    <style name="Widget.UniversitySchedule.Switch" parent="Widget.Material3.CompoundButton.MaterialSwitch">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.UniversitySchedule.Switch</item>
+        <item name="thumbTint">@color/switch_thumb_color</item>
+        <item name="trackTint">@color/switch_track_color</item>
+    </style>
+
+    <style name="ThemeOverlay.UniversitySchedule.Switch" parent="">
+        <item name="colorOnPrimary">@color/accent_color</item>
+        <item name="colorPrimary">@color/primary_color</item>
+    </style>
+
+    <style name="Widget.UniversitySchedule.Button" parent="Widget.Material3.Button">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.UniversitySchedule.Button</item>
+    </style>
+
+    <style name="ThemeOverlay.UniversitySchedule.Button" parent="ThemeOverlay.Material3.Button">
+        <item name="colorContainer">@color/accent_color</item>
     </style>
 
     <style name="Widget.UniversitySchedule.NavigationRailView" parent="Widget.Material3.NavigationRailView">

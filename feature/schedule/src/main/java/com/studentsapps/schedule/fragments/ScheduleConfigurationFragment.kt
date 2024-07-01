@@ -9,6 +9,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
+import androidx.navigation.ui.setupWithNavController
 import com.studentsapps.schedule.R
 import com.studentsapps.schedule.databinding.FragmentScheduleConfigurationBinding
 import com.studentsapps.schedule.viewmodels.ScheduleConfigurationUiState.Success
@@ -22,6 +25,7 @@ class ScheduleConfigurationFragment : Fragment() {
     private var _binding: FragmentScheduleConfigurationBinding? = null
     private val binding get() = _binding!!
     private val viewModel: ScheduleConfigurationViewModel by viewModels()
+    private lateinit var navController: NavController
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,18 +41,19 @@ class ScheduleConfigurationFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        navController = view.findNavController()
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { currentState ->
                     if (currentState is Success) {
-                        binding.firstDayOfWeekValue.text =
+                        binding.btnDayOfTheWeek.text =
                             if (currentState.isMondayFirstDayOfWeek)
                                 getText(R.string.monday)
                             else
                                 getText(R.string.sunday)
 
-                        binding.hourFormatValue.text =
+                        binding.btnTimeFormat.text =
                             if (currentState.is12HoursFormat)
                                 getText(R.string.twelve_hours)
                             else
@@ -73,6 +78,14 @@ class ScheduleConfigurationFragment : Fragment() {
                     }
                 }
             }
+        }
+
+        configureAppBar()
+    }
+
+    private fun configureAppBar() {
+        binding.toolbar.run {
+            setupWithNavController(navController)
         }
     }
 

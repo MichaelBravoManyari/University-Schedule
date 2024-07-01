@@ -2,13 +2,18 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/timetable_list_item_container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:background="@drawable/rounded_background"
+    android:padding="15dp"
+    tools:backgroundTint="@color/primary_color">
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/timetable_list_item_course_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Math" />
@@ -17,9 +22,10 @@
         android:id="@+id/timetable_list_item_course_hour"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/timetable_list_item_course_name"
-        tools:text="9:00 AM -> 10:00 AM" />
+        tools:text="9:00 AM - 10:00 AM" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/timetable_list_item_classroom"
@@ -28,8 +34,12 @@
         android:drawableStart="@drawable/ic_classroom"
         android:drawablePadding="10dp"
         android:gravity="center"
+        android:textStyle="bold"
+        android:visibility="gone"
+        android:layout_marginTop="5dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/timetable_list_item_course_hour"
-        tools:text="Ed. Ancient 506" />
+        tools:text="Ed. Ancient 506"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

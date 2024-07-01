@@ -45,4 +45,5 @@
     <string name="select_date">Select a date</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
+    <string name="schedule_configuration">Schedule configuration</string>
 </resources>

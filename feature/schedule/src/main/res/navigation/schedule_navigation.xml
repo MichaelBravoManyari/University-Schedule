@@ -21,7 +21,7 @@
     <fragment
         android:id="@+id/scheduleConfigurationFragment"
         android:name="com.studentsapps.schedule.fragments.ScheduleConfigurationFragment"
-        android:label="ScheduleConfigurationFragment" >
+        android:label="@string/schedule_configuration" >
         <action
             android:id="@+id/action_scheduleConfigurationFragment_to_scheduleFragment"
             app:destination="@id/scheduleFragment" />

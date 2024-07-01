@@ -64,9 +64,9 @@ class ScheduleConfigurationFragmentTest {
     @Test
     fun verifyTimeFormatClickUpdates() {
         launchFragmentInHiltContainer<ScheduleConfigurationFragment>()
-        onView(withId(R.id.time_format_container)).perform(click())
+        onView(withId(R.id.container_time_format)).perform(click())
         onView(withId(R.id.hour_format_value)).check(matches(withText("24 hours")))
-        onView(withId(R.id.time_format_container)).perform(click())
+        onView(withId(R.id.container_time_format)).perform(click())
         onView(withId(R.id.hour_format_value)).check(matches(withText("12 hours")))
     }
 
