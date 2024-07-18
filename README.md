@@ -37,15 +37,16 @@
 
 ## Architecture
 
-The app follows the MVVM (Model-View-ViewModel) architecture, ensuring a clear separation of concerns and facilitating maintainability and testability. The architecture leverages:
+The **University Schedule** app follows the [official architecture guidance](https://developer.android.com/topic/architecture), ensuring a clear separation of concerns and facilitating maintainability and testability. The architecture leverages:
 - **ViewModel**: Manages UI-related data in a lifecycle-conscious way.
+- **Kotlin Flows**: For asynchronous data streams, ensuring efficient and reactive handling of data updates.
 - **LiveData**: Provides observable data holder classes.
 - **Repository Pattern**: Manages data operations and provides a clean API to the ViewModel.
 - **Room Database**: For local data storage.
 
 ## Modularization
 
-University Schedule is structured into several modules to enhance scalability and maintainability. The modules are:
+University Schedule is structured into several modules to enhance scalability and maintainability, following the [official modularization guide](https://developer.android.com/topic/modularization) from the Android Developer website. The modules are:
 
 - **App Module**: The main entry point of the application.
 - **Build-Logic Module**: Contains the convention module for build configurations.
@@ -80,7 +81,3 @@ The app employs a comprehensive testing strategy utilizing several libraries to 
 The user interface of University Schedule is built using Material 3 components and Views, ensuring a modern and consistent design. Key UI elements include:
 - **Material 3 Components**: For a cohesive and responsive design.
 - **Custom Views**: Tailored to the specific needs of the app for a unique user experience.
-
----
-
-Thank you for considering my application for the Android developer position. I look forward to discussing how my experience with University Schedule can contribute to your team.
