@@ -23,7 +23,7 @@
 
 *Add Course*
 
-![Add schedule](screenshots/add_schedule.png)
+![Add schedule](screenshots/add_schedule.jpg)
 
 *Add Schedule*
 
