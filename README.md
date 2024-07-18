@@ -19,12 +19,21 @@
 
 *Home Screen*
 
-![Add Course](screenshots/add_course.png)
+![Add Course](screenshots/add_course.jpg)
 
 *Add Course*
 
-![Schedule](screenshots/schedule.png)
-*Schedule*
+![Add schedule](screenshots/add_schedule.png)
+
+*Add Schedule*
+
+![Courses](screenshots/courses.jpg)
+
+*Courses*
+
+![Schedule Configuration](screenshots/schedule_configuration.jpg)
+
+*Schedule Configuration*
 
 ## Architecture
 
