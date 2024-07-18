@@ -97,7 +97,6 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
     private fun configureView(attrs: AttributeSet) {
         inflateView()
         getAttrs(attrs)
-        configureDayViews()
         configureScheduleListAdapter()
     }
 
@@ -225,6 +224,7 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
             hoursCellWidth = 0
             displayListView()
             setDaysOfMonthViewsEnabledState(true)
+            selectCurrentDay()
         }
 
         (binding.startDayOfWeek.layoutParams as MarginLayoutParams).let { layoutParams ->
@@ -600,9 +600,11 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
             }
             createSelectorLine()
         } else {
-            adapter.set12HoursFormat(is12HoursFormat)
-            adapter.onItemClicked = onItemClicked
-            adapter.submitList(schedules)
+            animateTransition {
+                adapter.set12HoursFormat(is12HoursFormat)
+                adapter.onItemClicked = onItemClicked
+                adapter.submitList(schedules)
+            }
         }
     }
 
@@ -676,7 +678,13 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
             backgroundTintList = ColorStateList.valueOf(color)
             addView(materialTextView1)
             addView(materialTextView2)
-            setOnClickListener { onItemClicked(id) }
+            setOnClickListener {
+                animateOpacity(this, 0.5f) {
+                    animateOpacity(this, 1.0f) {
+                        onItemClicked(id)
+                    }
+                }
+            }
         }
     }
 

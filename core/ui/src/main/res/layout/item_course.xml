@@ -30,16 +30,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:text="@{course.name}"
+            app:layout_constraintBottom_toBottomOf="@id/color_course"
             app:layout_constraintStart_toEndOf="@id/color_course"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toTopOf="@id/color_course"
             tools:text="Math" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/menu_course"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/three_points"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

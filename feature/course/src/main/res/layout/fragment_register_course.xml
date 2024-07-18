@@ -24,6 +24,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:fitsSystemWindows="true"
+            android:paddingEnd="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -35,36 +36,49 @@
                 app:menu="@menu/registration_menu" />
         </com.google.android.material.appbar.AppBarLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/text_input_layout_course_name"
-            style="@style/Widget.App.TextInputLayout"
+        <RelativeLayout
+            android:id="@+id/relative_layout_course_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="@string/course_name"
-            app:endIconMode="custom"
-            app:endIconDrawable="@{viewModel.uiState.courseNameError ? @drawable/ic_error : null}"
-            app:hintTextColor="@color/text_color"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/background_rounded_bottom_schedule_registration_options"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/appbar">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edit_text_course_name"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/text_input_layout_course_name"
+                style="@style/Widget.App.TextInputLayout2"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                app:endIconMode="custom"
+                android:hint="@string/course_name"
+                app:endIconDrawable="@{viewModel.uiState.courseNameError ? @drawable/ic_error : null}"
+                app:hintTextColor="@color/text_color">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edit_text_course_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </com.google.android.material.textfield.TextInputLayout>
+        </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/relative_layout_course_color"
             android:layout_width="0dp"
             android:layout_height="60dp"
-            android:layout_marginTop="5dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="10dp"
             android:background="@drawable/background_rounded_bottom_schedule_registration_options"
             android:onClick="@{() -> registerCourseFragment.goToBottomSheetColor(viewModel.uiState.color)}"
             android:padding="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/text_input_layout_course_name">
+            app:layout_constraintTop_toBottomOf="@id/relative_layout_course_name">
 
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="wrap_content"
@@ -98,22 +112,32 @@
                 android:background="@drawable/ic_baseline_keyboard_arrow_right" />
         </RelativeLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/text_input_layout_teacher_course"
-            style="@style/Widget.App.TextInputLayout"
+        <RelativeLayout
+            android:id="@+id/relative_layout_teacher"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="@string/teacher_name"
-            app:endIconMode="custom"
-            app:hintTextColor="@color/text_color"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/background_rounded_bottom_schedule_registration_options"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/relative_layout_course_color">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edit_text_teacher_course"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/text_input_layout_teacher_course"
+                style="@style/Widget.App.TextInputLayout2"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:hint="@string/teacher_name"
+                app:hintTextColor="@color/text_color">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edit_text_teacher_course"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </com.google.android.material.textfield.TextInputLayout>
+        </RelativeLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

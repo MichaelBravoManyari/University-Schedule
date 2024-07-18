@@ -9,6 +9,7 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.studentsapps.schedule.databinding.ModalBottomSheetRepetitionBinding
 import com.studentsapps.schedule.viewmodels.RecurrenceOption
+import com.studentsapps.ui.timetable.animateOpacity
 
 class ModalBottomSheetRepetition : BottomSheetDialogFragment() {
 
@@ -27,9 +28,16 @@ class ModalBottomSheetRepetition : BottomSheetDialogFragment() {
         return binding.root
     }
 
-    fun goToRegisterScheduleFragment(recurrenceOption: RecurrenceOption) {
-        navController.previousBackStackEntry?.savedStateHandle?.set("repetition", recurrenceOption)
-        dismiss()
+    fun goToRegisterScheduleFragment(recurrenceOption: RecurrenceOption, view: View) {
+        animateOpacity(view, 0.5f) {
+            animateOpacity(view, 1.0f) {
+                navController.previousBackStackEntry?.savedStateHandle?.set(
+                    "repetition",
+                    recurrenceOption
+                )
+                dismiss()
+            }
+        }
     }
 
     override fun onDestroyView() {

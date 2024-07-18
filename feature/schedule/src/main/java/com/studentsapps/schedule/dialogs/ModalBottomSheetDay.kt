@@ -8,6 +8,7 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.studentsapps.schedule.databinding.ModalBottomSheetDayBinding
+import com.studentsapps.ui.timetable.animateOpacity
 
 class ModalBottomSheetDay : BottomSheetDialogFragment() {
 
@@ -24,9 +25,13 @@ class ModalBottomSheetDay : BottomSheetDialogFragment() {
         return binding.root
     }
 
-    fun goToRegisterScheduleFragment(day: Int) {
-        navController.previousBackStackEntry?.savedStateHandle?.set("day", day)
-        dismiss()
+    fun goToRegisterScheduleFragment(day: Int, view: View) {
+        animateOpacity(view, 0.5f) {
+            animateOpacity(view, 1.0f) {
+                navController.previousBackStackEntry?.savedStateHandle?.set("day", day)
+                dismiss()
+            }
+        }
     }
 
     override fun onDestroyView() {

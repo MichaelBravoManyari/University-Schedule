@@ -16,8 +16,8 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.button.MaterialButton
 import com.studentsapps.course.R
 import com.studentsapps.course.databinding.FragmentRegisterCourseBinding
 import com.studentsapps.course.viewmodels.RegisterCourseUiState
@@ -56,7 +56,12 @@ class RegisterCourseFragment : Fragment() {
         update an existing course.*/
 
         courseId = args.courseId
-        if (courseId != 0) viewModel.displayCourseData(courseId)
+        if (courseId != 0) {
+            navController.currentDestination?.label = getString(R.string.update_course)
+            viewModel.displayCourseData(courseId)
+        } else {
+            navController.currentDestination?.label = getString(R.string.new_course)
+        }
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -123,24 +128,20 @@ class RegisterCourseFragment : Fragment() {
     private fun configureMenuOptionsInAppBar() {
         binding.toolbar.run {
             setupWithNavController(navController)
+            val menuAdd = menu.findItem(com.studentsapps.ui.R.id.menu_add)
             if (courseId > 0) {
-                val menuAdd = menu.findItem(com.studentsapps.ui.R.id.menu_add)
-                menuAdd.title = getText(com.studentsapps.ui.R.string.update)
+                menuAdd.actionView?.findViewById<MaterialButton>(com.studentsapps.ui.R.id.custom_action_button)?.text =
+                    getString(com.studentsapps.ui.R.string.update)
             }
-            setOnMenuItemClickListener { menuItem ->
-                when (menuItem.itemId) {
-                    com.studentsapps.ui.R.id.menu_add -> {
-                        viewModel.run {
-                            setCourseName(binding.editTextCourseName.text.toString())
-                            setNameProfessor(binding.editTextTeacherCourse.text.toString())
-                            if (courseId > 0) updateCourse() else registerCourse()
-                        }
-                        true
-                    }
 
-                    else -> menuItem.onNavDestinationSelected(findNavController())
+            menuAdd.actionView?.findViewById<MaterialButton>(com.studentsapps.ui.R.id.custom_action_button)
+                ?.setOnClickListener {
+                    viewModel.run {
+                        setCourseName(binding.editTextCourseName.text.toString())
+                        setNameProfessor(binding.editTextTeacherCourse.text.toString())
+                        if (courseId > 0) updateCourse() else registerCourse()
+                    }
                 }
-            }
         }
     }
 

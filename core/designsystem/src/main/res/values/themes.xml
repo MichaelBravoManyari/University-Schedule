@@ -18,6 +18,37 @@
         </item>
         <item name="materialButtonStyle">@style/Widget.UniversitySchedule.Button</item>
         <item name="materialSwitchStyle">@style/Widget.UniversitySchedule.Switch</item>
+        <item name="bottomSheetDialogTheme">
+            @style/ThemeOverlay.UniversitySchedule.BottomSheetDialog
+        </item>
+        <item name="materialTimePickerTheme">@style/ThemeOverlay.UniversitySchedule.TimePicker</item>
+        <item name="materialCalendarTheme">@style/ThemeOverlay.UniversitySchedule.DatePicker</item>
+    </style>
+
+    <style name="ThemeOverlay.UniversitySchedule.DatePicker" parent="@style/ThemeOverlay.Material3.MaterialCalendar">
+        <item name="colorPrimary">@color/accent_color</item>
+        <item name="colorOnPrimary">@color/secondary_color</item>
+    </style>
+
+    <style name="ThemeOverlay.UniversitySchedule.TimePicker" parent="ThemeOverlay.Material3.MaterialTimePicker">
+        <item name="colorPrimary">@color/accent_color</item>
+        <item name="colorOnPrimary">@color/accent_color</item>
+        <item name="chipStyle">@style/Widget.UniversitySchedule.Chip</item>
+        <item name="materialButtonOutlinedStyle">@style/Widget.UniversitySchedule.TimePicker.AmPmButton</item>
+    </style>
+
+    <style name="Widget.UniversitySchedule.Chip" parent="Widget.Material3.MaterialTimePicker.Display">
+        <item name="chipBackgroundColor">@color/selector_bg_chip</item>
+        <item name="android:textColor">@color/selector_text_chip</item>
+    </style>
+
+    <style name="Widget.UniversitySchedule.TimePicker.AmPmButton" parent="Widget.Material3.MaterialTimePicker.Button">
+        <item name="backgroundTint">@color/selector_bg_chip</item>
+        <item name="android:textColor">@color/selector_text_chip</item>
+    </style>
+
+    <style name="ThemeOverlay.UniversitySchedule.BottomSheetDialog" parent="ThemeOverlay.Material3.BottomSheetDialog">
+        <item name="materialButtonStyle">@style/Widget.UniversitySchedule.BottomSheetDialog.Button</item>
     </style>
 
     <style name="Widget.UniversitySchedule.Switch" parent="Widget.Material3.CompoundButton.MaterialSwitch">
@@ -35,8 +66,16 @@
         <item name="materialThemeOverlay">@style/ThemeOverlay.UniversitySchedule.Button</item>
     </style>
 
+    <style name="Widget.UniversitySchedule.BottomSheetDialog.Button" parent="Widget.Material3.Button.TextButton">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.UniversitySchedule.BottomSheetDialog.Button</item>
+    </style>
+
     <style name="ThemeOverlay.UniversitySchedule.Button" parent="ThemeOverlay.Material3.Button">
         <item name="colorContainer">@color/accent_color</item>
+    </style>
+
+    <style name="ThemeOverlay.UniversitySchedule.BottomSheetDialog.Button" parent="ThemeOverlay.Material3.Button.TextButton">
+        <item name="colorOnContainer">@color/accent_color</item>
     </style>
 
     <style name="Widget.UniversitySchedule.NavigationRailView" parent="Widget.Material3.NavigationRailView">
@@ -128,7 +167,7 @@
         <!-- NOTA: the top bar list icon does not change as it is obtained programmatically -->
         <item name="colorOnSurfaceVariant">@color/text_color</item>
         <!-- Menu and overflow icon color -->
-        <item name="colorControlNormal">@color/text_color</item>
+        <!--<item name="colorControlNormal">@color/text_color</item>-->
     </style>
 
     <style name="Widget.UniversitySchedule.FloatingActionButton" parent="Widget.Material3.FloatingActionButton.Primary">

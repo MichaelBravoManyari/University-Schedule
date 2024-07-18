@@ -4,4 +4,7 @@
     <string name="course_name">Nombre de curso</string>
     <string name="course_color">Color del curso</string>
     <string name="teacher_name">Nombre de profesor</string>
+    <string name="courses">Cursos</string>
+    <string name="update_course">Actualizar curso</string>
+    <string name="new_course">Nuevo curso</string>
 </resources>

@@ -1,6 +1,8 @@
 package com.studentsapps.schedule.fragments
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,8 +20,8 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -71,7 +73,10 @@ class RegisterScheduleFragment : Fragment() {
         navController = view.findNavController()
 
         scheduleId = args.scheduleId
-        if (scheduleId != 0) viewModel.displayScheduleData(scheduleId)
+        if (scheduleId != 0) {
+            navController.currentDestination?.label = getString(R.string.update_schedule)
+            viewModel.displayScheduleData(scheduleId)
+        } else navController.currentDestination?.label = getString(R.string.new_schedule)
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -103,24 +108,19 @@ class RegisterScheduleFragment : Fragment() {
     private fun configureMenuOptionsInAppBar() {
         binding.toolbar.run {
             setupWithNavController(navController)
+            val menuAdd = menu.findItem(com.studentsapps.ui.R.id.menu_add)
             if (scheduleId > 0) {
-                val menuAdd = menu.findItem(com.studentsapps.ui.R.id.menu_add)
-                menuAdd.title = getText(com.studentsapps.ui.R.string.update)
+                menuAdd.actionView?.findViewById<MaterialButton>(com.studentsapps.ui.R.id.custom_action_button)?.text =
+                    getString(com.studentsapps.ui.R.string.update)
             }
-            setOnMenuItemClickListener { menuItem ->
-                when (menuItem.itemId) {
-                    com.studentsapps.ui.R.id.menu_add -> {
-                        viewModel.run {
-                            if (!uiState.value.existingCourses) setCourseName(binding.editTextCourse.text.toString())
-                            setClassroom(binding.editTextClassroom.text.toString())
-                            if(scheduleId > 0) updateSchedule() else registerSchedule()
-                        }
-                        true
+            menuAdd.actionView?.findViewById<MaterialButton>(com.studentsapps.ui.R.id.custom_action_button)
+                ?.setOnClickListener {
+                    viewModel.run {
+                        if (!uiState.value.existingCourses) setCourseName(binding.editTextCourse.text.toString())
+                        setClassroom(binding.editTextClassroom.text.toString())
+                        if (scheduleId > 0) updateSchedule() else registerSchedule()
                     }
-
-                    else -> menuItem.onNavDestinationSelected(findNavController())
                 }
-            }
         }
     }
 
@@ -155,13 +155,15 @@ class RegisterScheduleFragment : Fragment() {
     }
 
     fun goToBottomSheetDay() {
-        if (viewModel.uiState.value.repetition == RecurrenceOption.EVERY_WEEK) {
-            navController.navigate(
-                RegisterScheduleFragmentDirections.actionRegisterScheduleFragmentToModalBottomSheetDay()
-            )
-            return
+        binding.btnDay.preventDoubleClick {
+            if (viewModel.uiState.value.repetition == RecurrenceOption.EVERY_WEEK) {
+                navController.navigate(
+                    RegisterScheduleFragmentDirections.actionRegisterScheduleFragmentToModalBottomSheetDay()
+                )
+            } else {
+                showDatePicker()
+            }
         }
-        showDatePicker()
     }
 
     private fun showDatePicker() {
@@ -192,9 +194,11 @@ class RegisterScheduleFragment : Fragment() {
     }
 
     fun goToBottomSheetCourse() {
-        navController.navigate(
-            RegisterScheduleFragmentDirections.actionRegisterScheduleFragmentToModalBottomSheetCourse()
-        )
+        binding.selectedCourseSection.preventDoubleClick {
+            navController.navigate(
+                RegisterScheduleFragmentDirections.actionRegisterScheduleFragmentToModalBottomSheetCourse()
+            )
+        }
     }
 
     fun goToBottomSheetColor(colorCourse: Int) {
@@ -205,9 +209,11 @@ class RegisterScheduleFragment : Fragment() {
     }
 
     fun goToBottomSheetRepetition() {
-        navController.navigate(
-            RegisterScheduleFragmentDirections.actionRegisterScheduleFragmentToModalBottomSheetRepetition()
-        )
+        binding.btnRepetition.preventDoubleClick {
+            navController.navigate(
+                RegisterScheduleFragmentDirections.actionRegisterScheduleFragmentToModalBottomSheetRepetition()
+            )
+        }
     }
 
     fun showTimePicker(isStartTime: Boolean, time: LocalTime) {
@@ -231,6 +237,14 @@ class RegisterScheduleFragment : Fragment() {
         }
 
         return picker
+    }
+
+    fun View.preventDoubleClick(delay: Long = 500, action: () -> Unit) {
+        this.isEnabled = false
+        action()
+        Handler(Looper.getMainLooper()).postDelayed({
+            this.isEnabled = true
+        }, delay)
     }
 
     override fun onDestroyView() {

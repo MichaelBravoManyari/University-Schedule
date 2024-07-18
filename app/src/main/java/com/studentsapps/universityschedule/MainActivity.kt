@@ -26,12 +26,4 @@ class MainActivity : AppCompatActivity() {
         binding.bottomNavView?.setupWithNavController(navController)
         binding.navigationRail?.setupWithNavController(navController)
     }
-
-    private fun handleDestinationChanges() {
-        navController.addOnDestinationChangedListener { _,destination, _ ->
-            when(destination.id) {
-
-            }
-        }
-    }
 }

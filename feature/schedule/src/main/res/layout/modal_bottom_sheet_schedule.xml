@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <import type="android.view.View" />
 
         <variable
             name="viewModel"
@@ -13,7 +14,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp">
+        android:padding="20dp">
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/color_course"
@@ -32,6 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:text="@{viewModel.uiState.scheduleDetails.courseName}"
+            android:textStyle="bold"
             app:layout_constraintStart_toEndOf="@id/color_course"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Math" />
@@ -40,7 +42,8 @@
             android:id="@+id/schedule_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
+            android:textStyle="bold"
             app:dayOfWeek="@{viewModel.uiState.scheduleDetails.dayOfWeek}"
             app:layout_constraintStart_toStartOf="@id/course_name"
             app:layout_constraintTop_toBottomOf="@id/course_name"
@@ -51,7 +54,8 @@
             android:id="@+id/schedule_hours"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
+            android:textStyle="bold"
             app:endTime="@{viewModel.uiState.scheduleDetails.endTime}"
             app:layout_constraintStart_toStartOf="@id/course_name"
             app:layout_constraintTop_toBottomOf="@id/schedule_date"
@@ -63,6 +67,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
+            android:textStyle="bold"
+            android:drawableStart="@drawable/ic_classroom"
+            android:drawablePadding="10dp"
+            android:gravity="center"
+            android:visibility='@{!viewModel.uiState.scheduleDetails.classPlace.replace(" ", "").isEmpty() ? View.VISIBLE : View.GONE}'
             android:text="@{viewModel.uiState.scheduleDetails.classPlace}"
             app:layout_constraintStart_toStartOf="@id/course_name"
             app:layout_constraintTop_toBottomOf="@id/schedule_hours"
@@ -73,6 +82,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/edit"
+            android:layout_marginTop="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/schedule_class_place" />
 
@@ -81,6 +91,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="10dp"
+            android:layout_marginTop="10dp"
             android:text="@string/delete"
             app:layout_constraintEnd_toStartOf="@id/btn_edit_schedule"
             app:layout_constraintTop_toBottomOf="@id/schedule_class_place" />

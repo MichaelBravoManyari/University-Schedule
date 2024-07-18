@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/courseFragment"
         android:name="com.studentsapps.course.fragments.CourseFragment"
-        android:label="fragment_course"
+        android:label="@string/courses"
         tools:layout="@layout/fragment_course" >
         <action
             android:id="@+id/action_courseFragment_to_registerCourseFragment"
@@ -22,6 +22,7 @@
         <action
             android:id="@+id/action_registerCourseFragment_to_courseFragment"
             app:destination="@id/courseFragment" />
+        <deepLink app:uri="android-app://studentsapps.app/registerCourseFragment"/>
         <argument
             android:name="courseId"
             app:argType="integer"

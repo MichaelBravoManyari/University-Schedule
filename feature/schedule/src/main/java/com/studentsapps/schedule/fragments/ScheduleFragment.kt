@@ -127,6 +127,16 @@ class ScheduleFragment : Fragment() {
     private fun handleScheduleDetailsUpdate(currentState: ScheduleUiState.Success) {
         with(binding.timetable) {
             setTimetableUserPreferences(currentState.timetableUserPreferences)
+            if (isDisplayedAsGrid()) {
+                viewModel.updateScheduleDetailsListInGridMode(
+                    displaySaturday(),
+                    displaySunday(),
+                    getStartDate(),
+                    getEndDate()
+                )
+            } else {
+                viewModel.updateScheduleDetailsListInListMode(date.value)
+            }
         }
     }
 
@@ -158,6 +168,11 @@ class ScheduleFragment : Fragment() {
 
                     R.id.timetable_today -> {
                         binding.timetable.selectCurrentDay()
+                        true
+                    }
+
+                    R.id.scheduleConfigurationFragment -> {
+                        navController.navigate(R.id.action_scheduleFragment_to_scheduleConfigurationFragment)
                         true
                     }
 

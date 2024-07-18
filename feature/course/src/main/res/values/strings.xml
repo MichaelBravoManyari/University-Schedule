@@ -3,4 +3,7 @@
     <string name="course_name">Course name</string>
     <string name="course_color">Course color</string>
     <string name="teacher_name">Name teacher</string>
+    <string name="courses">Courses</string>
+    <string name="update_course">Update course</string>
+    <string name="new_course">New course</string>
 </resources>

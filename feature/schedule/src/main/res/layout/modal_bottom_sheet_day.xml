@@ -34,7 +34,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:onClick="@{() -> bottomSheetDay.goToRegisterScheduleFragment(1)}"
+                android:onClick="@{() -> bottomSheetDay.goToRegisterScheduleFragment(1, monday)}"
                 android:text="@string/monday"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/select_day" />
@@ -44,7 +44,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:onClick="@{() -> bottomSheetDay.goToRegisterScheduleFragment(2)}"
+                android:onClick="@{() -> bottomSheetDay.goToRegisterScheduleFragment(2, tuesday)}"
                 android:text="@string/tuesday"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/monday" />
@@ -54,7 +54,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:onClick="@{() -> bottomSheetDay.goToRegisterScheduleFragment(3)}"
+                android:onClick="@{() -> bottomSheetDay.goToRegisterScheduleFragment(3, wednesday)}"
                 android:text="@string/wednesday"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tuesday" />
@@ -64,7 +64,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:onClick="@{() -> bottomSheetDay.goToRegisterScheduleFragment(4)}"
+                android:onClick="@{() -> bottomSheetDay.goToRegisterScheduleFragment(4, thursday)}"
                 android:text="@string/thursday"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/wednesday" />
@@ -74,7 +74,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:onClick="@{() -> bottomSheetDay.goToRegisterScheduleFragment(5)}"
+                android:onClick="@{() -> bottomSheetDay.goToRegisterScheduleFragment(5, friday)}"
                 android:text="@string/friday"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/thursday" />
@@ -84,7 +84,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:onClick="@{() -> bottomSheetDay.goToRegisterScheduleFragment(6)}"
+                android:onClick="@{() -> bottomSheetDay.goToRegisterScheduleFragment(6, saturday)}"
                 android:text="@string/saturday"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/friday" />
@@ -94,7 +94,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:onClick="@{() -> bottomSheetDay.goToRegisterScheduleFragment(7)}"
+                android:onClick="@{() -> bottomSheetDay.goToRegisterScheduleFragment(7, sunday)}"
                 android:text="@string/sunday"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/saturday" />

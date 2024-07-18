@@ -12,14 +12,15 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:padding="20dp">
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/text_view_select_course"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="30dp"
+            android:textSize="20sp"
+            android:textStyle="bold"
             android:text="@string/select_course"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -28,11 +29,11 @@
             android:id="@+id/add_new_course_section"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="20dp"
             android:drawableStart="@drawable/ic_add"
             android:drawablePadding="10dp"
             android:gravity="center_vertical"
+            android:onClick="@{() -> bottomSheetCourse.goToRegisterCourseFragment()}"
             android:text="@string/add_course"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -42,6 +43,7 @@
             android:id="@+id/recycler_view_courses"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/add_new_course_section"

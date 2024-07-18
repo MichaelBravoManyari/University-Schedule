@@ -12,8 +12,8 @@
     <string name="sunday_display_switch">Switch de mostrar domingo</string>
     <string name="hour_format">Formato de hora</string>
     <string name="hour_format_value">Val</string>
-    <string name="monday">lunes</string>
-    <string name="sunday">domingo</string>
+    <string name="monday">Lunes</string>
+    <string name="sunday">Domingo</string>
     <string name="twelve_hours">12 horas</string>
     <string name="twenty_four_hours">24 horas</string>
     <string name="configuration">Configuración</string>
@@ -47,4 +47,7 @@
     <string name="edit">Editar</string>
     <string name="delete">Eliminar</string>
     <string name="schedule_configuration">Configuración del horario</string>
+    <string name="new_schedule">Nuevo horario</string>
+    <string name="update_schedule">Actualizar horario</string>
+    <string name="select_option">Selecciona una opción</string>
 </resources>

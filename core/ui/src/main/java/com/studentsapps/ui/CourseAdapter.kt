@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.studentsapps.model.Course
 import com.studentsapps.ui.databinding.ItemCourseBinding
+import com.studentsapps.ui.timetable.animateOpacity
 
 class CourseAdapter(private val onItemClicked: (Course) -> Unit) :
     ListAdapter<Course, CourseAdapter.CourseViewHolder>(DiffCallback) {
@@ -41,8 +42,12 @@ class CourseAdapter(private val onItemClicked: (Course) -> Unit) :
             )
         )
         viewHolder.itemView.setOnClickListener {
-            val position = viewHolder.adapterPosition
-            onItemClicked(getItem(position))
+            animateOpacity(it, 0.5f) {
+                animateOpacity(it, 1.0f) {
+                    val position = viewHolder.adapterPosition
+                    onItemClicked(getItem(position))
+                }
+            }
         }
         return viewHolder
     }

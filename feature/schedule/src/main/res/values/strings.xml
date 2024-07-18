@@ -46,4 +46,7 @@
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
     <string name="schedule_configuration">Schedule configuration</string>
+    <string name="new_schedule">New schedule</string>
+    <string name="update_schedule">Update schedule</string>
+    <string name="select_option">Select an option</string>
 </resources>

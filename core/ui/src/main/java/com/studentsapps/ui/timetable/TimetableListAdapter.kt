@@ -39,9 +39,14 @@ class TimetableListAdapter :
         )
 
         viewHolder.itemView.setOnClickListener {
-            val position = viewHolder.adapterPosition
-            onItemClicked?.let { it1 -> it1(getItem(position).id) }
+            animateOpacity(viewHolder.itemView, 0.5f) {
+                animateOpacity(viewHolder.itemView, 1.0f) {
+                    val position = viewHolder.adapterPosition
+                    onItemClicked?.let { it1 -> it1(getItem(position).id) }
+                }
+            }
         }
+
         return viewHolder
     }
 
@@ -64,26 +69,28 @@ class TimetableListAdapter :
                 )
                 timetableListItemCourseHour.setTextColor(getTextColorBasedOnCourseColor(scheduleView.color))
                 timetableListItemClassroom.visibility = View.GONE
-                if (!scheduleView.classPlace.isNullOrEmpty()) {
-                    timetableListItemClassroom.apply {
-                        visibility = View.VISIBLE
-                        text = scheduleView.classPlace
-                        setTextColor(
-                            getTextColorBasedOnCourseColor(
-                                scheduleView.color
+                scheduleView.classPlace?.let { classPlace ->
+                    if (classPlace.replace(" ", "").isNotEmpty()) {
+                        timetableListItemClassroom.apply {
+                            visibility = View.VISIBLE
+                            text = scheduleView.classPlace
+                            setTextColor(
+                                getTextColorBasedOnCourseColor(
+                                    scheduleView.color
+                                )
                             )
-                        )
-                        val drawableStart = compoundDrawablesRelative[0]
-                        if (drawableStart != null) {
-                            val color = getTextColorBasedOnCourseColor(scheduleView.color)
-                            drawableStart.colorFilter =
-                                PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN)
-                            setCompoundDrawablesRelativeWithIntrinsicBounds(
-                                drawableStart, null, null, null
-                            )
+                            val drawableStart = compoundDrawablesRelative[0]
+                            if (drawableStart != null) {
+                                val color = getTextColorBasedOnCourseColor(scheduleView.color)
+                                drawableStart.colorFilter =
+                                    PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN)
+                                setCompoundDrawablesRelativeWithIntrinsicBounds(
+                                    drawableStart, null, null, null
+                                )
+                            }
                         }
-                    }
 
+                    }
                 }
                 timetableListItemContainer.backgroundTintList =
                     ColorStateList.valueOf(scheduleView.color)
