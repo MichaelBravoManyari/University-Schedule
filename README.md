@@ -14,7 +14,7 @@
 
 ### Screenshots
 
-![Home Screen](screenshots/home_screen.png)
+![Home Screen](screenshots/schedule_timetable.jpg)
 *Home Screen*
 
 ![Add Course](screenshots/add_course.png)
