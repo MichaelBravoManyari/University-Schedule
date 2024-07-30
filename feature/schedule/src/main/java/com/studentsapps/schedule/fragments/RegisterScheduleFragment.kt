@@ -239,7 +239,7 @@ class RegisterScheduleFragment : Fragment() {
         return picker
     }
 
-    fun View.preventDoubleClick(delay: Long = 500, action: () -> Unit) {
+    private fun View.preventDoubleClick(delay: Long = 500, action: () -> Unit) {
         this.isEnabled = false
         action()
         Handler(Looper.getMainLooper()).postDelayed({

@@ -42,4 +42,8 @@ class ScheduleLocalDataSource @Inject constructor(
     suspend fun updateSchedule(schedule: ScheduleEntity) = withContext(ioDispatcher) {
         scheduleDao.update(schedule)
     }
+
+    suspend fun deleteSchedule(schedule: ScheduleEntity) = withContext(ioDispatcher) {
+        scheduleDao.delete(schedule)
+    }
 }

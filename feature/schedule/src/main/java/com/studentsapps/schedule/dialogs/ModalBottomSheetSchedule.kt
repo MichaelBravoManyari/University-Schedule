@@ -9,6 +9,8 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.studentsapps.schedule.R
 import com.studentsapps.schedule.databinding.ModalBottomSheetScheduleBinding
 import com.studentsapps.schedule.viewmodels.BottomSheetScheduleViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -41,7 +43,23 @@ class ModalBottomSheetSchedule : BottomSheetDialogFragment() {
         val scheduleId = args.scheduleId
         viewModel.setScheduleDetails(scheduleId)
         binding.btnEditSchedule.setOnClickListener {
-            navController.navigate(ModalBottomSheetScheduleDirections.actionModalBottomSheetScheduleToRegisterScheduleFragment(scheduleId))
+            navController.navigate(
+                ModalBottomSheetScheduleDirections.actionModalBottomSheetScheduleToRegisterScheduleFragment(
+                    scheduleId
+                )
+            )
+        }
+        binding.btnDeleteSchedule.setOnClickListener {
+            MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.delete)
+                .setMessage(R.string.delete_schedule)
+                .setPositiveButton(R.string.accept_dialog) { _, _ ->
+                    viewModel.deleteSchedule(args.scheduleId)
+                    navController.previousBackStackEntry?.savedStateHandle?.set("updateScheduleList", true)
+                    this.dismiss()
+                }
+                .setNegativeButton(R.string.cancel) { dialog, _ ->
+                    dialog.dismiss()
+                }.show()
         }
     }
 

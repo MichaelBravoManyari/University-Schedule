@@ -49,4 +49,22 @@ class ScheduleRepositoryImp @Inject constructor(
             )
         })
     }
+
+    override suspend fun deleteSchedule(scheduleId: Int) {
+        scheduleLocalDataSource.deleteSchedule(with(
+            scheduleLocalDataSource.getScheduleDetailsView(
+                scheduleId
+            )
+        ) {
+            ScheduleEntity(
+                id = scheduleId,
+                startTime = startTime,
+                endTime = endTime,
+                classPlace = classPlace,
+                dayOfWeek = dayOfWeek,
+                specificDate = specificDate,
+                courseId = courseId
+            )
+        })
+    }
 }

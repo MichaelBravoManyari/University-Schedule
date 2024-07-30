@@ -22,4 +22,6 @@ interface ScheduleRepository {
     suspend fun getScheduleDetailsById(scheduleId: Int): ScheduleDetails
 
     suspend fun updateSchedule(schedule: Schedule, specificDate: LocalDate?)
+
+    suspend fun deleteSchedule(scheduleId: Int)
 }

@@ -23,6 +23,16 @@
         </item>
         <item name="materialTimePickerTheme">@style/ThemeOverlay.UniversitySchedule.TimePicker</item>
         <item name="materialCalendarTheme">@style/ThemeOverlay.UniversitySchedule.DatePicker</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.UniversitySchedule.MaterialAlertDialog</item>
+    </style>
+
+    <style name="ThemeOverlay.UniversitySchedule.MaterialAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.UniversitySchedule.Button.Dialog</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.UniversitySchedule.Button.Dialog</item>
+    </style>
+
+    <style name="Widget.UniversitySchedule.Button.Dialog" parent="Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/accent_color</item>
     </style>
 
     <style name="ThemeOverlay.UniversitySchedule.DatePicker" parent="@style/ThemeOverlay.Material3.MaterialCalendar">

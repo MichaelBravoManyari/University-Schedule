@@ -43,11 +43,13 @@
     <string name="specific_date">Fecha especifica</string>
     <string name="select_date">Select a date</string>
     <string name="select_color">Seleccionar un color</string>
-    <string name="accept">Aceptar</string>
+    <string name="accept_dialog">Aceptar</string>
     <string name="edit">Editar</string>
     <string name="delete">Eliminar</string>
     <string name="schedule_configuration">Configuración del horario</string>
     <string name="new_schedule">Nuevo horario</string>
     <string name="update_schedule">Actualizar horario</string>
     <string name="select_option">Selecciona una opción</string>
+    <string name="delete_schedule">¿Desea eliminar el horario?</string>
+    <string name="cancel">Cancelar</string>
 </resources>

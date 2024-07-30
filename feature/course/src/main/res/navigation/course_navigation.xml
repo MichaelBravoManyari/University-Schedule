@@ -9,7 +9,7 @@
         android:id="@+id/courseFragment"
         android:name="com.studentsapps.course.fragments.CourseFragment"
         android:label="@string/courses"
-        tools:layout="@layout/fragment_course" >
+        tools:layout="@layout/fragment_course">
         <action
             android:id="@+id/action_courseFragment_to_registerCourseFragment"
             app:destination="@id/registerCourseFragment" />
@@ -18,14 +18,18 @@
         android:id="@+id/registerCourseFragment"
         android:name="com.studentsapps.course.fragments.RegisterCourseFragment"
         android:label="fragment_register_course"
-        tools:layout="@layout/fragment_register_course" >
+        tools:layout="@layout/fragment_register_course">
         <action
             android:id="@+id/action_registerCourseFragment_to_courseFragment"
             app:destination="@id/courseFragment" />
-        <deepLink app:uri="android-app://studentsapps.app/registerCourseFragment"/>
+        <deepLink app:uri="android-app://studentsapps.app/registerCourseFragment/{navigatedFromTimeLoggingDestination}" />
         <argument
             android:name="courseId"
-            app:argType="integer"
-            android:defaultValue="0" />
+            android:defaultValue="0"
+            app:argType="integer" />
+        <argument
+            android:name="navigatedFromTimeLoggingDestination"
+            android:defaultValue="false"
+            app:argType="boolean" />
     </fragment>
 </navigation>

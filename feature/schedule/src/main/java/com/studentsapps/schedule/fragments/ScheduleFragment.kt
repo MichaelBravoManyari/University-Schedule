@@ -8,7 +8,9 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.Observer
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
@@ -18,11 +20,13 @@ import androidx.navigation.ui.setupWithNavController
 import com.studentsapps.model.asScheduleView
 import com.studentsapps.schedule.R
 import com.studentsapps.schedule.databinding.FragmentScheduleBinding
+import com.studentsapps.schedule.viewmodels.RecurrenceOption
 import com.studentsapps.schedule.viewmodels.ScheduleUiState
 import com.studentsapps.schedule.viewmodels.ScheduleViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.time.DayOfWeek
 
 @AndroidEntryPoint
 class ScheduleFragment : Fragment() {
@@ -62,7 +66,44 @@ class ScheduleFragment : Fragment() {
         }
 
         binding.toolbar.setupWithNavController(navController)
+        setupNavigationObservers()
         configureMenuOptionsInAppBar()
+    }
+
+    private fun setupNavigationObservers() {
+        val navBackStackEntry = navController.getBackStackEntry(R.id.scheduleFragment)
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                handleSavedState(navBackStackEntry.savedStateHandle)
+            }
+        }
+
+        navBackStackEntry.lifecycle.addObserver(observer)
+        viewLifecycleOwner.lifecycle.addObserver(LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_DESTROY) {
+                navBackStackEntry.lifecycle.removeObserver(observer)
+            }
+        })
+    }
+
+    private fun handleSavedState(savedStateHandle: SavedStateHandle) {
+        with(savedStateHandle) {
+            get<Boolean>("updateScheduleList")?.let { updateScheduleList ->
+                if (updateScheduleList) with(binding.timetable) {
+                    if (isDisplayedAsGrid()) {
+                        viewModel.updateScheduleDetailsListInGridMode(
+                            displaySaturday(),
+                            displaySunday(),
+                            getStartDate(),
+                            getEndDate()
+                        )
+                    } else {
+                        viewModel.updateScheduleDetailsListInListMode(date.value)
+                    }
+                }
+            }
+            remove<Boolean>("updateScheduleList")
+        }
     }
 
     private fun observeCurrentMonth() {

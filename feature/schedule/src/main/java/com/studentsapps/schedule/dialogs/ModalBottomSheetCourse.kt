@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavDeepLinkRequest
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -30,9 +31,7 @@ class ModalBottomSheetCourse : BottomSheetDialogFragment() {
     private val viewModel: BottomSheetCourseViewModel by viewModels()
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = ModalBottomSheetCourseBinding.inflate(inflater, container, false)
         navController = findNavController()
@@ -63,10 +62,15 @@ class ModalBottomSheetCourse : BottomSheetDialogFragment() {
     }
 
     fun goToRegisterCourseFragment() {
+        val navOptions = NavOptions.Builder().setEnterAnim(android.R.anim.slide_in_left)
+            .setExitAnim(android.R.anim.slide_out_right)
+            .setPopEnterAnim(android.R.anim.slide_in_left)
+            .setPopExitAnim(android.R.anim.slide_out_right).build()
+        val navigatedFromTimeLoggingDestination = true
         val request =
-            NavDeepLinkRequest.Builder.fromUri("android-app://studentsapps.app/registerCourseFragment".toUri())
+            NavDeepLinkRequest.Builder.fromUri("android-app://studentsapps.app/registerCourseFragment/$navigatedFromTimeLoggingDestination".toUri())
                 .build()
-        navController.navigate(request)
+        navController.navigate(request = request, navOptions = navOptions)
     }
 
     override fun onDestroy() {

@@ -29,6 +29,12 @@ class BottomSheetScheduleViewModel @Inject constructor(
             }
         }
     }
+
+    fun deleteSchedule(scheduleId: Int) {
+        viewModelScope.launch {
+            scheduleRepository.deleteSchedule(scheduleId)
+        }
+    }
 }
 
 data class BottomSheetScheduleUiState(

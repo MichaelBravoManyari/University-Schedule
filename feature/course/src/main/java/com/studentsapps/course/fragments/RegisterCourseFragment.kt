@@ -34,6 +34,7 @@ class RegisterCourseFragment : Fragment() {
     private lateinit var navController: NavController
     private val viewModel: RegisterCourseViewModel by viewModels()
     private var courseId = 0
+    private var navigatedFromTimeLoggingDestination = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -56,6 +57,8 @@ class RegisterCourseFragment : Fragment() {
         update an existing course.*/
 
         courseId = args.courseId
+        navigatedFromTimeLoggingDestination = args.navigatedFromTimeLoggingDestination
+
         if (courseId != 0) {
             navController.currentDestination?.label = getString(R.string.update_course)
             viewModel.displayCourseData(courseId)
@@ -77,7 +80,10 @@ class RegisterCourseFragment : Fragment() {
 
     private fun handleUiState(uiState: RegisterCourseUiState) {
         if (uiState.isCourseRecorded) {
-            navigateToCourseFragment()
+            if (!navigatedFromTimeLoggingDestination)
+                navigateToCourseFragment()
+            else
+                navigateToScheduleRegisterScheduleFragment()
         }
 
         if (uiState.name.isNotEmpty()) {
@@ -87,6 +93,10 @@ class RegisterCourseFragment : Fragment() {
         if (!uiState.nameProfessor.isNullOrEmpty()) {
             binding.editTextTeacherCourse.setText(uiState.nameProfessor)
         }
+    }
+
+    private fun navigateToScheduleRegisterScheduleFragment() {
+        navController.popBackStack()
     }
 
     private fun navigateToCourseFragment() {
