@@ -16,23 +16,30 @@
 
 *Home Screen*
 
-![Home Screen](screenshots/schedule_timetable.jpg)![](screenshots/schedule_list.jpg)
+![Home Screen](screenshots/schedule_timetable.jpg)
+![](screenshots/schedule_timetable_night.jpg)
+![](screenshots/schedule_list.jpg)
+![](screenshots/schedule_list_night.jpg)
 
 *Add Course*
 
 ![Add Course](screenshots/add_course.jpg)
+![](screenshots/add_course_night.jpg)
 
 *Add Schedule*
 
 ![Add schedule](screenshots/add_schedule.jpg)
+![](screenshots/add_schedule_night.jpg)
 
 *Courses*
 
 ![Courses](screenshots/courses.jpg)
+![](screenshots/courses_night.jpg)
 
 *Schedule Configuration*
 
 ![Schedule Configuration](screenshots/schedule_configuration.jpg)
+![Schedule Configuration](screenshots/schedule_configuration_night.jpg)
 
 ## Architecture
 
