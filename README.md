@@ -39,7 +39,7 @@
 *Schedule Configuration*
 
 ![Schedule Configuration](screenshots/schedule_configuration.jpg)
-![Schedule Configuration](screenshots/schedule_configuration_night.jpg)
+![](screenshots/schedule_configuration_night.jpg)
 
 ## Architecture
 
