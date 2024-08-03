@@ -15,7 +15,7 @@
 ### Screenshots
 
 ![Home Screen](screenshots/schedule_timetable.jpg)
-![Home Screen Night](screenshots/schedule_list.jpg)
+![](screenshots/schedule_list.jpg)
 
 *Home Screen*
 
