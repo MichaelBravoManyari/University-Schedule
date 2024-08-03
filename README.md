@@ -14,27 +14,26 @@
 
 ### Screenshots
 
+*Home Screen*
+
 ![Home Screen](screenshots/schedule_timetable.jpg)
 ![](screenshots/schedule_list.jpg)
 
-*Home Screen*
-
-![Add Course](screenshots/add_course.jpg)
-[](screenshots/add_course.jpg)
-
 *Add Course*
 
-![Add schedule](screenshots/add_schedule.jpg)
+![Add Course](screenshots/add_course.jpg)[](screenshots/add_course.jpg)
 
 *Add Schedule*
 
-![Courses](screenshots/courses.jpg)
+![Add schedule](screenshots/add_schedule.jpg)
 
 *Courses*
 
-![Schedule Configuration](screenshots/schedule_configuration.jpg)
+![Courses](screenshots/courses.jpg)
 
 *Schedule Configuration*
+
+![Schedule Configuration](screenshots/schedule_configuration.jpg)
 
 ## Architecture
 
