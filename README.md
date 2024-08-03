@@ -16,12 +16,11 @@
 
 *Home Screen*
 
-![Home Screen](screenshots/schedule_timetable.jpg)
-![](screenshots/schedule_list.jpg)
+![Home Screen](screenshots/schedule_timetable.jpg)![](screenshots/schedule_list.jpg)
 
 *Add Course*
 
-![Add Course](screenshots/add_course.jpg)[](screenshots/add_course.jpg)
+![Add Course](screenshots/add_course.jpg)
 
 *Add Schedule*
 
