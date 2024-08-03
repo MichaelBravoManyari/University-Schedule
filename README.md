@@ -19,7 +19,8 @@
 
 *Home Screen*
 
-![Add Course](screenshots/add_course.jpg)[](screenshots/add_course.jpg)
+![Add Course](screenshots/add_course.jpg)
+[](screenshots/add_course.jpg)
 
 *Add Course*
 
