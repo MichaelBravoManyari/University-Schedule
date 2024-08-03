@@ -8,9 +8,10 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.studentsapps.schedule.databinding.ModalBottomSheetDayBinding
+import com.studentsapps.ui.dialogs.BaseBottomSheetDialogFragment
 import com.studentsapps.ui.timetable.animateOpacity
 
-class ModalBottomSheetDay : BottomSheetDialogFragment() {
+class ModalBottomSheetDay : BaseBottomSheetDialogFragment() {
 
     private var _binding: ModalBottomSheetDayBinding? = null
     private val binding get() = _binding!!

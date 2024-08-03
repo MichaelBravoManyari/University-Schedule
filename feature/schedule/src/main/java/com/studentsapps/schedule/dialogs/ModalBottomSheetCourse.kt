@@ -14,16 +14,18 @@ import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.studentsapps.schedule.databinding.ModalBottomSheetCourseBinding
 import com.studentsapps.schedule.viewmodels.BottomSheetCourseUiState
 import com.studentsapps.schedule.viewmodels.BottomSheetCourseViewModel
 import com.studentsapps.ui.CourseAdapter
+import com.studentsapps.ui.dialogs.BaseBottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class ModalBottomSheetCourse : BottomSheetDialogFragment() {
+class ModalBottomSheetCourse : BaseBottomSheetDialogFragment() {
 
     private var _binding: ModalBottomSheetCourseBinding? = null
     private val binding get() = _binding!!

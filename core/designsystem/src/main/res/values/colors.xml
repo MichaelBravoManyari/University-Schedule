@@ -5,4 +5,5 @@
     <color name="accent_color">#1a83a8</color>
     <color name="text_color">#1D1F23</color>
     <color name="secondary_text_color">#747476</color>
+    <color name="background_registration_option">#DDDDDF</color>
 </resources>

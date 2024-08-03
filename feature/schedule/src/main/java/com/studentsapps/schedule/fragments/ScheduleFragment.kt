@@ -20,13 +20,11 @@ import androidx.navigation.ui.setupWithNavController
 import com.studentsapps.model.asScheduleView
 import com.studentsapps.schedule.R
 import com.studentsapps.schedule.databinding.FragmentScheduleBinding
-import com.studentsapps.schedule.viewmodels.RecurrenceOption
 import com.studentsapps.schedule.viewmodels.ScheduleUiState
 import com.studentsapps.schedule.viewmodels.ScheduleViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.time.DayOfWeek
 
 @AndroidEntryPoint
 class ScheduleFragment : Fragment() {
@@ -235,7 +233,7 @@ class ScheduleFragment : Fragment() {
 
     fun goToRegisterSchedule() {
         navController.navigate(
-            ScheduleFragmentDirections.actionScheduleFragmentToRegisterScheduleFragment()
+            ScheduleFragmentDirections.actionScheduleFragmentToRegisterScheduleFragment(title = R.string.new_schedule)
         )
     }
 

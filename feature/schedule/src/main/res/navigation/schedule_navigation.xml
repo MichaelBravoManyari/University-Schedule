@@ -40,6 +40,7 @@
         android:label="ModalBottomSheetDay" />
     <fragment
         android:id="@+id/registerScheduleFragment"
+        android:label="{title}"
         android:name="com.studentsapps.schedule.fragments.RegisterScheduleFragment">
         <action
             android:id="@+id/action_registerScheduleFragment_to_scheduleFragment"
@@ -59,6 +60,10 @@
             android:name="scheduleId"
             android:defaultValue="0"
             app:argType="integer" />
+        <argument
+            android:name="title"
+            app:argType="reference"
+            android:defaultValue="@string/update_schedule"/>
     </fragment>
     <dialog
         android:id="@+id/modalBottomSheetCourse"

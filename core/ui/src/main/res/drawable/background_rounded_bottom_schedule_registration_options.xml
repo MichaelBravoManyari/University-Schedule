@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="#DDDDDF" />
+    <solid android:color="@color/background_registration_option" />
     <corners
         android:bottomLeftRadius="10dp"
         android:bottomRightRadius="10dp"

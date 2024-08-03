@@ -16,7 +16,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.studentsapps.ui.databinding.ModalBottomSheetColorBinding
 import kotlin.math.floor
 
-class ModalBottomSheetColor : BottomSheetDialogFragment() {
+class ModalBottomSheetColor : BaseBottomSheetDialogFragment() {
     private var _binding: ModalBottomSheetColorBinding? = null
     private val binding get() = _binding!!
     private lateinit var navController: NavController

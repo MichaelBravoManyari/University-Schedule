@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.UniversitySchedule" parent="Theme.Material3.Light.NoActionBar">
+    <style name="Theme.UniversitySchedule" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:statusBarColor">@color/primary_color</item>
-        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightStatusBar">false</item>
         <item name="appBarLayoutStyle">@style/Widget.UniversitySchedule.AppBarLayout</item>
         <item name="toolbarStyle">@style/Widget.UniversitySchedule.Toolbar</item>
         <!--<item name="android:actionButtonStyle">@style/MyActionButtonStyle</item>-->
@@ -74,6 +74,7 @@
 
     <style name="Widget.UniversitySchedule.Button" parent="Widget.Material3.Button">
         <item name="materialThemeOverlay">@style/ThemeOverlay.UniversitySchedule.Button</item>
+        <item name="android:textColor">@color/primary_color</item>
     </style>
 
     <style name="Widget.UniversitySchedule.BottomSheetDialog.Button" parent="Widget.Material3.Button.TextButton">

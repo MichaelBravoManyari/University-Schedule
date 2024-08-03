@@ -73,10 +73,7 @@ class RegisterScheduleFragment : Fragment() {
         navController = view.findNavController()
 
         scheduleId = args.scheduleId
-        if (scheduleId != 0) {
-            navController.currentDestination?.label = getString(R.string.update_schedule)
-            viewModel.displayScheduleData(scheduleId)
-        } else navController.currentDestination?.label = getString(R.string.new_schedule)
+        if (scheduleId != 0) viewModel.displayScheduleData(scheduleId)
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {

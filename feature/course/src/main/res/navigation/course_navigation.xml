@@ -17,7 +17,7 @@
     <fragment
         android:id="@+id/registerCourseFragment"
         android:name="com.studentsapps.course.fragments.RegisterCourseFragment"
-        android:label="fragment_register_course"
+        android:label="{title}"
         tools:layout="@layout/fragment_register_course">
         <action
             android:id="@+id/action_registerCourseFragment_to_courseFragment"
@@ -31,5 +31,9 @@
             android:name="navigatedFromTimeLoggingDestination"
             android:defaultValue="false"
             app:argType="boolean" />
+        <argument
+            android:name="title"
+            app:argType="reference"
+            android:defaultValue="@string/new_course"/>
     </fragment>
 </navigation>

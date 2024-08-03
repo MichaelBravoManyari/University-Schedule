@@ -60,10 +60,7 @@ class RegisterCourseFragment : Fragment() {
         navigatedFromTimeLoggingDestination = args.navigatedFromTimeLoggingDestination
 
         if (courseId != 0) {
-            navController.currentDestination?.label = getString(R.string.update_course)
             viewModel.displayCourseData(courseId)
-        } else {
-            navController.currentDestination?.label = getString(R.string.new_course)
         }
 
         lifecycleScope.launch {

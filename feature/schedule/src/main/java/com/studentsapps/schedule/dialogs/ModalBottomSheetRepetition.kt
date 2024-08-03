@@ -9,9 +9,10 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.studentsapps.schedule.databinding.ModalBottomSheetRepetitionBinding
 import com.studentsapps.schedule.viewmodels.RecurrenceOption
+import com.studentsapps.ui.dialogs.BaseBottomSheetDialogFragment
 import com.studentsapps.ui.timetable.animateOpacity
 
-class ModalBottomSheetRepetition : BottomSheetDialogFragment() {
+class ModalBottomSheetRepetition : BaseBottomSheetDialogFragment() {
 
     private var _binding: ModalBottomSheetRepetitionBinding? = null
     private val binding get() = _binding!!

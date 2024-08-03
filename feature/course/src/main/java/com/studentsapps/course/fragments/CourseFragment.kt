@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -50,9 +49,7 @@ class CourseFragment : Fragment() {
 
         val courseAdapter = CourseListAdapter {
             navController.navigate(
-                CourseFragmentDirections.actionCourseFragmentToRegisterCourseFragment(
-                    it.id
-                )
+                CourseFragmentDirections.actionCourseFragmentToRegisterCourseFragment(title = R.string.update_course)
             )
         }
         val space = resources.getDimensionPixelSize(com.studentsapps.ui.R.dimen.item_spacing)

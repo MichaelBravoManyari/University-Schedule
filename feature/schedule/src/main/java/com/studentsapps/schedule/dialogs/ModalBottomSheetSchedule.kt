@@ -13,10 +13,11 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.studentsapps.schedule.R
 import com.studentsapps.schedule.databinding.ModalBottomSheetScheduleBinding
 import com.studentsapps.schedule.viewmodels.BottomSheetScheduleViewModel
+import com.studentsapps.ui.dialogs.BaseBottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class ModalBottomSheetSchedule : BottomSheetDialogFragment() {
+class ModalBottomSheetSchedule : BaseBottomSheetDialogFragment() {
 
     private var _binding: ModalBottomSheetScheduleBinding? = null
     private lateinit var navController: NavController
