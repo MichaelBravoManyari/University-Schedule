@@ -27,7 +27,12 @@ class FakeScheduleRepository @Inject constructor() : ScheduleRepository {
             .map(ScheduleDetailsView::asExternalModel)
     }
 
-    override suspend fun registerSchedule(schedule: Schedule, specificDate: LocalDate?) {
+    override suspend fun registerSchedule(
+        schedule: Schedule,
+        specificDate: LocalDate?,
+        courseName: String,
+        courseColor: Int
+    ) {
         scheduleDao.insert(with(schedule) {
             ScheduleEntity(
                 id, startTime, endTime, classPlace, dayOfWeek, specificDate, courseId

@@ -17,7 +17,7 @@ interface ScheduleRepository {
         date: LocalDate
     ): List<ScheduleDetails>
 
-    suspend fun registerSchedule(schedule: Schedule, specificDate: LocalDate?)
+    suspend fun registerSchedule(schedule: Schedule, specificDate: LocalDate?, courseName: String, courseColor: Int)
 
     suspend fun getScheduleDetailsById(scheduleId: Int): ScheduleDetails
 

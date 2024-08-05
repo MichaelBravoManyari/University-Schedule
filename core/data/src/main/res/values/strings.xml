@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="class_reminder">Class reminder</string>
+    <string name="class_is_about_begin">%s is about to begin</string>
+</resources>

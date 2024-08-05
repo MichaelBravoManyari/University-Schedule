@@ -1,12 +1,22 @@
 package com.studentsapps.schedule.fragments
 
+import android.Manifest
+import android.app.AlarmManager
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
@@ -51,10 +61,28 @@ class RegisterScheduleFragment : Fragment() {
     private val viewModel: RegisterScheduleViewModel by viewModels()
     private var scheduleId = 0
 
+    private lateinit var notificationPermissionLauncher: ActivityResultLauncher<String>
+    private lateinit var exactAlarmPermissionLauncher: ActivityResultLauncher<Intent>
+
+
     val onExistingCoursesCheckedChangeListener =
         CompoundButton.OnCheckedChangeListener { _, isChecked ->
             viewModel.existingCourseChecked(isChecked)
         }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        notificationPermissionLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+                if (isGranted) {
+                    checkAndRequestExactAlarmPermission()
+                }
+            }
+
+        exactAlarmPermissionLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -71,6 +99,8 @@ class RegisterScheduleFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         navController = view.findNavController()
+
+        checkAndRequestPermissions()
 
         scheduleId = args.scheduleId
         if (scheduleId != 0) viewModel.displayScheduleData(scheduleId)
@@ -100,6 +130,54 @@ class RegisterScheduleFragment : Fragment() {
 
         setupNavigationObservers()
         configureMenuOptionsInAppBar()
+    }
+
+    private fun checkAndRequestPermissions() {
+        if (!checkNotificationPermission()) {
+            requestNotificationPermission()
+        } else if (!checkExactAlarmPermission()) {
+            requestExactAlarmPermission()
+        }
+    }
+
+    private fun checkNotificationPermission(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+        } else {
+            true
+        }
+    }
+
+    private fun checkExactAlarmPermission(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val alarmManager =
+                requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            alarmManager.canScheduleExactAlarms()
+        } else {
+            true
+        }
+    }
+
+    private fun requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
+    private fun requestExactAlarmPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+            exactAlarmPermissionLauncher.launch(intent)
+        }
+    }
+
+    private fun checkAndRequestExactAlarmPermission() {
+        if (!checkExactAlarmPermission()) {
+            requestExactAlarmPermission()
+        }
     }
 
     private fun configureMenuOptionsInAppBar() {

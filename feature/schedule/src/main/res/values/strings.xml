@@ -52,4 +52,6 @@
     <string name="delete_schedule">Do you want to delete the schedule?</string>
     <string name="cancel">Cancel</string>
     <string name="accept_dialog">Accept</string>
+    <string name="permission_denied_show_notifications">Permission denied to show notifications</string>
+    <string name="permission_denied_schedule_reminders">Permission denied to schedule reminders</string>
 </resources>

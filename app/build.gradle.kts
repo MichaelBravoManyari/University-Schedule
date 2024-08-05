@@ -24,6 +24,7 @@ dependencies {
     implementation(project(":feature:course"))
     implementation(project(":core:designsystem"))
     implementation(project(":core:ui"))
+    implementation(project(":core:data"))
 
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)

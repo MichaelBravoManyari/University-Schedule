@@ -52,4 +52,6 @@
     <string name="select_option">Selecciona una opción</string>
     <string name="delete_schedule">¿Desea eliminar el horario?</string>
     <string name="cancel">Cancelar</string>
+    <string name="permission_denied_show_notifications">Permiso denegado para mostrar notificaciones</string>
+    <string name="permission_denied_schedule_reminders">Permiso denegado para programar recordatorios</string>
 </resources>
