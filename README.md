@@ -44,6 +44,7 @@
 ## Architecture
 
 The **University Schedule** app follows the [official architecture guidance](https://developer.android.com/topic/architecture), ensuring a clear separation of concerns and facilitating maintainability and testability. The architecture leverages:
+- **Model-View-ViewModel (MVVM)**: Ensures a clear separation of the UI logic from the business logic, making the app more modular and easier to test.
 - **ViewModel**: Manages UI-related data in a lifecycle-conscious way.
 - **Kotlin Flows**: For asynchronous data streams, ensuring efficient and reactive handling of data updates.
 - **LiveData**: Provides observable data holder classes.
