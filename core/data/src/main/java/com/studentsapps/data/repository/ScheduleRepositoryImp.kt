@@ -40,18 +40,23 @@ class ScheduleRepositoryImp @Inject constructor(
         courseName: String,
         courseColor: Int
     ) {
-        scheduleLocalDataSource.insert(with(schedule) {
+        val scheduleId = scheduleLocalDataSource.insert(with(schedule) {
             ScheduleEntity(
                 id, startTime, endTime, classPlace, dayOfWeek, specificDate, courseId
             )
         })
-        scheduleAlarm(context, schedule.asScheduleDetails(specificDate, courseName, courseColor))
+        scheduleAlarm(
+            context,
+            schedule.asScheduleDetails(scheduleId.toInt(), specificDate, courseName, courseColor)
+        )
     }
 
     override suspend fun getScheduleDetailsById(scheduleId: Int): ScheduleDetails =
         scheduleLocalDataSource.getScheduleDetailsView(scheduleId).asExternalModel()
 
-    override suspend fun updateSchedule(schedule: Schedule, specificDate: LocalDate?) {
+    override suspend fun updateSchedule(schedule: Schedule, specificDate: LocalDate?, courseName: String, courseColor: Int) {
+        val scheduleDetails = schedule.asScheduleDetails(schedule.id, specificDate, courseName, courseColor)
+        cancelAlarm(context, scheduleDetails)
         scheduleLocalDataSource.updateSchedule(with(schedule) {
             ScheduleEntity(
                 id = id,
@@ -63,14 +68,13 @@ class ScheduleRepositoryImp @Inject constructor(
                 courseId = courseId
             )
         })
+        scheduleAlarm(context, scheduleDetails)
     }
 
     override suspend fun deleteSchedule(scheduleId: Int) {
-        scheduleLocalDataSource.deleteSchedule(with(
-            scheduleLocalDataSource.getScheduleDetailsView(
-                scheduleId
-            )
-        ) {
+        val scheduleDetails = scheduleLocalDataSource.getScheduleDetailsView(scheduleId).asExternalModel()
+        cancelAlarm(context, scheduleDetails)
+        scheduleLocalDataSource.deleteSchedule(with(scheduleDetails) {
             ScheduleEntity(
                 id = scheduleId,
                 startTime = startTime,
@@ -132,12 +136,25 @@ class ScheduleRepositoryImp @Inject constructor(
         return triggerTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
     }
 
+    private fun cancelAlarm(context: Context, scheduleDetails: ScheduleDetails) {
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(context, ScheduleAlarmReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            scheduleDetails.scheduleId,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        alarmManager.cancel(pendingIntent)
+    }
+
     private fun Schedule.asScheduleDetails(
+        scheduleId: Int,
         specificDate: LocalDate?,
         courseName: String,
         courseColor: Int
     ) = ScheduleDetails(
-        scheduleId = id,
+        scheduleId = scheduleId,
         startTime = startTime,
         endTime = endTime,
         classPlace = classPlace,

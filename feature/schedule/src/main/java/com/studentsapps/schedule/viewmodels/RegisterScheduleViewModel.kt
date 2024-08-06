@@ -166,7 +166,7 @@ class RegisterScheduleViewModel @Inject constructor(
                     schedule,
                     uiState.value.specificDate,
                     uiState.value.selectedCourse!!.name,
-                    uiState.value.colorCourse
+                    uiState.value.selectedCourse!!.color
                 )
                 _uiState.update { currentState ->
                     currentState.copy(isScheduleRecorded = true)
@@ -185,7 +185,12 @@ class RegisterScheduleViewModel @Inject constructor(
         if (uiState.value.selectedCourse != null) {
             val schedule = createSchedule(uiState.value.selectedCourse!!.id)
             viewModelScope.launch {
-                scheduleRepository.updateSchedule(schedule, uiState.value.specificDate)
+                scheduleRepository.updateSchedule(
+                    schedule,
+                    uiState.value.specificDate,
+                    uiState.value.selectedCourse!!.name,
+                    uiState.value.selectedCourse!!.color
+                )
                 _uiState.update { currentState ->
                     currentState.copy(isScheduleRecorded = true)
                 }
@@ -205,7 +210,12 @@ class RegisterScheduleViewModel @Inject constructor(
             viewModelScope.launch {
                 val courseId = courseRepository.registerCourse(course).toInt()
                 val schedule = createSchedule(courseId)
-                scheduleRepository.updateSchedule(schedule, uiState.value.specificDate)
+                scheduleRepository.updateSchedule(
+                    schedule,
+                    uiState.value.specificDate,
+                    uiState.value.courseName!!,
+                    uiState.value.colorCourse
+                )
                 _uiState.update { currentState ->
                     currentState.copy(isScheduleRecorded = true)
                 }

@@ -43,7 +43,7 @@ class FakeScheduleRepository @Inject constructor() : ScheduleRepository {
     override suspend fun getScheduleDetailsById(scheduleId: Int): ScheduleDetails =
         scheduleDao.getScheduleDetailsById(scheduleId).asExternalModel()
 
-    override suspend fun updateSchedule(schedule: Schedule, specificDate: LocalDate?) {
+    override suspend fun updateSchedule(schedule: Schedule, specificDate: LocalDate?, courseName: String, courseColor: Int) {
         TODO("Not yet implemented")
     }
 
