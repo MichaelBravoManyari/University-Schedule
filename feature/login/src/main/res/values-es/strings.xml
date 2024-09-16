@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sign_in_with_email">Ingresar con email</string>
+    <string name="sign_in_with_google">Ingresar con Google</string>
+    <string name="are_you_new_register_here">¿Eres nuevo? Registrate aquí</string>
+    <string name="welcome_to_university_schedule">¡Bienvenido a Horario Universitario! Organiza tus clases y horarios fácilmente. ¡Tu planificación comienza ahora!</string>
+    <string name="enter_your_email">Ingrese su correo</string>
+    <string name="enter_your_password">Ingrese su contraseña</string>
+    <string name="login">Ingresar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="validate_your_password">Validar tu contraseña</string>
+    <string name="sign_up">Registrarse</string>
+</resources>

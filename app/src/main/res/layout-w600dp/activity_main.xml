@@ -17,7 +17,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:navGraph="@navigation/nav_graph"
-        tools:layout="@layout/fragment_schedule" />
+        tools:layout="@layout/fragment_auth" />
 
     <com.google.android.material.navigationrail.NavigationRailView
         android:id="@+id/navigation_rail"

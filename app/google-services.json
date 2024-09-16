@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1056896212396",
+    "project_id": "university-schedule-6d492",
+    "storage_bucket": "university-schedule-6d492.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1056896212396:android:78399c689178b298fc6e09",
+        "android_client_info": {
+          "package_name": "com.studentsapps.universityschedule"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1P3jiWeYiFBM63s66gdJJ3b5HkqvUy6A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

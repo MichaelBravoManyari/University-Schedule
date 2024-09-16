@@ -50,4 +50,8 @@ class FakeScheduleRepository @Inject constructor() : ScheduleRepository {
     override suspend fun deleteSchedule(scheduleId: Int) {
         TODO("Not yet implemented")
     }
+
+    override suspend fun getAllScheduleDetails(): List<ScheduleDetails> {
+        TODO("Not yet implemented")
+    }
 }

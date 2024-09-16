@@ -22,6 +22,7 @@ dependencies {
 
     implementation(project(":feature:schedule"))
     implementation(project(":feature:course"))
+    implementation(project(":feature:login"))
     implementation(project(":core:designsystem"))
     implementation(project(":core:ui"))
     implementation(project(":core:data"))
@@ -29,6 +30,8 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.material)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
 
     // Navigation component
     implementation(libs.androidx.navigation.fragment.ktx)

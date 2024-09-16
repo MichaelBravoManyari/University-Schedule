@@ -67,4 +67,7 @@ abstract class ScheduleDao : BaseDao<ScheduleEntity> {
         dayOfWeek: DayOfWeek,
         specificDate: LocalDate
     ): List<ScheduleDetailsView>
+
+    @Query("SELECT * FROM schedule_details")
+    abstract suspend fun getAllSchedule(): List<ScheduleDetailsView>
 }

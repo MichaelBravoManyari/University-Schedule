@@ -11,6 +11,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 apply("com.android.application")
                 apply("org.jetbrains.kotlin.android")
                 apply("androidx.navigation.safeargs.kotlin")
+                apply("com.google.gms.google-services")
             }
 
             extensions.configure<ApplicationExtension> {

@@ -24,4 +24,6 @@ interface ScheduleRepository {
     suspend fun updateSchedule(schedule: Schedule, specificDate: LocalDate?, courseName: String, courseColor: Int)
 
     suspend fun deleteSchedule(scheduleId: Int)
+
+    suspend fun getAllScheduleDetails(): List<ScheduleDetails>
 }

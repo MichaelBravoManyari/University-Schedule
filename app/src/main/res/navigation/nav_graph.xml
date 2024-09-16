@@ -2,10 +2,11 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/schedule_nav_graph">
+    app:startDestination="@id/login_navigation">
 
     <include app:graph="@navigation/schedule_navigation" />
     <include app:graph="@navigation/course_navigation" />
+    <include app:graph="@navigation/login_navigation" />
     <dialog
         android:id="@+id/modalBottomSheetColor"
         android:name="com.studentsapps.ui.dialogs.ModalBottomSheetColor"

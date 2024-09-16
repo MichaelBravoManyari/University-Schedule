@@ -1,0 +1,12 @@
+<resources>
+    <string name="sign_in_with_email">Sign in with Email</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="are_you_new_register_here">Are you new? Register here</string>
+    <string name="welcome_to_university_schedule">Welcome to University Schedule! Easily organize your classes and schedules. Your planning starts now!</string>
+    <string name="enter_your_email">Enter your email</string>
+    <string name="enter_your_password">Enter your password</string>
+    <string name="login">Login</string>
+    <string name="cancel">Cancel</string>
+    <string name="validate_your_password">Validate your password</string>
+    <string name="sign_up">Sign up</string>
+</resources>
