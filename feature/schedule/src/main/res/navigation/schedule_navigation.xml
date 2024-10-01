@@ -25,6 +25,8 @@
         <action
             android:id="@+id/action_scheduleFragment_to_modalBottomSheetSchedule"
             app:destination="@id/modalBottomSheetSchedule" />
+
+        <deepLink app:uri="android-app://studentsapps.app/scheduleFragment" />
     </fragment>
     <fragment
         android:id="@+id/scheduleConfigurationFragment"

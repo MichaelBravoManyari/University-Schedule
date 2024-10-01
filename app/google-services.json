@@ -12,7 +12,20 @@
           "package_name": "com.studentsapps.universityschedule"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1056896212396-hgahtnog03fkfm7p6qk1qudjhg4dmku5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.studentsapps.universityschedule",
+            "certificate_hash": "757252939d0b06278ea52c167acfe1a638e934d7"
+          }
+        },
+        {
+          "client_id": "1056896212396-jqkd4ba6qvch3352mgtumbt79ssbq59u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyD1P3jiWeYiFBM63s66gdJJ3b5HkqvUy6A"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1056896212396-jqkd4ba6qvch3352mgtumbt79ssbq59u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

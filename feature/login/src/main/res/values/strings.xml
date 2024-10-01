@@ -9,4 +9,6 @@
     <string name="cancel">Cancel</string>
     <string name="validate_your_password">Validate your password</string>
     <string name="sign_up">Sign up</string>
+    <string name="web_client_id" translatable="false">1056896212396-jqkd4ba6qvch3352mgtumbt79ssbq59u.apps.googleusercontent.com</string>
+    <string name="login_error">Login error</string>
 </resources>
