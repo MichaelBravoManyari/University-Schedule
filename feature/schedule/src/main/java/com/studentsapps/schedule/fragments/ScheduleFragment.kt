@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -14,9 +15,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.findNavController
 import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupWithNavController
+import com.google.firebase.auth.FirebaseAuth
 import com.studentsapps.model.asScheduleView
 import com.studentsapps.schedule.R
 import com.studentsapps.schedule.databinding.FragmentScheduleBinding
@@ -25,6 +28,7 @@ import com.studentsapps.schedule.viewmodels.ScheduleViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ScheduleFragment : Fragment() {
@@ -33,6 +37,9 @@ class ScheduleFragment : Fragment() {
     private var _binding: FragmentScheduleBinding? = null
     private val binding get() = _binding!!
     private val viewModel: ScheduleViewModel by viewModels()
+
+    @Inject
+    lateinit var auth: FirebaseAuth
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -215,6 +222,15 @@ class ScheduleFragment : Fragment() {
                         true
                     }
 
+                    R.id.sign_out -> {
+                        auth.signOut()
+                        val request =
+                            NavDeepLinkRequest.Builder.fromUri("android-app://studentsapps.app/authFragment".toUri())
+                                .build()
+                        navController.navigate(request)
+                        true
+                    }
+
                     else -> menuItem.onNavDestinationSelected(findNavController())
                 }
             }
@@ -235,6 +251,16 @@ class ScheduleFragment : Fragment() {
         navController.navigate(
             ScheduleFragmentDirections.actionScheduleFragmentToRegisterScheduleFragment(title = R.string.new_schedule)
         )
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if (auth.currentUser == null) {
+            val request =
+                NavDeepLinkRequest.Builder.fromUri("android-app://studentsapps.app/authFragment".toUri())
+                    .build()
+            navController.navigate(request)
+        }
     }
 
     override fun onDestroyView() {

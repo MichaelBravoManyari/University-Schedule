@@ -31,9 +31,9 @@ dependencies {
 
     // Authentication with Credential Manager
     implementation (libs.googleid)
-    implementation("com.google.android.gms:play-services-auth:21.2.0")
-    implementation("androidx.credentials:credentials:1.2.2")
-    implementation("androidx.credentials:credentials-play-services-auth:1.2.2")
+    implementation(libs.play.services.auth)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)

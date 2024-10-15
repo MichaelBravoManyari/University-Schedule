@@ -54,4 +54,7 @@
     <string name="accept_dialog">Accept</string>
     <string name="permission_denied_show_notifications">Permission denied to show notifications</string>
     <string name="permission_denied_schedule_reminders">Permission denied to schedule reminders</string>
+    <string name="sign_out">Sign out</string>
+    <string name="mail">Mail</string>
+    <string name="no_user">No user</string>
 </resources>

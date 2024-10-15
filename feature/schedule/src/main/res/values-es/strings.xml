@@ -54,4 +54,7 @@
     <string name="cancel">Cancelar</string>
     <string name="permission_denied_show_notifications">Permiso denegado para mostrar notificaciones</string>
     <string name="permission_denied_schedule_reminders">Permiso denegado para programar recordatorios</string>
+    <string name="sign_out">Cerrar sesión</string>
+    <string name="mail">Email</string>
+    <string name="no_user">Sin usuario</string>
 </resources>

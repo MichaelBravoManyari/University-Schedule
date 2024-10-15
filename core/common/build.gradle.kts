@@ -8,5 +8,5 @@ android {
 }
 
 dependencies {
-
+    implementation(libs.firebase.auth.ktx)
 }

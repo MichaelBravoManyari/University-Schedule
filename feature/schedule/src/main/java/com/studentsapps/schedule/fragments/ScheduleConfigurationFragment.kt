@@ -75,6 +75,11 @@ class ScheduleConfigurationFragment : Fragment() {
                                 viewModel.setShowSunday()
                             }
                         }
+
+                        binding.mailDisplay.apply {
+                            text =
+                                currentState.mail ?: getText(R.string.no_user)
+                        }
                     }
                 }
             }

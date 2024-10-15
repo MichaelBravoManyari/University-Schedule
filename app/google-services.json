@@ -14,11 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "1056896212396-hgahtnog03fkfm7p6qk1qudjhg4dmku5.apps.googleusercontent.com",
+          "client_id": "1056896212396-9anl9h474iqgsqj4htscpjjjhumqmr6a.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.studentsapps.universityschedule",
-            "certificate_hash": "757252939d0b06278ea52c167acfe1a638e934d7"
+            "certificate_hash": "eae155de2bab310cab34a616d2b2d705dbd816d9"
           }
         },
         {

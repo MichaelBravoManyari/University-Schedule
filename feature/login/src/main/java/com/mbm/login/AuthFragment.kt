@@ -21,25 +21,27 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import com.studentsapps.login.R
 import com.studentsapps.login.databinding.FragmentAuthBinding
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class AuthFragment : Fragment() {
 
     private var _binding: FragmentAuthBinding? = null
     private val binding get() = _binding!!
     private lateinit var navController: NavController
-    private lateinit var auth: FirebaseAuth
+
+    @Inject
+    lateinit var auth: FirebaseAuth
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentAuthBinding.inflate(layoutInflater, container, false)
-        auth = Firebase.auth
         return binding.root
     }
 
@@ -124,16 +126,6 @@ class AuthFragment : Fragment() {
                     }
                 }
             }
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        if (auth.currentUser != null) {
-            val request =
-                NavDeepLinkRequest.Builder.fromUri("android-app://studentsapps.app/scheduleFragment".toUri())
-                    .build()
-            navController.navigate(request)
         }
     }
 

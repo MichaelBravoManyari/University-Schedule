@@ -2,6 +2,7 @@ package com.studentsapps.schedule.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import com.studentsapps.data.repository.TimetableUserPreferencesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -13,7 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ScheduleConfigurationViewModel @Inject constructor(
-    private val timetableUserPreferencesRepository: TimetableUserPreferencesRepository
+    private val timetableUserPreferencesRepository: TimetableUserPreferencesRepository,
+    private val auth: FirebaseAuth,
 ) : ViewModel() {
 
     val uiState: StateFlow<ScheduleConfigurationUiState> =
@@ -23,7 +25,8 @@ class ScheduleConfigurationViewModel @Inject constructor(
                     isMondayFirstDayOfWeek,
                     is12HoursFormat,
                     showSaturday,
-                    showSunday
+                    showSunday,
+                    auth.currentUser?.email
                 )
             }
         }.stateIn(
@@ -66,5 +69,6 @@ sealed interface ScheduleConfigurationUiState {
         val is12HoursFormat: Boolean,
         val showSaturday: Boolean,
         val showSunday: Boolean,
+        val mail: String?,
     ) : ScheduleConfigurationUiState
 }
