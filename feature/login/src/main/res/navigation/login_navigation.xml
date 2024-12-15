@@ -21,9 +21,17 @@
     <fragment
         android:id="@+id/emailSignUpFragment"
         android:name="com.mbm.login.EmailSignUpFragment"
-        android:label="EmailSignUpFragment" />
+        android:label="EmailSignUpFragment" >
+        <action
+            android:id="@+id/action_emailSignUpFragment_to_authFragment"
+            app:destination="@id/authFragment" />
+    </fragment>
     <fragment
         android:id="@+id/emailLoginFragment"
         android:name="com.mbm.login.EmailLoginFragment"
-        android:label="EmailLoginFragment" />
+        android:label="EmailLoginFragment" >
+        <action
+            android:id="@+id/action_emailLoginFragment_to_authFragment"
+            app:destination="@id/authFragment" />
+    </fragment>
 </navigation>

@@ -35,7 +35,7 @@
                 android:layout_height="wrap_content"
                 android:drawableStart="@drawable/ic_email"
                 android:drawablePadding="5dp"
-                android:hint="@string/enter_your_email"
+                android:hint="@string/email"
                 android:inputType="textEmailAddress" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -56,7 +56,7 @@
                 android:layout_height="wrap_content"
                 android:drawableStart="@drawable/ic_password"
                 android:drawablePadding="5dp"
-                android:hint="@string/enter_your_password"
+                android:hint="@string/password"
                 android:inputType="textPassword" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -77,9 +77,9 @@
             android:layout_marginTop="15dp"
             android:layout_marginBottom="15dp"
             android:text="@string/cancel"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btn_login"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintTop_toBottomOf="@id/btn_login" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

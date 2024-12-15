@@ -11,4 +11,13 @@
     <string name="sign_up">Sign up</string>
     <string name="web_client_id" translatable="false">1056896212396-jqkd4ba6qvch3352mgtumbt79ssbq59u.apps.googleusercontent.com</string>
     <string name="login_error">Login error</string>
+    <string name="login_error_message">The user could not be identified</string>
+    <string name="accept">OK</string>
+    <string name="invalid_email">Invalid email</string>
+    <string name="email" translatable="false">Email</string>
+    <string name="password">Password</string>
+    <string name="low_security_password">Low security password</string>
+    <string name="user_creation_error_message">User could not be created</string>
+    <string name="email_already_registered">Email already registered</string>
+    <string name="passwords_do_not_match">Passwords do not match</string>
 </resources>

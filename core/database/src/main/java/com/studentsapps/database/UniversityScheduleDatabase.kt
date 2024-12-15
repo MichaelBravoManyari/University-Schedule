@@ -10,6 +10,7 @@ import com.studentsapps.database.model.ScheduleDetailsView
 import com.studentsapps.database.model.ScheduleEntity
 import com.studentsapps.database.util.DayOfWeekConverter
 import com.studentsapps.database.util.LocalDateConverter
+import com.studentsapps.database.util.LocalDateTimeConverter
 import com.studentsapps.database.util.LocalTimeConverter
 
 @Database(
@@ -25,6 +26,7 @@ import com.studentsapps.database.util.LocalTimeConverter
     LocalTimeConverter::class,
     DayOfWeekConverter::class,
     LocalDateConverter::class,
+    LocalDateTimeConverter::class
 )
 abstract class UniversityScheduleDatabase : RoomDatabase() {
 

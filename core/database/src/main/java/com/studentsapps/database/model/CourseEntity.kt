@@ -4,6 +4,8 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.studentsapps.model.Course
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Entity(tableName = "courses")
 data class CourseEntity(
@@ -12,7 +14,9 @@ data class CourseEntity(
     val name: String,
     @ColumnInfo(name = "name_professor")
     val nameProfessor: String?,
-    val color: Int
+    val color: Int,
+    @ColumnInfo(name = "last_modified")
+    val lastModified: LocalDateTime
 )
 
 fun CourseEntity.asExternalModel() = Course(

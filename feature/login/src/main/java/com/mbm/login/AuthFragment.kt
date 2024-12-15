@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.core.net.toUri
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
@@ -21,6 +22,7 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.firestore.FirebaseFirestore
 import com.studentsapps.login.R
 import com.studentsapps.login.databinding.FragmentAuthBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -47,6 +49,14 @@ class AuthFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    requireActivity().finishAffinity()
+                }
+            })
+
         navController = view.findNavController()
 
         binding.btnLoginEmail.setOnClickListener {
@@ -63,6 +73,9 @@ class AuthFragment : Fragment() {
     }
 
     private fun signInWithGoogle() {
+
+        showLoading(true)
+
         val googleIdOption =
             GetSignInWithGoogleOption.Builder(getString(R.string.web_client_id))
                 .build()
@@ -73,6 +86,7 @@ class AuthFragment : Fragment() {
                     .getCredential(requireActivity(), request)
                 handleSignIn(result)
             } catch (e: GetCredentialException) {
+                showLoading(false)
                 Toast.makeText(
                     requireContext(),
                     getString(R.string.login_error),
@@ -94,11 +108,19 @@ class AuthFragment : Fragment() {
                         val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
                         auth.signInWithCredential(firebaseCredential).addOnCompleteListener {
                             if (it.isSuccessful) {
-                                val request =
-                                    NavDeepLinkRequest.Builder.fromUri("android-app://studentsapps.app/scheduleFragment".toUri())
-                                        .build()
-                                navController.navigate(request)
+                                val userId = auth.currentUser?.uid
+                                if (userId != null) {
+                                    checkAndRegisterUser(userId)
+                                } else {
+                                    showLoading(false)
+                                    Toast.makeText(
+                                        requireContext(),
+                                        getString(R.string.login_error),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
                             } else {
+                                showLoading(false)
                                 Toast.makeText(
                                     requireContext(),
                                     getString(R.string.login_error),
@@ -106,6 +128,7 @@ class AuthFragment : Fragment() {
                                 ).show()
                             }
                         }.addOnFailureListener {
+                            showLoading(false)
                             Toast.makeText(
                                 requireContext(),
                                 getString(R.string.login_error),
@@ -113,6 +136,7 @@ class AuthFragment : Fragment() {
                             ).show()
                         }
                     } catch (e: GoogleIdTokenParsingException) {
+                        showLoading(false)
                         Toast.makeText(
                             requireContext(),
                             getString(R.string.login_error),
@@ -127,6 +151,60 @@ class AuthFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun checkAndRegisterUser(userId: String) {
+        val firestore = FirebaseFirestore.getInstance()
+        val userDocRef = firestore.collection("users").document(userId)
+
+        userDocRef.get().addOnSuccessListener { document ->
+            if (!document.exists()) {
+                userDocRef.set(mapOf("userId" to userId)).addOnSuccessListener {
+                    Log.d("AuthFragment", "Usuario registrado correctamente en Firestore.")
+                    navigateToScheduleFragment()
+                }.addOnFailureListener { e ->
+                    Log.e("AuthFragment", "Error al registrar el usuario en Firestore.", e)
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.login_error),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            } else {
+                Log.d("AuthFragment", "Usuario ya existe en Firestore.")
+                navigateToScheduleFragment()
+            }
+        }.addOnFailureListener { e ->
+            Log.e("AuthFragment", "Error al verificar el usuario en Firestore.", e)
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.login_error),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    private fun showLoading(isLoading: Boolean) {
+        val progressIndicator = binding.progressIndicator
+        val blockingLayer = binding.blockingLayer
+
+        if (isLoading) {
+            progressIndicator.visibility = View.VISIBLE
+            blockingLayer.visibility = View.VISIBLE
+            blockingLayer.isClickable = true
+        } else {
+            progressIndicator.visibility = View.GONE
+            blockingLayer.visibility = View.GONE
+            blockingLayer.isClickable = false
+        }
+    }
+
+
+    private fun navigateToScheduleFragment() {
+        val request =
+            NavDeepLinkRequest.Builder.fromUri("android-app://studentsapps.app/scheduleFragment".toUri())
+                .build()
+        navController.navigate(request)
     }
 
     override fun onDestroyView() {

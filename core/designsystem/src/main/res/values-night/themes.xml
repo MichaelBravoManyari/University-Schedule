@@ -21,14 +21,30 @@
         <item name="bottomSheetDialogTheme">
             @style/ThemeOverlay.UniversitySchedule.BottomSheetDialog
         </item>
-        <item name="materialTimePickerTheme">@style/ThemeOverlay.UniversitySchedule.TimePicker</item>
+        <item name="materialTimePickerTheme">@style/ThemeOverlay.UniversitySchedule.TimePicker
+        </item>
         <item name="materialCalendarTheme">@style/ThemeOverlay.UniversitySchedule.DatePicker</item>
-        <item name="materialAlertDialogTheme">@style/ThemeOverlay.UniversitySchedule.MaterialAlertDialog</item>
+        <item name="materialAlertDialogTheme">
+            @style/ThemeOverlay.UniversitySchedule.MaterialAlertDialog
+        </item>
+        <item name="circularProgressIndicatorStyle">
+            @style/Widget.UniversitySchedule.CircularProgressIndicator
+        </item>
+    </style>
+
+    <style name="Widget.UniversitySchedule.CircularProgressIndicator" parent="Widget.Material3.CircularProgressIndicator.Legacy">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.CircularProgressIndicator</item>
+    </style>
+
+    <style name="ThemeOverlay.App.CircularProgressIndicator" parent="">
+        <item name="colorPrimary">@color/accent_color</item>
     </style>
 
     <style name="ThemeOverlay.UniversitySchedule.MaterialAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
-        <item name="buttonBarPositiveButtonStyle">@style/Widget.UniversitySchedule.Button.Dialog</item>
-        <item name="buttonBarNegativeButtonStyle">@style/Widget.UniversitySchedule.Button.Dialog</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.UniversitySchedule.Button.Dialog
+        </item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.UniversitySchedule.Button.Dialog
+        </item>
     </style>
 
     <style name="Widget.UniversitySchedule.Button.Dialog" parent="Widget.Material3.Button.TextButton.Dialog">
@@ -44,7 +60,9 @@
         <item name="colorPrimary">@color/accent_color</item>
         <item name="colorOnPrimary">@color/accent_color</item>
         <item name="chipStyle">@style/Widget.UniversitySchedule.Chip</item>
-        <item name="materialButtonOutlinedStyle">@style/Widget.UniversitySchedule.TimePicker.AmPmButton</item>
+        <item name="materialButtonOutlinedStyle">
+            @style/Widget.UniversitySchedule.TimePicker.AmPmButton
+        </item>
     </style>
 
     <style name="Widget.UniversitySchedule.Chip" parent="Widget.Material3.MaterialTimePicker.Display">
@@ -58,7 +76,8 @@
     </style>
 
     <style name="ThemeOverlay.UniversitySchedule.BottomSheetDialog" parent="ThemeOverlay.Material3.BottomSheetDialog">
-        <item name="materialButtonStyle">@style/Widget.UniversitySchedule.BottomSheetDialog.Button</item>
+        <item name="materialButtonStyle">@style/Widget.UniversitySchedule.BottomSheetDialog.Button
+        </item>
     </style>
 
     <style name="Widget.UniversitySchedule.Switch" parent="Widget.Material3.CompoundButton.MaterialSwitch">
@@ -78,7 +97,9 @@
     </style>
 
     <style name="Widget.UniversitySchedule.BottomSheetDialog.Button" parent="Widget.Material3.Button.TextButton">
-        <item name="materialThemeOverlay">@style/ThemeOverlay.UniversitySchedule.BottomSheetDialog.Button</item>
+        <item name="materialThemeOverlay">
+            @style/ThemeOverlay.UniversitySchedule.BottomSheetDialog.Button
+        </item>
     </style>
 
     <style name="ThemeOverlay.UniversitySchedule.Button" parent="ThemeOverlay.Material3.Button">

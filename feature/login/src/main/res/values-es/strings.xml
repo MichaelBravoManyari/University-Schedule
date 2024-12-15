@@ -11,4 +11,12 @@
     <string name="validate_your_password">Validar tu contraseña</string>
     <string name="sign_up">Registrarse</string>
     <string name="login_error">Error al iniciar sesión</string>
+    <string name="login_error_message">No se pudo identificar el usuario</string>
+    <string name="accept">Aceptar</string>
+    <string name="invalid_email">Correo no valido</string>
+    <string name="password">Contraseña</string>
+    <string name="low_security_password">Contraseña de baja seguridad</string>
+    <string name="user_creation_error_message">No se pudo crear el usuario</string>
+    <string name="email_already_registered">Correo  ya registrado</string>
+    <string name="passwords_do_not_match">Las contraseñas no coinciden</string>
 </resources>

@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 import com.studentsapps.model.Schedule
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 
 @Entity(
@@ -32,6 +33,8 @@ data class ScheduleEntity(
     val dayOfWeek: DayOfWeek,
     @ColumnInfo(name = "specific_date")
     val specificDate: LocalDate?,
+    @ColumnInfo(name = "last_modified")
+    val lastModified: LocalDateTime,
     @ColumnInfo(name = "course_id")
     val courseId: Int
 )

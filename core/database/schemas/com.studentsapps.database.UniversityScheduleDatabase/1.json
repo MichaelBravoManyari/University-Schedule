@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "e087b652e574f13e01df351bb5c8518f",
+    "identityHash": "d99072d741fe51969208b1ff22a5cd9d",
     "entities": [
       {
         "tableName": "schedules",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `start_time` TEXT NOT NULL, `end_time` TEXT NOT NULL, `class_place` TEXT, `day_of_week` INTEGER NOT NULL, `specific_date` TEXT, `course_id` INTEGER NOT NULL, FOREIGN KEY(`course_id`) REFERENCES `courses`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `start_time` TEXT NOT NULL, `end_time` TEXT NOT NULL, `class_place` TEXT, `day_of_week` INTEGER NOT NULL, `specific_date` TEXT, `last_modified` TEXT NOT NULL, `course_id` INTEGER NOT NULL, FOREIGN KEY(`course_id`) REFERENCES `courses`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
         "fields": [
           {
             "fieldPath": "id",
@@ -45,6 +45,12 @@
             "notNull": false
           },
           {
+            "fieldPath": "lastModified",
+            "columnName": "last_modified",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
             "fieldPath": "courseId",
             "columnName": "course_id",
             "affinity": "INTEGER",
@@ -74,7 +80,7 @@
       },
       {
         "tableName": "courses",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `name_professor` TEXT, `color` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `name_professor` TEXT, `color` INTEGER NOT NULL, `last_modified` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -99,6 +105,12 @@
             "columnName": "color",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "lastModified",
+            "columnName": "last_modified",
+            "affinity": "TEXT",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -119,7 +131,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e087b652e574f13e01df351bb5c8518f')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd99072d741fe51969208b1ff22a5cd9d')"
     ]
   }
 }

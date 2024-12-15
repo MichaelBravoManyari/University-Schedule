@@ -7,6 +7,7 @@ import com.studentsapps.database.test.data.testdoubles.TestCourseDao
 import com.studentsapps.model.Course
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 class FakeCourseRepository @Inject constructor() : CourseRepository {
@@ -18,7 +19,7 @@ class FakeCourseRepository @Inject constructor() : CourseRepository {
 
     override suspend fun registerCourse(course: Course): Long = courseDao.insert(with(course) {
         CourseEntity(
-            id, name, nameProfessor, color
+            id, name, nameProfessor, color, LocalDateTime.now()
         )
     })
 
@@ -28,7 +29,7 @@ class FakeCourseRepository @Inject constructor() : CourseRepository {
 
     override suspend fun updateCourse(course: Course) = courseDao.update(with(course) {
         CourseEntity(
-            id, name, nameProfessor, color
+            id, name, nameProfessor, color, LocalDateTime.now()
         )
     })
 

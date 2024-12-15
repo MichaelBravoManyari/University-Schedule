@@ -8,6 +8,7 @@ import com.studentsapps.database.test.data.testdoubles.TestScheduleDao
 import com.studentsapps.model.Schedule
 import com.studentsapps.model.ScheduleDetails
 import java.time.LocalDate
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 class FakeScheduleRepository @Inject constructor() : ScheduleRepository {
@@ -35,7 +36,7 @@ class FakeScheduleRepository @Inject constructor() : ScheduleRepository {
     ) {
         scheduleDao.insert(with(schedule) {
             ScheduleEntity(
-                id, startTime, endTime, classPlace, dayOfWeek, specificDate, courseId
+                id, startTime, endTime, classPlace, dayOfWeek, specificDate, LocalDateTime.now(),courseId
             )
         })
     }

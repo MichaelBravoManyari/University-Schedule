@@ -1,6 +1,7 @@
 package com.studentsapps.database.test.data
 
 import com.studentsapps.database.model.CourseEntity
+import java.time.LocalDateTime
 
 private val backupCourseList = listOf(
     createTestCourse(1, "Math"),
@@ -18,4 +19,4 @@ fun restoreCoursesBackup() {
     courseList.addAll(backupCourseList)
 }
 
-private fun createTestCourse(id: Int, name: String) = CourseEntity(id = id, name = name, null, 1234)
+private fun createTestCourse(id: Int, name: String) = CourseEntity(id = id, name = name, null, 1234, LocalDateTime.now())

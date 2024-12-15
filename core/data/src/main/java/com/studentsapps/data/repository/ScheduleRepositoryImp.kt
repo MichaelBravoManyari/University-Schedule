@@ -12,6 +12,7 @@ import com.studentsapps.model.Schedule
 import com.studentsapps.model.ScheduleDetails
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.LocalDate
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 class ScheduleRepositoryImp @Inject constructor(
@@ -39,7 +40,14 @@ class ScheduleRepositoryImp @Inject constructor(
     ) {
         val scheduleId = scheduleLocalDataSource.insert(with(schedule) {
             ScheduleEntity(
-                id, startTime, endTime, classPlace, dayOfWeek, specificDate, courseId
+                id,
+                startTime,
+                endTime,
+                classPlace,
+                dayOfWeek,
+                specificDate,
+                LocalDateTime.now(),
+                courseId
             )
         })
         scheduleAlarm(
@@ -68,6 +76,7 @@ class ScheduleRepositoryImp @Inject constructor(
                 classPlace = classPlace,
                 dayOfWeek = dayOfWeek,
                 specificDate = specificDate,
+                LocalDateTime.now(),
                 courseId = courseId
             )
         })
@@ -86,6 +95,7 @@ class ScheduleRepositoryImp @Inject constructor(
                 classPlace = classPlace,
                 dayOfWeek = dayOfWeek,
                 specificDate = specificDate,
+                LocalDateTime.now(),
                 courseId = courseId
             )
         })
