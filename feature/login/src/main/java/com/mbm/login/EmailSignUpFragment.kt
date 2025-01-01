@@ -1,16 +1,19 @@
 package com.mbm.login
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
 import androidx.navigation.NavController
 import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.findNavController
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.studentsapps.login.R
 import com.studentsapps.login.databinding.FragmentEmailSignUpBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,6 +29,8 @@ class EmailSignUpFragment : Fragment() {
     @Inject
     lateinit var auth: FirebaseAuth
 
+    private lateinit var backPressCallback: OnBackPressedCallback
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -37,7 +42,17 @@ class EmailSignUpFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         navController = view.findNavController()
+        setupBackPressHandler()
         setupClickListeners()
+    }
+
+    private fun setupBackPressHandler() {
+        backPressCallback = object : OnBackPressedCallback(false) {
+            override fun handleOnBackPressed() {
+                // No se hace nada mientras la carga esté activa
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, backPressCallback)
     }
 
     private fun setupClickListeners() {
@@ -97,13 +112,15 @@ class EmailSignUpFragment : Fragment() {
     }
 
     private fun createUser(email: String, password: String) {
+        showLoading(true)
         auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                val request =
-                    NavDeepLinkRequest.Builder.fromUri("android-app://studentsapps.app/scheduleFragment".toUri())
-                        .build()
-                navController.navigate(request)
+                val userId = auth.currentUser?.uid
+                if (userId != null) {
+                    saveUserToFirestore(userId)
+                }
             } else {
+                showLoading(false)
                 val builder = AlertDialog.Builder(requireContext())
                 builder.apply {
                     setTitle(getString(R.string.user_creation_error_message))
@@ -114,6 +131,36 @@ class EmailSignUpFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun saveUserToFirestore(userId: String) {
+        val firestore = FirebaseFirestore.getInstance()
+        firestore.collection("users").document(userId).set(emptyMap<String, Any>())
+            .addOnSuccessListener {
+                showLoading(false)
+                val request =
+                    NavDeepLinkRequest.Builder.fromUri("android-app://studentsapps.app/scheduleFragment".toUri())
+                        .build()
+                navController.navigate(request)
+            }
+            .addOnFailureListener { e ->
+                showLoading(false)
+                val builder = AlertDialog.Builder(requireContext())
+                builder.apply {
+                    setTitle(getString(R.string.user_creation_error_message))
+                    setMessage(getString(R.string.firestore_save_error))
+                    setNegativeButton(getString(R.string.accept), null)
+                    val dialog: AlertDialog = builder.create()
+                    dialog.show()
+                }
+                Log.d("EmailSignUpFragment", "Error: $e")
+            }
+    }
+
+    private fun showLoading(show: Boolean) {
+        binding.progressIndicator.visibility = if (show) View.VISIBLE else View.GONE
+        binding.blockingLayer.visibility = if (show) View.VISIBLE else View.GONE
+        backPressCallback.isEnabled = show
     }
 
     override fun onDestroyView() {

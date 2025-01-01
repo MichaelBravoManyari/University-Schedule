@@ -19,7 +19,6 @@ dependencies {
     implementation(project(":core:data"))
     implementation(project(":core:model"))
     implementation(project(":core:common"))
-    implementation(libs.firebase.firestore.ktx)
     testImplementation(project(":core:testing"))
     testImplementation(project(":core:data-test"))
 
@@ -29,7 +28,7 @@ dependencies {
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.firebase.auth.ktx)
-    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.firestore.ktx)
 
     // Authentication with Credential Manager
     implementation (libs.googleid)

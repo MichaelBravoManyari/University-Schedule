@@ -19,4 +19,5 @@
     <string name="user_creation_error_message">No se pudo crear el usuario</string>
     <string name="email_already_registered">Correo  ya registrado</string>
     <string name="passwords_do_not_match">Las contraseñas no coinciden</string>
+    <string name="firestore_save_error">No se pudo guardar el usuario</string>
 </resources>

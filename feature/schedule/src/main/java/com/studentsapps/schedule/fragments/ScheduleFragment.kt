@@ -1,9 +1,11 @@
 package com.studentsapps.schedule.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
@@ -21,6 +23,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupWithNavController
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.studentsapps.model.asScheduleView
 import com.studentsapps.schedule.R
 import com.studentsapps.schedule.databinding.FragmentScheduleBinding
@@ -269,6 +272,21 @@ class ScheduleFragment : Fragment() {
                 NavDeepLinkRequest.Builder.fromUri("android-app://studentsapps.app/authFragment".toUri())
                     .build()
             navController.navigate(request)
+        } else {
+            val firestore = FirebaseFirestore.getInstance()
+            val userId = auth.currentUser!!.uid
+            val userDocRef = firestore.collection("users").document(userId)
+
+            userDocRef.get().addOnSuccessListener { document ->
+                if (!document.exists()) {
+                    // Registrar al usuario si no existe
+                    userDocRef.set(mapOf("userId" to userId)).addOnSuccessListener {
+                        Log.d("AuthFragment", "Usuario registrado correctamente en Firestore.")
+                    }.addOnFailureListener { e ->
+                        Log.e("AuthFragment", "Error al registrar el usuario en Firestore.", e)
+                    }
+                }
+            }
         }
     }
 

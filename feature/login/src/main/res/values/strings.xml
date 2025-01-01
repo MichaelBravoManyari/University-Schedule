@@ -20,4 +20,5 @@
     <string name="user_creation_error_message">User could not be created</string>
     <string name="email_already_registered">Email already registered</string>
     <string name="passwords_do_not_match">Passwords do not match</string>
+    <string name="firestore_save_error">Failed to save user</string>
 </resources>
