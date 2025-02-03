@@ -47,9 +47,12 @@ class CourseFragment : Fragment() {
         navController = view.findNavController()
         val appBarConfiguration = AppBarConfiguration(setOf(R.id.courseFragment))
 
-        val courseAdapter = CourseListAdapter {
+        val courseAdapter = CourseListAdapter { course ->
             navController.navigate(
-                CourseFragmentDirections.actionCourseFragmentToRegisterCourseFragment(title = R.string.update_course)
+                CourseFragmentDirections.actionCourseFragmentToRegisterCourseFragment(
+                    title = R.string.update_course,
+                    courseId = course.id
+                )
             )
         }
         val space = resources.getDimensionPixelSize(com.studentsapps.ui.R.dimen.item_spacing)

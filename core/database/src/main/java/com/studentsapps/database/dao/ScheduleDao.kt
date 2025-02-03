@@ -70,4 +70,7 @@ abstract class ScheduleDao : BaseDao<ScheduleEntity> {
 
     @Query("SELECT * FROM schedule_details")
     abstract suspend fun getAllSchedule(): List<ScheduleDetailsView>
+
+    @Query("SELECT * FROM schedules WHERE course_id = :courseId")
+    abstract suspend fun getSchedulesByCourseId(courseId: Int): List<ScheduleEntity>
 }

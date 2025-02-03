@@ -27,12 +27,17 @@ dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:data"))
     implementation(project(":core:common"))
+    implementation(project(":sync"))
 
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.material)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
+    implementation(libs.androidx.hilt.work)
+    implementation(libs.androidx.work.runtime.ktx)
+
+    kapt("androidx.hilt:hilt-compiler:1.2.0")
 
     // Navigation component
     implementation(libs.androidx.navigation.fragment.ktx)

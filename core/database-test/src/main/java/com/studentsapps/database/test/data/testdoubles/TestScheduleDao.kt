@@ -45,6 +45,10 @@ class TestScheduleDao : ScheduleDao() {
         TODO("Not yet implemented")
     }
 
+    override suspend fun getSchedulesByCourseId(courseId: Int): List<ScheduleEntity> {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun insert(obj: ScheduleEntity): Long {
         return obj.id.toLong()
     }

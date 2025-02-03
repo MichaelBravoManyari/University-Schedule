@@ -22,4 +22,8 @@ class CourseLocalDataSource @Inject constructor(
     fun getAllCourse(): Flow<List<CourseEntity>> = courseDao.getAll()
 
     suspend fun updateCourse(course: CourseEntity) = courseDao.update(course)
+
+    suspend fun deleteCourse(course: CourseEntity) = withContext(ioDispatcher) {
+        courseDao.delete(course)
+    }
 }

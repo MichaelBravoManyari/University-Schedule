@@ -6,4 +6,8 @@
     <string name="courses">Courses</string>
     <string name="update_course">Update course</string>
     <string name="new_course">New course</string>
+    <string name="delete_course">Delete</string>
+    <string name="message_delete_course">If this course is deleted, the schedules it contains will also be removed. Do you want to delete it?</string>
+    <string name="accept_dialog">Accept</string>
+    <string name="cancel">Cancel</string>
 </resources>

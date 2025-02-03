@@ -12,4 +12,6 @@ interface CourseRepository {
     fun getAllCourse(): Flow<List<Course>>
 
     suspend fun updateCourse(course: Course)
+
+    suspend fun deleteCourse(courseId: Int)
 }

@@ -261,6 +261,7 @@ class RegisterScheduleViewModel @Inject constructor(
             uiState.value.endTime,
             uiState.value.classroom,
             uiState.value.day,
+            null,
             courseId
         )
     }

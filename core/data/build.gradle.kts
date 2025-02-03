@@ -14,6 +14,8 @@ dependencies {
     implementation(project(":core:database-test"))
     androidTestImplementation(project(":core:datastore-test"))
 
+    implementation(libs.gson)
+
     androidTestImplementation(libs.junit)
     androidTestImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.test.runner)

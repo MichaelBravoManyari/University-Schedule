@@ -18,6 +18,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.studentsapps.course.R
 import com.studentsapps.course.databinding.FragmentRegisterCourseBinding
 import com.studentsapps.course.viewmodels.RegisterCourseUiState
@@ -90,6 +91,10 @@ class RegisterCourseFragment : Fragment() {
         if (!uiState.nameProfessor.isNullOrEmpty()) {
             binding.editTextTeacherCourse.setText(uiState.nameProfessor)
         }
+
+        if (uiState.isCourseDeleted) {
+            navigateToCourseFragment()
+        }
     }
 
     private fun navigateToScheduleRegisterScheduleFragment() {
@@ -150,6 +155,17 @@ class RegisterCourseFragment : Fragment() {
                     }
                 }
         }
+    }
+
+    fun deleteCourse() {
+        MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.delete_course)
+            .setMessage(R.string.message_delete_course)
+            .setPositiveButton(R.string.accept_dialog) { _, _ ->
+                viewModel.deleteCourse()
+            }
+            .setNegativeButton(R.string.cancel) { dialog, _ ->
+                dialog.dismiss()
+            }.show()
     }
 
     override fun onDestroyView() {

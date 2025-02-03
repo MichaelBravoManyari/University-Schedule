@@ -51,4 +51,8 @@ class ScheduleLocalDataSource @Inject constructor(
         scheduleDao.getAllSchedule()
 
     }
+
+    suspend fun getSchedulesByCourseId(courseId: Int): List<ScheduleEntity> = withContext(ioDispatcher) {
+        scheduleDao.getSchedulesByCourseId(courseId)
+    }
 }

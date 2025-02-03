@@ -4,8 +4,10 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.studentsapps.database.dao.CourseDao
+import com.studentsapps.database.dao.PendingOperationDao
 import com.studentsapps.database.dao.ScheduleDao
 import com.studentsapps.database.model.CourseEntity
+import com.studentsapps.database.model.PendingOperationEntity
 import com.studentsapps.database.model.ScheduleDetailsView
 import com.studentsapps.database.model.ScheduleEntity
 import com.studentsapps.database.util.DayOfWeekConverter
@@ -17,6 +19,7 @@ import com.studentsapps.database.util.LocalTimeConverter
     entities = [
         ScheduleEntity::class,
         CourseEntity::class,
+        PendingOperationEntity::class,
     ],
     views = [ScheduleDetailsView::class],
     version = 1,
@@ -32,4 +35,5 @@ abstract class UniversityScheduleDatabase : RoomDatabase() {
 
     abstract fun scheduleDao(): ScheduleDao
     abstract fun courseDao(): CourseDao
+    abstract fun pendingOperationDao(): PendingOperationDao
 }

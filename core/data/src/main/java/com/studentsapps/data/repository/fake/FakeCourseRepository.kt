@@ -33,5 +33,9 @@ class FakeCourseRepository @Inject constructor() : CourseRepository {
         )
     })
 
+    override suspend fun deleteCourse(courseId: Int) {
+        TODO("Not yet implemented")
+    }
+
     fun restoreDatabase() = courseDao.restoreDatabase()
 }

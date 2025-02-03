@@ -1,6 +1,7 @@
 plugins {
     id("universityschedule.android.ui")
     alias(libs.plugins.org.jetbrains.kotlin.android)
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.10"
 }
 
 android {
@@ -19,14 +20,23 @@ dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:model"))
     implementation(project(":core:data"))
+    implementation(project(":core:network"))
+    implementation(project(":sync"))
     implementation(libs.navigation.fragment.ktx)
     implementation(libs.navigation.ui.ktx)
     testImplementation(project(":core:testing"))
     testImplementation(project(":core:data-test"))
 
+    kapt("androidx.hilt:hilt-compiler:1.2.0")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.kotlinx.serialization.json)
+    //implementation(libs.kotlinx.serialization.java.time)
+    implementation(libs.androidx.hilt.work)
+    implementation(libs.firebase.auth.ktx)
 
     // Local test
     testImplementation(libs.junit)

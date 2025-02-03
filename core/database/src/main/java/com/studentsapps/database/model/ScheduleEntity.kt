@@ -39,11 +39,12 @@ data class ScheduleEntity(
     val courseId: Int
 )
 
-fun ScheduleEntity.asExternalMode() = Schedule(
+fun ScheduleEntity.asExternalModel() = Schedule(
     id = id,
     startTime = startTime,
     endTime = endTime,
     classPlace = classPlace,
     dayOfWeek = dayOfWeek,
+    specificDate = specificDate,
     courseId = courseId
 )

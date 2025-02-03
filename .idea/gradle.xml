@@ -35,12 +35,14 @@
             <option value="$PROJECT_DIR$/core/datastore-test" />
             <option value="$PROJECT_DIR$/core/designsystem" />
             <option value="$PROJECT_DIR$/core/model" />
+            <option value="$PROJECT_DIR$/core/network" />
             <option value="$PROJECT_DIR$/core/testing" />
             <option value="$PROJECT_DIR$/core/ui" />
             <option value="$PROJECT_DIR$/feature" />
             <option value="$PROJECT_DIR$/feature/course" />
             <option value="$PROJECT_DIR$/feature/login" />
             <option value="$PROJECT_DIR$/feature/schedule" />
+            <option value="$PROJECT_DIR$/sync" />
             <option value="$PROJECT_DIR$/ui-test-hilt-manifest" />
           </set>
         </option>
