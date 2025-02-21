@@ -23,6 +23,4 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.hilt.work)
     implementation(libs.firebase.auth.ktx)
-
-    
 }

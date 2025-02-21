@@ -13,6 +13,10 @@ class TestCourseDao : CourseDao() {
 
     override fun getAll(): Flow<List<CourseEntity>> = flowOf(courseList)
 
+    override fun getCoursesByIds(courseIds: List<String>): Flow<List<CourseEntity>> {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun insert(obj: CourseEntity): Long = obj.id.toLong()
 
     override suspend fun update(obj: CourseEntity) {

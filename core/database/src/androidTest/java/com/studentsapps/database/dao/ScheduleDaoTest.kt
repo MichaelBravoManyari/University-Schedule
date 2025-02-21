@@ -20,6 +20,7 @@ import org.junit.runner.RunWith
 import java.io.IOException
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 
 @RunWith(AndroidJUnit4::class)
@@ -191,7 +192,8 @@ class ScheduleDaoTest {
                     id = i,
                     name = "Math${if (i == 1) "" else i-1}",
                     nameProfessor = "",
-                    1234
+                    1234,
+                    lastModified = LocalDateTime.now()
                 )
             )
         }
@@ -207,7 +209,8 @@ class ScheduleDaoTest {
             classPlace = null,
             dayOfWeek = DayOfWeek.SATURDAY,
             courseId = 1,
-            specificDate = null
+            specificDate = null,
+            lastModified = LocalDateTime.now()
         )
 
     private fun ScheduleDetailsView.toScheduleEntity() =
@@ -218,6 +221,7 @@ class ScheduleDaoTest {
             classPlace = classPlace,
             dayOfWeek = dayOfWeek,
             specificDate = specificDate,
-            courseId = courseId
+            courseId = courseId,
+            lastModified = LocalDateTime.now()
         )
 }

@@ -1,5 +1,6 @@
 package com.studentsapps.schedule.viewmodels
 
+import android.content.Context
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,6 +10,7 @@ import com.studentsapps.model.Course
 import com.studentsapps.model.Schedule
 import com.studentsapps.schedule.R
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -22,7 +24,8 @@ import javax.inject.Inject
 @HiltViewModel
 class RegisterScheduleViewModel @Inject constructor(
     private val courseRepository: CourseRepository,
-    private val scheduleRepository: ScheduleRepository
+    private val scheduleRepository: ScheduleRepository,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
     private var _uiState = MutableStateFlow(RegisterScheduleUiState())
     val uiState: StateFlow<RegisterScheduleUiState> = _uiState

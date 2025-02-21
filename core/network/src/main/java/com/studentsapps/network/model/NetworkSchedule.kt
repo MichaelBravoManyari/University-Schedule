@@ -1,5 +1,6 @@
 package com.studentsapps.network.model
 
+import com.studentsapps.network.serializer.LocalDateSerializer
 import com.studentsapps.network.serializer.LocalTimeSerializer
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
@@ -15,7 +16,7 @@ data class NetworkSchedule(
     @Serializable(with = LocalTimeSerializer::class) val endTime: LocalTime,
     val classPlace: String?,
     val dayOfWeek: DayOfWeek,
-    @Contextual val specificDate: LocalDate? = null,
+    @Serializable(with = LocalDateSerializer::class) val specificDate: LocalDate? = null,
     @Contextual val lastModified: LocalDateTime = LocalDateTime.now(),
     val courseId: Int
 )

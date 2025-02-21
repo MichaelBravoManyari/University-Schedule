@@ -17,6 +17,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.IOException
+import java.time.LocalDateTime
 
 @RunWith(AndroidJUnit4::class)
 class CourseDaoTest {
@@ -93,6 +94,7 @@ class CourseDaoTest {
             id = id,
             name = "Math",
             nameProfessor = "",
-            color = 1245
+            color = 1245,
+            lastModified = LocalDateTime.now()
         )
 }

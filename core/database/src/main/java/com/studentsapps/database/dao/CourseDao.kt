@@ -13,4 +13,7 @@ abstract class CourseDao : BaseDao<CourseEntity> {
 
     @Query("SELECT * FROM courses")
     abstract fun getAll(): Flow<List<CourseEntity>>
+
+    @Query("SELECT * FROM courses WHERE id IN (:courseIds)")
+    abstract fun getCoursesByIds(courseIds: List<String>): Flow<List<CourseEntity>>
 }

@@ -37,5 +37,9 @@ class FakeCourseRepository @Inject constructor() : CourseRepository {
         TODO("Not yet implemented")
     }
 
+    override fun getCoursesByIds(courseIds: List<String>): Flow<List<Course>> {
+        TODO("Not yet implemented")
+    }
+
     fun restoreDatabase() = courseDao.restoreDatabase()
 }
