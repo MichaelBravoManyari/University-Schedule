@@ -2,6 +2,7 @@ package com.studentsapps.schedule.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import com.studentsapps.data.repository.ScheduleRepository
 import com.studentsapps.data.repository.TimetableUserPreferencesRepository
 import com.studentsapps.model.ScheduleDetails
@@ -18,7 +19,9 @@ import javax.inject.Inject
 class ScheduleViewModel @Inject constructor(
     private val timetableUserPreferencesRepository: TimetableUserPreferencesRepository,
     private val scheduleRepository: ScheduleRepository,
+    auth: FirebaseAuth
 ) : ViewModel() {
+    private val userId = auth.currentUser?.uid ?: ""
 
     private val _uiState: MutableStateFlow<ScheduleUiState> =
         MutableStateFlow(ScheduleUiState.Loading)
@@ -57,7 +60,8 @@ class ScheduleViewModel @Inject constructor(
                         showSaturday,
                         showSunday,
                         startDate,
-                        endDate
+                        endDate,
+                        userId
                     )
                     currentState.copy(scheduleDetailsList = scheduleDetails)
                 } else
@@ -71,7 +75,7 @@ class ScheduleViewModel @Inject constructor(
             _uiState.update { currentState ->
                 if (currentState is ScheduleUiState.Success) {
                     val scheduleDetails =
-                        scheduleRepository.getSchedulesForTimetableInListMode(date)
+                        scheduleRepository.getSchedulesForTimetableInListMode(date, userId)
                     currentState.copy(scheduleDetailsList = scheduleDetails)
                 } else
                     ScheduleUiState.Loading
@@ -86,6 +90,6 @@ sealed interface ScheduleUiState {
 
     data class Success(
         val timetableUserPreferences: TimetableUserPreferences,
-        val scheduleDetailsList: List<ScheduleDetails>? = null,
+        val scheduleDetailsList: List<ScheduleDetails>? = null
     ) : ScheduleUiState
 }

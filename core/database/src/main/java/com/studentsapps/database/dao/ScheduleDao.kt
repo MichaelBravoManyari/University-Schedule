@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Query
 import com.studentsapps.database.model.ScheduleDetailsView
 import com.studentsapps.database.model.ScheduleEntity
+import kotlinx.coroutines.flow.Flow
 import java.time.DayOfWeek
 import java.time.LocalDate
 
@@ -11,10 +12,10 @@ import java.time.LocalDate
 abstract class ScheduleDao : BaseDao<ScheduleEntity> {
 
     @Query("SELECT * FROM schedules where id = :scheduleId")
-    abstract suspend fun getScheduleById(scheduleId: Int): ScheduleEntity
+    abstract fun getScheduleById(scheduleId: String): Flow<ScheduleEntity>
 
     @Query("SELECT * FROM schedule_details where schedule_id = :scheduleId")
-    abstract suspend fun getScheduleDetailsById(scheduleId: Int): ScheduleDetailsView
+    abstract suspend fun getScheduleDetailsById(scheduleId: String): ScheduleDetailsView
 
     @Query(
         value = """ 
@@ -31,6 +32,8 @@ abstract class ScheduleDao : BaseDao<ScheduleEntity> {
                 END
              AND
                 specific_date IS NULL
+             AND
+                user_id = :userId
              UNION 
              SELECT * FROM schedule_details
              wHERE
@@ -45,32 +48,44 @@ abstract class ScheduleDao : BaseDao<ScheduleEntity> {
                 END
              AND
                 specific_date BETWEEN :startDate AND :endDate
+             AND
+                user_id = :userId
         """
     )
     abstract suspend fun getSchedulesForTimetableInGridMode(
         showSaturday: Boolean,
         showSunday: Boolean,
         startDate: LocalDate,
-        endDate: LocalDate
+        endDate: LocalDate,
+        userId: String
     ): List<ScheduleDetailsView>
 
     @Query(
         value = """
             SELECT * FROM schedule_details
             WHERE
-                (day_of_week = :dayOfWeek AND specific_date IS NULL)
+                ((day_of_week = :dayOfWeek AND specific_date IS NULL)
             OR
-                specific_date = :specificDate
+                specific_date = :specificDate)
+            AND 
+                user_id = :userId
         """
     )
     abstract suspend fun getSchedulesForTimetableInListMode(
         dayOfWeek: DayOfWeek,
-        specificDate: LocalDate
+        specificDate: LocalDate,
+        userId: String
     ): List<ScheduleDetailsView>
 
-    @Query("SELECT * FROM schedule_details")
-    abstract suspend fun getAllSchedule(): List<ScheduleDetailsView>
+    @Query("SELECT * FROM schedule_details WHERE user_id = :userId")
+    abstract suspend fun getAllSchedule(userId: String): List<ScheduleDetailsView>
+
+    @Query("SELECT * FROM schedules WHERE user_id = :userId")
+    abstract fun getAllScheduleEntity(userId: String): Flow<List<ScheduleEntity>>
 
     @Query("SELECT * FROM schedules WHERE course_id = :courseId")
-    abstract suspend fun getSchedulesByCourseId(courseId: Int): List<ScheduleEntity>
+    abstract suspend fun getSchedulesByCourseId(courseId: String): List<ScheduleEntity>
+
+    @Query("SELECT * FROM schedules WHERE id IN (:schedulesIds)")
+    abstract fun getSchedulesByIds(schedulesIds: List<String>): Flow<List<ScheduleEntity>>
 }

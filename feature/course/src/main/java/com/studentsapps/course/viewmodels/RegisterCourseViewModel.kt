@@ -2,6 +2,7 @@ package com.studentsapps.course.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import com.studentsapps.data.repository.CourseRepository
 import com.studentsapps.model.Course
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,14 +16,16 @@ import javax.inject.Inject
 @HiltViewModel
 class RegisterCourseViewModel @Inject constructor(
     private val courseRepository: CourseRepository,
+    auth: FirebaseAuth
 ) : ViewModel() {
+    private val userId = auth.currentUser?.uid ?: ""
 
     private val _uiState: MutableStateFlow<RegisterCourseUiState> =
         MutableStateFlow(RegisterCourseUiState())
 
     val uiState: StateFlow<RegisterCourseUiState> = _uiState
 
-    fun displayCourseData(courseId: Int) {
+    fun displayCourseData(courseId: String) {
         viewModelScope.launch {
             val course = courseRepository.getCourse(courseId).first()
             _uiState.update {
@@ -39,7 +42,7 @@ class RegisterCourseViewModel @Inject constructor(
     fun registerCourse() {
         viewModelScope.launch {
             performCourseOperation {
-                courseRepository.registerCourse(it)
+                courseRepository.registerCourse(it, userId)
             }
         }
     }
@@ -47,7 +50,7 @@ class RegisterCourseViewModel @Inject constructor(
     fun updateCourse() {
         viewModelScope.launch {
             performCourseOperation {
-                courseRepository.updateCourse(it)
+                courseRepository.updateCourse(it, userId)
             }
         }
     }
@@ -114,7 +117,7 @@ class RegisterCourseViewModel @Inject constructor(
 }
 
 data class RegisterCourseUiState(
-    val courseId: Int = 0,
+    val courseId: String = "",
     val name: String = "",
     val nameProfessor: String? = "",
     val color: Int = 0xffffff00.toInt(),

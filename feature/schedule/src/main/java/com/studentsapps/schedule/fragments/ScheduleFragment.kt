@@ -260,7 +260,10 @@ class ScheduleFragment : Fragment() {
 
     fun goToRegisterSchedule() {
         navController.navigate(
-            ScheduleFragmentDirections.actionScheduleFragmentToRegisterScheduleFragment(title = R.string.new_schedule)
+            ScheduleFragmentDirections.actionScheduleFragmentToRegisterScheduleFragment(
+                scheduleId = "",
+                title = R.string.new_schedule
+            )
         )
     }
 

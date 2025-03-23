@@ -4,7 +4,7 @@ import java.time.DayOfWeek
 import java.time.LocalTime
 
 data class ScheduleView(
-    val id: Int,
+    val id: String,
     val startTime: LocalTime,
     val endTime: LocalTime,
     val classPlace: String?,

@@ -60,8 +60,7 @@
             app:destination="@id/modalBottomSheetRepetition" />
         <argument
             android:name="scheduleId"
-            android:defaultValue="0"
-            app:argType="integer" />
+            app:argType="string" />
         <argument
             android:name="title"
             app:argType="reference"
@@ -81,7 +80,7 @@
         android:label="ModalBottomSheetSchedule">
         <argument
             android:name="scheduleId"
-            app:argType="integer" />
+            app:argType="string" />
         <action
             android:id="@+id/action_modalBottomSheetSchedule_to_registerScheduleFragment"
             app:destination="@id/registerScheduleFragment"

@@ -8,10 +8,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
 class TestCourseDao : CourseDao() {
-    override fun getCourseById(courseId: Int): Flow<CourseEntity> =
+    override fun getCourseById(courseId: String): Flow<CourseEntity> =
         flowOf(courseList.find { it.id == courseId }!!)
 
-    override fun getAll(): Flow<List<CourseEntity>> = flowOf(courseList)
+    override fun getAll(userId: String): Flow<List<CourseEntity>> = flowOf(courseList)
 
     override fun getCoursesByIds(courseIds: List<String>): Flow<List<CourseEntity>> {
         TODO("Not yet implemented")

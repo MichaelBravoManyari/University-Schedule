@@ -17,10 +17,16 @@ class PendingOperationLocalDataSource @Inject constructor(
         pendingOperationDao.insert(pendingOperation)
     }
 
-    fun getPendingOperations(status: String): Flow<List<PendingOperationEntity>> =
-        pendingOperationDao.getPendingOperations(status)
+    fun getPendingOperations(status: String, userId: String): Flow<List<PendingOperationEntity>> =
+        pendingOperationDao.getPendingOperations(status, userId)
 
     suspend fun updateStatus(id: Int, status: String) = withContext(ioDispatcher) {
         pendingOperationDao.updateStatus(id, status)
     }
+
+    fun getPendingReadOperations(operationType: String, entityType: String, userId: String): Flow<List<PendingOperationEntity>> =
+        pendingOperationDao.getPendingReadOperations(operationType, entityType, userId)
+
+    fun getFirstPendingOperation(status: String, userId: String): Flow<PendingOperationEntity?> =
+        pendingOperationDao.getFirstPendingOperation(status, userId)
 }

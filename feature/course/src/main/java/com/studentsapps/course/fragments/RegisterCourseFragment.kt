@@ -34,7 +34,7 @@ class RegisterCourseFragment : Fragment() {
     private val args: RegisterCourseFragmentArgs by navArgs()
     private lateinit var navController: NavController
     private val viewModel: RegisterCourseViewModel by viewModels()
-    private var courseId = 0
+    private var courseId = ""
     private var navigatedFromTimeLoggingDestination = false
 
     override fun onCreateView(
@@ -60,7 +60,7 @@ class RegisterCourseFragment : Fragment() {
         courseId = args.courseId
         navigatedFromTimeLoggingDestination = args.navigatedFromTimeLoggingDestination
 
-        if (courseId != 0) {
+        if (courseId != "") {
             viewModel.displayCourseData(courseId)
         }
 
@@ -141,7 +141,7 @@ class RegisterCourseFragment : Fragment() {
         binding.toolbar.run {
             setupWithNavController(navController)
             val menuAdd = menu.findItem(com.studentsapps.ui.R.id.menu_add)
-            if (courseId > 0) {
+            if (courseId != "") {
                 menuAdd.actionView?.findViewById<MaterialButton>(com.studentsapps.ui.R.id.custom_action_button)?.text =
                     getString(com.studentsapps.ui.R.string.update)
             }
@@ -151,7 +151,7 @@ class RegisterCourseFragment : Fragment() {
                     viewModel.run {
                         setCourseName(binding.editTextCourseName.text.toString())
                         setNameProfessor(binding.editTextTeacherCourse.text.toString())
-                        if (courseId > 0) updateCourse() else registerCourse()
+                        if (courseId != "") updateCourse() else registerCourse()
                     }
                 }
         }

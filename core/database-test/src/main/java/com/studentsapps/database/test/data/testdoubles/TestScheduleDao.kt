@@ -4,21 +4,23 @@ import com.studentsapps.database.dao.ScheduleDao
 import com.studentsapps.database.model.ScheduleDetailsView
 import com.studentsapps.database.model.ScheduleEntity
 import com.studentsapps.database.test.data.scheduleDetailsList
+import kotlinx.coroutines.flow.Flow
 import java.time.DayOfWeek
 import java.time.LocalDate
 
 class TestScheduleDao : ScheduleDao() {
-    override suspend fun getScheduleById(scheduleId: Int): ScheduleEntity {
+    override fun getScheduleById(scheduleId: String): Flow<ScheduleEntity> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getScheduleDetailsById(scheduleId: Int): ScheduleDetailsView = scheduleDetailsList.find { it.scheduleId == scheduleId }!!
+    override suspend fun getScheduleDetailsById(scheduleId: String): ScheduleDetailsView = scheduleDetailsList.find { it.scheduleId == scheduleId }!!
 
     override suspend fun getSchedulesForTimetableInGridMode(
         showSaturday: Boolean,
         showSunday: Boolean,
         startDate: LocalDate,
-        endDate: LocalDate
+        endDate: LocalDate,
+        userId: String
     ): List<ScheduleDetailsView> {
         val filteredByDayOfWeek = scheduleDetailsList.filter {
             it.specificDate == null && (showSaturday || it.dayOfWeek != DayOfWeek.SATURDAY) && (showSunday || it.dayOfWeek != DayOfWeek.SUNDAY)
@@ -33,7 +35,8 @@ class TestScheduleDao : ScheduleDao() {
 
     override suspend fun getSchedulesForTimetableInListMode(
         dayOfWeek: DayOfWeek,
-        specificDate: LocalDate
+        specificDate: LocalDate,
+        userId: String
     ): List<ScheduleDetailsView> {
         return scheduleDetailsList.filter {
             (it.dayOfWeek == dayOfWeek && it.specificDate == null) ||
@@ -41,11 +44,19 @@ class TestScheduleDao : ScheduleDao() {
         }
     }
 
-    override suspend fun getAllSchedule(): List<ScheduleDetailsView> {
+    override suspend fun getAllSchedule(userId: String): List<ScheduleDetailsView> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getSchedulesByCourseId(courseId: Int): List<ScheduleEntity> {
+    override fun getAllScheduleEntity(userId: String): Flow<List<ScheduleEntity>> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getSchedulesByCourseId(courseId: String): List<ScheduleEntity> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getSchedulesByIds(schedulesIds: List<String>): Flow<List<ScheduleEntity>> {
         TODO("Not yet implemented")
     }
 

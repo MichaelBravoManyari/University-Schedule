@@ -6,7 +6,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.studentsapps.network.model.NetworkCourse
 import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.tasks.await
-import java.time.ZoneId
 import java.time.ZoneOffset
 import javax.inject.Inject
 
@@ -17,16 +16,20 @@ class CourseNetworkDataSource @Inject constructor() {
     suspend fun updateOrCreateCourse(userId: String, course: NetworkCourse) {
         try {
             val courseData = mapOf(
+                "id" to course.id,
                 "name" to course.name,
                 "nameProfessor" to course.nameProfessor,
                 "color" to course.color,
-                "lastModified" to Timestamp(course.lastModified.toInstant(ZoneOffset.UTC).toEpochMilli() / 1000, 0)
+                "lastModified" to Timestamp(
+                    course.lastModified.toInstant(ZoneOffset.UTC).toEpochMilli() / 1000, 0
+                ),
+                "userId" to userId
             )
 
             firestore.collection("users")
                 .document(userId)
                 .collection("courses")
-                .document(course.id.toString())
+                .document(course.id)
                 .set(courseData, SetOptions.merge())
                 .await()
         } catch (e: Exception) {
@@ -34,12 +37,12 @@ class CourseNetworkDataSource @Inject constructor() {
         }
     }
 
-    suspend fun deleteCourse(userId: String, courseId: Int) {
+    suspend fun deleteCourse(userId: String, courseId: String) {
         try {
             firestore.collection("users")
                 .document(userId)
                 .collection("courses")
-                .document(courseId.toString())
+                .document(courseId)
                 .delete()
                 .await()
         } catch (e: Exception) {
@@ -64,11 +67,12 @@ class CourseNetworkDataSource @Inject constructor() {
                 val lastModified = timestamp?.toInstant()?.atZone(ZoneOffset.UTC)?.toLocalDateTime()
 
                 NetworkCourse(
-                    id = courseId.toInt(),
+                    id = courseId,
                     name = name,
                     nameProfessor = nameProfessor,
                     color = color,
-                    lastModified = lastModified!!
+                    lastModified = lastModified!!,
+                    userId = userId
                 )
             } else {
                 null
@@ -93,19 +97,18 @@ class CourseNetworkDataSource @Inject constructor() {
             querySnapshot.documents.mapNotNull { documentSnapshot ->
                 val name = documentSnapshot.getString("name") ?: ""
                 val nameProfessor = documentSnapshot.getString("nameProfessor") ?: ""
-                val color = documentSnapshot.getString("color") ?: ""
-                val phoneTimeZone = ZoneId.systemDefault()
+                val color = documentSnapshot.getLong("color")?.toInt() ?: 0
                 val timestamp = documentSnapshot.getTimestamp("lastModified")?.toDate()
-                val lastModifiedLocal = timestamp?.toInstant()
-                    ?.atZone(ZoneId.of("UTC-5"))
-                    ?.withZoneSameInstant(phoneTimeZone)
-                    ?.toLocalDateTime()
+                val lastModifiedUtc =
+                    timestamp?.toInstant()?.atZone(ZoneOffset.UTC)?.toLocalDateTime()
+
                 NetworkCourse(
-                    id = documentSnapshot.id.toInt(),
+                    id = documentSnapshot.getString("id") ?: "",
                     name = name,
                     nameProfessor = nameProfessor,
-                    color = color.toInt(),
-                    lastModified = lastModifiedLocal!!
+                    color = color,
+                    lastModified = lastModifiedUtc!!,
+                    userId = userId
                 )
             }
         } catch (e: Exception) {
@@ -113,4 +116,39 @@ class CourseNetworkDataSource @Inject constructor() {
             emptyList()
         }
     }
+
+    suspend fun getAllCourses(userId: String): List<NetworkCourse> {
+        return try {
+            val querySnapshot = firestore.collection("users")
+                .document(userId)
+                .collection("courses")
+                .get()
+                .await()
+
+            querySnapshot.documents.mapNotNull { documentSnapshot ->
+                val id = documentSnapshot.getString("id")
+                val name = documentSnapshot.getString("name")
+                val nameProfessor = documentSnapshot.getString("nameProfessor")
+                val color = documentSnapshot.getLong("color")?.toInt()
+                val timestamp = documentSnapshot.getTimestamp("lastModified")?.toDate()
+
+                if (id == null || name.isNullOrEmpty()) return@mapNotNull null
+
+                val lastModifiedUtc = timestamp?.toInstant()?.atZone(ZoneOffset.UTC)?.toLocalDateTime()
+
+                NetworkCourse(
+                    id = id,
+                    name = name,
+                    nameProfessor = nameProfessor.orEmpty(),
+                    color = color ?: 0,
+                    lastModified = lastModifiedUtc!!,
+                    userId = userId
+                )
+            }
+        } catch (e: Exception) {
+            Log.e("CourseNetworkDataSource", "Error obteniendo todos los cursos: ${e.message}", e)
+            emptyList()
+        }
+    }
+
 }

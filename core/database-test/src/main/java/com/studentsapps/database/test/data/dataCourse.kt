@@ -4,10 +4,10 @@ import com.studentsapps.database.model.CourseEntity
 import java.time.LocalDateTime
 
 private val backupCourseList = listOf(
-    createTestCourse(1, "Math"),
-    createTestCourse(2, "History"),
-    createTestCourse(3, "Sciences"),
-    createTestCourse(4, "Statistics"),
+    createTestCourse("1", "Math"),
+    createTestCourse("2", "History"),
+    createTestCourse("3", "Sciences"),
+    createTestCourse("4", "Statistics"),
 )
 
 val courseList = mutableListOf<CourseEntity>().apply {
@@ -19,4 +19,4 @@ fun restoreCoursesBackup() {
     courseList.addAll(backupCourseList)
 }
 
-private fun createTestCourse(id: Int, name: String) = CourseEntity(id = id, name = name, null, 1234, LocalDateTime.now())
+private fun createTestCourse(id: String, name: String) = CourseEntity(id = id, name = name, null, 1234, LocalDateTime.now(), "")

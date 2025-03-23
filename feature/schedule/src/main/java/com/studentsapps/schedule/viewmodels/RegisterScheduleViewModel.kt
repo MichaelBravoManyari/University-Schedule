@@ -1,16 +1,15 @@
 package com.studentsapps.schedule.viewmodels
 
-import android.content.Context
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import com.studentsapps.data.repository.CourseRepository
 import com.studentsapps.data.repository.ScheduleRepository
 import com.studentsapps.model.Course
 import com.studentsapps.model.Schedule
 import com.studentsapps.schedule.R
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -25,9 +24,10 @@ import javax.inject.Inject
 class RegisterScheduleViewModel @Inject constructor(
     private val courseRepository: CourseRepository,
     private val scheduleRepository: ScheduleRepository,
-    @ApplicationContext private val context: Context
+    auth: FirebaseAuth
 ) : ViewModel() {
     private var _uiState = MutableStateFlow(RegisterScheduleUiState())
+    private val userId = auth.currentUser?.uid ?: ""
     val uiState: StateFlow<RegisterScheduleUiState> = _uiState
 
     fun selectDay(day: DayOfWeek) {
@@ -48,7 +48,7 @@ class RegisterScheduleViewModel @Inject constructor(
         }
     }
 
-    fun selectCourse(courseId: Int) {
+    fun selectCourse(courseId: String) {
         viewModelScope.launch {
             val course = courseRepository.getCourse(courseId).first()
             _uiState.update { currentState ->
@@ -124,9 +124,9 @@ class RegisterScheduleViewModel @Inject constructor(
         }
     }
 
-    fun displayScheduleData(scheduleId: Int) {
+    fun displayScheduleData(scheduleId: String) {
         viewModelScope.launch {
-            val schedule = scheduleRepository.getScheduleDetailsById(scheduleId)
+            val schedule = scheduleRepository.getScheduleDetailsById(scheduleId, userId)
             val course = courseRepository.getCourse(schedule.courseId).first()
             _uiState.update { currentState ->
                 with(schedule) {
@@ -169,7 +169,8 @@ class RegisterScheduleViewModel @Inject constructor(
                     schedule,
                     uiState.value.specificDate,
                     uiState.value.selectedCourse!!.name,
-                    uiState.value.selectedCourse!!.color
+                    uiState.value.selectedCourse!!.color,
+                    userId
                 )
                 _uiState.update { currentState ->
                     currentState.copy(isScheduleRecorded = true)
@@ -192,7 +193,8 @@ class RegisterScheduleViewModel @Inject constructor(
                     schedule,
                     uiState.value.specificDate,
                     uiState.value.selectedCourse!!.name,
-                    uiState.value.selectedCourse!!.color
+                    uiState.value.selectedCourse!!.color,
+                    userId
                 )
                 _uiState.update { currentState ->
                     currentState.copy(isScheduleRecorded = true)
@@ -211,13 +213,14 @@ class RegisterScheduleViewModel @Inject constructor(
         if (!uiState.value.courseName.isNullOrBlank()) {
             val course = createCourse()
             viewModelScope.launch {
-                val courseId = courseRepository.registerCourse(course).toInt()
+                val courseId = courseRepository.registerCourse(course, userId)
                 val schedule = createSchedule(courseId)
                 scheduleRepository.updateSchedule(
                     schedule,
                     uiState.value.specificDate,
                     uiState.value.courseName!!,
-                    uiState.value.colorCourse
+                    uiState.value.colorCourse,
+                    userId
                 )
                 _uiState.update { currentState ->
                     currentState.copy(isScheduleRecorded = true)
@@ -236,13 +239,14 @@ class RegisterScheduleViewModel @Inject constructor(
         if (!uiState.value.courseName.isNullOrBlank()) {
             val course = createCourse()
             viewModelScope.launch {
-                val courseId = courseRepository.registerCourse(course).toInt()
+                val courseId = courseRepository.registerCourse(course, userId)
                 val schedule = createSchedule(courseId)
                 scheduleRepository.registerSchedule(
                     schedule,
                     uiState.value.specificDate,
                     course.name,
-                    course.color
+                    course.color,
+                    userId
                 )
                 _uiState.update { currentState ->
                     currentState.copy(isScheduleRecorded = true)
@@ -257,7 +261,7 @@ class RegisterScheduleViewModel @Inject constructor(
         }
     }
 
-    private fun createSchedule(courseId: Int): Schedule {
+    private fun createSchedule(courseId: String): Schedule {
         return Schedule(
             uiState.value.scheduleId,
             uiState.value.startTime,
@@ -270,7 +274,7 @@ class RegisterScheduleViewModel @Inject constructor(
     }
 
     private fun createCourse(): Course {
-        return Course(0, uiState.value.courseName!!, null, uiState.value.colorCourse)
+        return Course("", uiState.value.courseName!!, null, uiState.value.colorCourse)
     }
 
     fun setSpecificDate(date: LocalDate?) {
@@ -292,7 +296,7 @@ class RegisterScheduleViewModel @Inject constructor(
 }
 
 data class RegisterScheduleUiState(
-    val scheduleId: Int = 0,
+    val scheduleId: String = "",
     val day: DayOfWeek = DayOfWeek.MONDAY,
     val startTime: LocalTime = LocalTime.of(9, 0),
     val endTime: LocalTime = LocalTime.of(10, 0),

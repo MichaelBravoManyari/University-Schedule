@@ -11,7 +11,7 @@ import javax.inject.Inject
 class PendingOperationRepositoryImp @Inject constructor(
     private val pendingOperationLocalDataSource: PendingOperationLocalDataSource,
 ) : PendingOperationRepository {
-    override suspend fun insert(pendingOperation: PendingOperation) =
+    override suspend fun insert(pendingOperation: PendingOperation, userId: String) =
         pendingOperationLocalDataSource.insert(with(pendingOperation) {
             PendingOperationEntity(
                 id,
@@ -19,14 +19,30 @@ class PendingOperationRepositoryImp @Inject constructor(
                 entityType,
                 payload,
                 status,
-                timestamp
+                timestamp,
+                userId
             )
         })
 
-    override fun getPendingOperations(status: String): Flow<List<PendingOperation>> =
-        pendingOperationLocalDataSource.getPendingOperations(status)
+    override fun getPendingOperations(
+        status: String,
+        userId: String
+    ): Flow<List<PendingOperation>> =
+        pendingOperationLocalDataSource.getPendingOperations(status, userId)
             .map { it.map(PendingOperationEntity::asExternalModel) }
 
     override suspend fun updateStatus(id: Int, status: String) =
         pendingOperationLocalDataSource.updateStatus(id, status)
+
+    override fun getPendingReadOperations(
+        operationType: String,
+        entityType: String,
+        userId: String
+    ): Flow<List<PendingOperation>> =
+        pendingOperationLocalDataSource.getPendingReadOperations(operationType, entityType, userId)
+            .map { it.map(PendingOperationEntity::asExternalModel) }
+
+    override fun getFirstPendingOperation(status: String, userId: String): Flow<PendingOperation?> =
+        pendingOperationLocalDataSource.getFirstPendingOperation(status, userId)
+            .map { it?.asExternalModel() }
 }

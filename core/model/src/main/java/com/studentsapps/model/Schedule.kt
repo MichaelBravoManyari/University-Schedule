@@ -7,11 +7,11 @@ import java.time.LocalTime
 
 @Serializable
 data class Schedule(
-    val id: Int,
+    val id: String,
     val startTime: LocalTime,
     val endTime: LocalTime,
     val classPlace: String?,
     val dayOfWeek: DayOfWeek,
     val specificDate: LocalDate?,
-    val courseId: Int
+    val courseId: String
 )

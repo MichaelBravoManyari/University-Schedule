@@ -6,6 +6,7 @@ import com.studentsapps.database.dao.ScheduleDao
 import com.studentsapps.database.model.ScheduleDetailsView
 import com.studentsapps.database.model.ScheduleEntity
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -17,24 +18,29 @@ class ScheduleLocalDataSource @Inject constructor(
 ) {
 
     suspend fun getSchedulesForTimetableInGridMode(
-        showSaturday: Boolean, showSunday: Boolean, startDate: LocalDate, endDate: LocalDate
+        showSaturday: Boolean,
+        showSunday: Boolean,
+        startDate: LocalDate,
+        endDate: LocalDate,
+        userId: String
     ): List<ScheduleDetailsView> = withContext(ioDispatcher) {
         scheduleDao.getSchedulesForTimetableInGridMode(
-            showSaturday, showSunday, startDate, endDate
+            showSaturday, showSunday, startDate, endDate, userId
         )
     }
 
     suspend fun getSchedulesForTimetableInListMode(
-        dayOfWeek: DayOfWeek, date: LocalDate
+        dayOfWeek: DayOfWeek, date: LocalDate, userId: String
     ): List<ScheduleDetailsView> = withContext(ioDispatcher) {
-        scheduleDao.getSchedulesForTimetableInListMode(dayOfWeek, date).sortedBy { it.startTime }
+        scheduleDao.getSchedulesForTimetableInListMode(dayOfWeek, date, userId)
+            .sortedBy { it.startTime }
     }
 
     suspend fun insert(schedule: ScheduleEntity): Long = withContext(ioDispatcher) {
         scheduleDao.insert(schedule)
     }
 
-    suspend fun getScheduleDetailsView(scheduleId: Int): ScheduleDetailsView =
+    suspend fun getScheduleDetailsView(scheduleId: String): ScheduleDetailsView =
         withContext(ioDispatcher) {
             scheduleDao.getScheduleDetailsById(scheduleId)
         }
@@ -47,12 +53,23 @@ class ScheduleLocalDataSource @Inject constructor(
         scheduleDao.delete(schedule)
     }
 
-    suspend fun getAllSchedules(): List<ScheduleDetailsView> = withContext(ioDispatcher) {
-        scheduleDao.getAllSchedule()
+    suspend fun getAllSchedules(userId: String): List<ScheduleDetailsView> =
+        withContext(ioDispatcher) {
+            scheduleDao.getAllSchedule(userId)
+        }
 
-    }
+    suspend fun getSchedulesByCourseId(courseId: String): List<ScheduleEntity> =
+        withContext(ioDispatcher) {
+            scheduleDao.getSchedulesByCourseId(courseId)
+        }
 
-    suspend fun getSchedulesByCourseId(courseId: Int): List<ScheduleEntity> = withContext(ioDispatcher) {
-        scheduleDao.getSchedulesByCourseId(courseId)
-    }
+    fun getScheduleById(scheduleId: String): Flow<ScheduleEntity> =
+        scheduleDao.getScheduleById(scheduleId)
+
+
+    fun getSchedulesByIds(schedulesIds: List<String>): Flow<List<ScheduleEntity>> =
+        scheduleDao.getSchedulesByIds(schedulesIds)
+
+    fun getAllScheduleEntity(userId: String): Flow<List<ScheduleEntity>> =
+        scheduleDao.getAllScheduleEntity(userId)
 }

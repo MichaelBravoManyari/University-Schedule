@@ -5,17 +5,20 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.studentsapps.model.Course
 import java.time.LocalDateTime
+import java.util.UUID
 
 @Entity(tableName = "courses")
 data class CourseEntity(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int,
+    @PrimaryKey
+    val id: String = UUID.randomUUID().toString(),
     val name: String,
     @ColumnInfo(name = "name_professor")
     val nameProfessor: String?,
     val color: Int,
     @ColumnInfo(name = "last_modified")
-    val lastModified: LocalDateTime
+    val lastModified: LocalDateTime,
+    @ColumnInfo(name = "user_id")
+    val userId: String
 )
 
 fun CourseEntity.asExternalModel() = Course(

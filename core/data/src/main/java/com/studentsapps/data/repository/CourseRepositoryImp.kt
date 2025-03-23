@@ -1,7 +1,9 @@
 package com.studentsapps.data.repository
 
 import android.content.Context
+import androidx.work.BackoffPolicy
 import androidx.work.Constraints
+import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
@@ -32,6 +34,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneOffset
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class CourseRepositoryImp @Inject constructor(
@@ -40,66 +43,77 @@ class CourseRepositoryImp @Inject constructor(
     private val pendingOperationLocalDataSource: PendingOperationLocalDataSource,
     @ApplicationContext private val context: Context
 ) : CourseRepository {
-    override fun getCourse(courseId: Int): Flow<Course> {
-        return courseLocalDataSource.getCourse(courseId).map(CourseEntity::asExternalModel)
+
+    override fun getCourse(courseId: String): Flow<Course> {
+        return courseLocalDataSource.getCourse(courseId)
             .onEach { course ->
                 val pendingOperation = PendingOperationEntity(
                     operationType = "READ",
                     entityType = "COURSE",
-                    payload = serializeCourse(course),
+                    payload = serializeCourse(course.asExternalModel()),
                     status = "PENDING",
-                    timestamp = LocalDateTime.now(ZoneOffset.UTC)
+                    timestamp = LocalDateTime.now(ZoneOffset.UTC),
+                    userId = course.userId
                 )
                 pendingOperationLocalDataSource.insert(pendingOperation)
                 scheduleSyncWorker()
             }
+            .map(CourseEntity::asExternalModel)
     }
 
-    override suspend fun registerCourse(course: Course): Long {
+    override suspend fun registerCourse(course: Course, userId: String): String {
         val timestamp = LocalDateTime.now(ZoneOffset.UTC)
-        val courseId = courseLocalDataSource.insert(with(course) {
-            CourseEntity(
-                id,
-                name,
-                nameProfessor,
-                color,
-                timestamp
-            )
-        })
+        val courseEntity = CourseEntity(
+            name = course.name,
+            nameProfessor = course.nameProfessor,
+            color = course.color,
+            lastModified = timestamp,
+            userId = userId
+        )
+        courseLocalDataSource.insert(courseEntity)
 
         val pendingOperation = PendingOperationEntity(
             operationType = "REGISTER",
             entityType = "COURSE",
-            payload = serializeCourse(course.copy(id = courseId.toInt())),
+            payload = serializeCourse(course.copy(id = courseEntity.id)),
             status = "PENDING",
-            timestamp = timestamp
+            timestamp = timestamp,
+            userId = userId
         )
         pendingOperationLocalDataSource.insert(pendingOperation)
         scheduleSyncWorker()
 
-        return courseId
+        return courseEntity.id
     }
 
-    override fun getAllCourse(): Flow<List<Course>> {
-        return courseLocalDataSource.getAllCourse().map { it.map(CourseEntity::asExternalModel) }
+    override suspend fun registerCourseEntity(courseEntity: CourseEntity) {
+        courseLocalDataSource.insert(courseEntity)
+    }
+
+    override fun getAllCourse(shouldSync: Boolean, userId: String): Flow<List<Course>> {
+        return courseLocalDataSource.getAllCourse(userId)
             .onEach { courses ->
-                val pendingOperation = PendingOperationEntity(
-                    operationType = "READ_LIST",
-                    entityType = "COURSE",
-                    payload = serializeCourses(courses),
-                    status = "PENDING",
-                    timestamp = LocalDateTime.now(ZoneOffset.UTC)
-                )
-                pendingOperationLocalDataSource.insert(pendingOperation)
-                scheduleSyncWorker()
+                if (shouldSync) {
+                    val pendingOperation = PendingOperationEntity(
+                        operationType = "READ_LIST",
+                        entityType = "COURSE",
+                        payload = serializeCourses(courses.map { it.asExternalModel() }),
+                        status = "PENDING",
+                        timestamp = LocalDateTime.now(ZoneOffset.UTC),
+                        userId = userId
+                    )
+                    pendingOperationLocalDataSource.insert(pendingOperation)
+                    scheduleSyncWorker()
+                }
             }
+            .map { it.map(CourseEntity::asExternalModel) }
     }
 
-    override suspend fun updateCourse(course: Course) {
+    override suspend fun updateCourse(course: Course, userId: String) {
         val timestamp = LocalDateTime.now(ZoneOffset.UTC)
         courseLocalDataSource.updateCourse(with(course) {
             CourseEntity(
-                id, name, nameProfessor, color, timestamp
+                id, name, nameProfessor, color, timestamp, userId
             )
         })
 
@@ -108,7 +122,8 @@ class CourseRepositoryImp @Inject constructor(
             entityType = "COURSE",
             payload = serializeCourse(course),
             status = "PENDING",
-            timestamp = timestamp
+            timestamp = timestamp,
+            userId = userId
         )
 
         pendingOperationLocalDataSource.insert(pendingOperation)
@@ -116,7 +131,11 @@ class CourseRepositoryImp @Inject constructor(
         scheduleSyncWorker()
     }
 
-    override suspend fun deleteCourse(courseId: Int) {
+    override suspend fun updateCourseEntity(courseEntity: CourseEntity) {
+        courseLocalDataSource.updateCourse(courseEntity)
+    }
+
+    override suspend fun deleteCourse(courseId: String) {
         val courseEntity = courseLocalDataSource.getCourse(courseId).first()
 
         if (courseEntity != null) {
@@ -130,7 +149,8 @@ class CourseRepositoryImp @Inject constructor(
                     entityType = "SCHEDULE",
                     payload = serializeSchedule(schedule.asExternalModel()),
                     status = "PENDING",
-                    timestamp = LocalDateTime.now(ZoneOffset.UTC)
+                    timestamp = LocalDateTime.now(ZoneOffset.UTC),
+                    userId = schedule.userId
                 )
 
                 pendingOperationLocalDataSource.insert(pendingOperationSchedule)
@@ -145,7 +165,8 @@ class CourseRepositoryImp @Inject constructor(
                 entityType = "COURSE",
                 payload = serializeCourse(courseEntity.asExternalModel()),
                 status = "PENDING",
-                timestamp = LocalDateTime.now()
+                timestamp = LocalDateTime.now(),
+                userId = courseEntity.userId
             )
 
             pendingOperationLocalDataSource.insert(pendingOperationCourse)
@@ -158,6 +179,10 @@ class CourseRepositoryImp @Inject constructor(
         courseLocalDataSource.getCoursesByIds(courseIds).map { entities ->
             entities.map { it.asExternalModel() }
         }
+
+    override fun getAllCourseEntity(userId: String): Flow<List<CourseEntity>> {
+        return courseLocalDataSource.getAllCourse(userId)
+    }
 
     private fun serializeCourse(course: Course): String {
         return Gson().toJson(course)
@@ -182,9 +207,15 @@ class CourseRepositoryImp @Inject constructor(
                     .setRequiredNetworkType(NetworkType.CONNECTED)
                     .build()
             )
+            .setBackoffCriteria(
+                BackoffPolicy.EXPONENTIAL,
+                10,
+                TimeUnit.SECONDS
+            )
             .build()
 
-        WorkManager.getInstance(context).enqueue(syncRequest)
+        WorkManager.getInstance(context)
+            .enqueueUniqueWork("SyncPendingOperations", ExistingWorkPolicy.APPEND, syncRequest)
     }
 }
 

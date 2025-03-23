@@ -59,7 +59,7 @@ class RegisterScheduleFragment : Fragment() {
     private val args: RegisterScheduleFragmentArgs by navArgs()
     private val binding get() = _binding!!
     private val viewModel: RegisterScheduleViewModel by viewModels()
-    private var scheduleId = 0
+    private var scheduleId = ""
 
     private lateinit var notificationPermissionLauncher: ActivityResultLauncher<String>
     private lateinit var exactAlarmPermissionLauncher: ActivityResultLauncher<Intent>
@@ -103,7 +103,7 @@ class RegisterScheduleFragment : Fragment() {
         checkAndRequestPermissions()
 
         scheduleId = args.scheduleId
-        if (scheduleId != 0) viewModel.displayScheduleData(scheduleId)
+        if (scheduleId != "") viewModel.displayScheduleData(scheduleId)
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -184,7 +184,7 @@ class RegisterScheduleFragment : Fragment() {
         binding.toolbar.run {
             setupWithNavController(navController)
             val menuAdd = menu.findItem(com.studentsapps.ui.R.id.menu_add)
-            if (scheduleId > 0) {
+            if (scheduleId != "") {
                 menuAdd.actionView?.findViewById<MaterialButton>(com.studentsapps.ui.R.id.custom_action_button)?.text =
                     getString(com.studentsapps.ui.R.string.update)
             }
@@ -193,7 +193,7 @@ class RegisterScheduleFragment : Fragment() {
                     viewModel.run {
                         if (!uiState.value.existingCourses) setCourseName(binding.editTextCourse.text.toString())
                         setClassroom(binding.editTextClassroom.text.toString())
-                        if (scheduleId > 0) updateSchedule() else registerSchedule()
+                        if (scheduleId != "") updateSchedule() else registerSchedule()
                     }
                 }
         }
@@ -218,12 +218,12 @@ class RegisterScheduleFragment : Fragment() {
     private fun handleSavedState(savedStateHandle: SavedStateHandle) {
         with(savedStateHandle) {
             get<Int>("day")?.let { viewModel.selectDay(DayOfWeek.of(it)) }
-            get<Int>("course")?.let { viewModel.selectCourse(it) }
+            get<String>("course")?.let { viewModel.selectCourse(it) }
             get<Int>("color")?.let { viewModel.selectColorCourse(it) }
             get<RecurrenceOption>("repetition")?.let { viewModel.setRecurrentOption(it) }
 
             remove<Int>("day")
-            remove<Int>("course")
+            remove<String>("course")
             remove<Int>("color")
             remove<RecurrenceOption>("repetition")
         }

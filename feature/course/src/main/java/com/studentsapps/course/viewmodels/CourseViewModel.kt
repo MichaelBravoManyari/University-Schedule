@@ -2,6 +2,7 @@ package com.studentsapps.course.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import com.studentsapps.data.repository.CourseRepository
 import com.studentsapps.model.Course
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,11 +14,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CourseViewModel @Inject constructor(
-    courseRepository: CourseRepository
+    courseRepository: CourseRepository,
+    auth: FirebaseAuth,
 ) : ViewModel() {
+    private val userId = auth.currentUser?.uid ?: ""
 
     val uiState: StateFlow<CourseUiState> =
-        courseRepository.getAllCourse().map(CourseUiState::Success).stateIn(
+        courseRepository.getAllCourse(userId = userId).map(CourseUiState::Success).stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = CourseUiState.Loading

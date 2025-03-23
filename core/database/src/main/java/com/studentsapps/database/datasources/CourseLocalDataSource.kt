@@ -13,13 +13,13 @@ class CourseLocalDataSource @Inject constructor(
     private val courseDao: CourseDao, @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher
 ) {
 
-    fun getCourse(courseId: Int): Flow<CourseEntity> = courseDao.getCourseById(courseId)
+    fun getCourse(courseId: String): Flow<CourseEntity> = courseDao.getCourseById(courseId)
 
     suspend fun insert(course: CourseEntity): Long = withContext(ioDispatcher) {
         courseDao.insert(course)
     }
 
-    fun getAllCourse(): Flow<List<CourseEntity>> = courseDao.getAll()
+    fun getAllCourse(userId: String): Flow<List<CourseEntity>> = courseDao.getAll(userId)
 
     suspend fun updateCourse(course: CourseEntity) = courseDao.update(course)
 

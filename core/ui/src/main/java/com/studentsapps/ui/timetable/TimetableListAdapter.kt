@@ -25,7 +25,7 @@ class TimetableListAdapter :
 
     private var is12HoursFormat = true
 
-    var onItemClicked: ((Int) -> Unit)? = null
+    var onItemClicked: ((String) -> Unit)? = null
 
     fun set12HoursFormat(value: Boolean) {
         is12HoursFormat = value

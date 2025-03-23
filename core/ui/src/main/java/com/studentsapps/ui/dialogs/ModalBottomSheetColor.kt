@@ -12,7 +12,6 @@ import android.view.ViewTreeObserver
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.studentsapps.ui.databinding.ModalBottomSheetColorBinding
 import kotlin.math.floor
 

@@ -14,8 +14,6 @@ import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.studentsapps.schedule.databinding.ModalBottomSheetCourseBinding
 import com.studentsapps.schedule.viewmodels.BottomSheetCourseUiState
 import com.studentsapps.schedule.viewmodels.BottomSheetCourseViewModel

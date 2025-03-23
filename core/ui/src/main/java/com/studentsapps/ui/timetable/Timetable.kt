@@ -577,7 +577,7 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
         return resources.getDimension(dimenId)
     }
 
-    fun showSchedules(schedules: List<ScheduleView>, onItemClicked: (Int) -> Unit) {
+    fun showSchedules(schedules: List<ScheduleView>, onItemClicked: (String) -> Unit) {
         if (showAsGrid) {
             post { binding.scheduleContainer.removeAllViews() }
             schedules.groupByDayOfWeek().forEach { (dayOfWeek, schedulesForOneDayOfWeek) ->
@@ -612,7 +612,7 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
         schedule: ScheduleView,
         crossedSchedulesCount: Int = 1,
         index: Int = 0,
-        onItemClicked: (Int) -> Unit
+        onItemClicked: (String) -> Unit
     ) {
         post {
             with(schedule) {
@@ -634,7 +634,7 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
     }
 
     private fun createScheduleView(
-        id: Int,
+        id: String,
         courseName: String,
         classPlace: String?,
         startTime: LocalTime,
@@ -643,7 +643,7 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
         color: Int,
         crossedSchedulesCount: Int = 1,
         crossScheduleIndex: Int = 0,
-        onItemClicked: (Int) -> Unit
+        onItemClicked: (String) -> Unit
     ): LinearLayout {
         val layoutParams = getScheduleViewLayoutParams(
             startTime, endTime, day, crossedSchedulesCount, crossScheduleIndex
@@ -657,7 +657,7 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
             setMargins(marginSchedule, marginSchedule, marginSchedule, 0)
         }
         val materialTextView1 = MaterialTextView(context).apply {
-            contentDescription = id.toString()
+            contentDescription = id
             text = courseName
             this.layoutParams = layoutParams1
             setTypeface(scheduleFont, Typeface.BOLD)

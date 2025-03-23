@@ -12,20 +12,28 @@ import com.studentsapps.data.R
 
 class ScheduleAlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        val scheduleId = intent.getIntExtra("scheduleId", -1)
+        val scheduleId = intent.getStringExtra("scheduleId") ?: ""
         val courseName = intent.getStringExtra("courseName") ?: "Class"
         val courseColor = intent.getIntExtra("courseColor", Color.BLUE)
 
         showNotification(context, scheduleId, courseName, courseColor)
     }
 
-    private fun showNotification(context: Context, scheduleId: Int, courseName: String, courseColor: Int) {
-        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    private fun showNotification(
+        context: Context,
+        scheduleId: String,
+        courseName: String,
+        courseColor: Int
+    ) {
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val channelId = "schedule_channel"
         val channelName = "Schedule Notifications"
+        val notificationId = generateRequestCode(scheduleId)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH)
+            val channel =
+                NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH)
             channel.description = "Notifications for schedule"
             channel.enableLights(true)
             channel.lightColor = courseColor
@@ -41,6 +49,6 @@ class ScheduleAlarmReceiver : BroadcastReceiver() {
             .setColor(courseColor)
             .setAutoCancel(true)
 
-        notificationManager.notify(scheduleId, notificationBuilder.build())
+        notificationManager.notify(notificationId, notificationBuilder.build())
     }
 }

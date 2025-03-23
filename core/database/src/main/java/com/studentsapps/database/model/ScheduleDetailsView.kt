@@ -10,7 +10,7 @@ import java.time.LocalTime
 @DatabaseView(
     value = """
         SELECT s.id as schedule_id, s.start_time, s.end_time, s.class_place, s.day_of_week, 
-        s.course_id, c.name as course_name, s.specific_date, c.color as course_color
+        s.course_id, c.name as course_name, s.specific_date, c.color as course_color, s.user_id
         FROM schedules s INNER JOIN courses c 
         ON s.course_id = c.id
     """,
@@ -18,7 +18,7 @@ import java.time.LocalTime
 )
 data class ScheduleDetailsView(
     @ColumnInfo(name = "schedule_id")
-    val scheduleId: Int,
+    val scheduleId: String,
     @ColumnInfo(name = "start_time")
     val startTime: LocalTime,
     @ColumnInfo(name = "end_time")
@@ -30,11 +30,13 @@ data class ScheduleDetailsView(
     @ColumnInfo(name = "specific_date")
     val specificDate: LocalDate?,
     @ColumnInfo(name = "course_id")
-    val courseId: Int,
+    val courseId: String,
     @ColumnInfo(name = "course_name")
     val courseName: String,
     @ColumnInfo(name = "course_color")
     val courseColor: Int,
+    @ColumnInfo(name = "user_id")
+    val userId: String
 )
 
 fun ScheduleDetailsView.asExternalModel() = ScheduleDetails(

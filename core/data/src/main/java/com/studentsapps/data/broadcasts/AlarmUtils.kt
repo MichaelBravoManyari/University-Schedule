@@ -10,6 +10,7 @@ import com.studentsapps.model.ScheduleDetails
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
+import kotlin.math.absoluteValue
 
 fun scheduleAlarm(context: Context, scheduleDetails: ScheduleDetails) {
     val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -19,9 +20,11 @@ fun scheduleAlarm(context: Context, scheduleDetails: ScheduleDetails) {
         putExtra("courseColor", scheduleDetails.courseColor)
     }
 
+    val requestCode = generateRequestCode(scheduleDetails.scheduleId)
+
     val pendingIntent = PendingIntent.getBroadcast(
         context,
-        scheduleDetails.scheduleId,
+        requestCode,
         intent,
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     )
@@ -42,6 +45,10 @@ fun scheduleAlarm(context: Context, scheduleDetails: ScheduleDetails) {
             pendingIntent
         )
     }
+}
+
+fun generateRequestCode(scheduleId: String): Int {
+    return scheduleId.hashCode().absoluteValue
 }
 
 private fun calculateTriggerTimeMillis(scheduleDetails: ScheduleDetails): Long {
@@ -70,9 +77,10 @@ private fun calculateTriggerTimeMillis(scheduleDetails: ScheduleDetails): Long {
 fun cancelAlarm(context: Context, scheduleDetails: ScheduleDetails) {
     val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
     val intent = Intent(context, ScheduleAlarmReceiver::class.java)
+    val requestCode = generateRequestCode(scheduleDetails.scheduleId)
     val pendingIntent = PendingIntent.getBroadcast(
         context,
-        scheduleDetails.scheduleId,
+        requestCode,
         intent,
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     )
@@ -80,7 +88,7 @@ fun cancelAlarm(context: Context, scheduleDetails: ScheduleDetails) {
 }
 
 fun Schedule.asScheduleDetails(
-    scheduleId: Int,
+    scheduleId: String,
     specificDate: LocalDate?,
     courseName: String,
     courseColor: Int

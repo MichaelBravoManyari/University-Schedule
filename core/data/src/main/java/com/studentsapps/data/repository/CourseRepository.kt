@@ -1,19 +1,26 @@
 package com.studentsapps.data.repository
 
+import com.studentsapps.database.model.CourseEntity
 import com.studentsapps.model.Course
 import kotlinx.coroutines.flow.Flow
 
 interface CourseRepository {
 
-    fun getCourse(courseId: Int): Flow<Course>
+    fun getCourse(courseId: String): Flow<Course>
 
-    suspend fun registerCourse(course: Course): Long
+    suspend fun registerCourse(course: Course, userId: String): String
 
-    fun getAllCourse(): Flow<List<Course>>
+    suspend fun registerCourseEntity(courseEntity: CourseEntity)
 
-    suspend fun updateCourse(course: Course)
+    fun getAllCourse(shouldSync: Boolean = true, userId: String): Flow<List<Course>>
 
-    suspend fun deleteCourse(courseId: Int)
+    suspend fun updateCourse(course: Course, userId: String)
+
+    suspend fun updateCourseEntity(courseEntity: CourseEntity)
+
+    suspend fun deleteCourse(courseId: String)
 
     fun getCoursesByIds(courseIds: List<String>): Flow<List<Course>>
+
+    fun getAllCourseEntity(userId: String): Flow<List<CourseEntity>>
 }

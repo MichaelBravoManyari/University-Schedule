@@ -19,7 +19,9 @@ data class PendingOperationEntity(
     @ColumnInfo(name = "status")
     val status: String,
     @ColumnInfo(name = "timestamp")
-    val timestamp: LocalDateTime
+    val timestamp: LocalDateTime,
+    @ColumnInfo(name = "user_id")
+    val userId: String
 )
 
 fun PendingOperationEntity.asExternalModel() = PendingOperation(

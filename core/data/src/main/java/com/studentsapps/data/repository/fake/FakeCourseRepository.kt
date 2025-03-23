@@ -14,30 +14,43 @@ class FakeCourseRepository @Inject constructor() : CourseRepository {
 
     private val courseDao = TestCourseDao()
 
-    override fun getCourse(courseId: Int): Flow<Course> =
+    override fun getCourse(courseId: String): Flow<Course> =
         courseDao.getCourseById(courseId).map(CourseEntity::asExternalModel)
 
-    override suspend fun registerCourse(course: Course): Long = courseDao.insert(with(course) {
-        CourseEntity(
-            id, name, nameProfessor, color, LocalDateTime.now()
-        )
-    })
+    override suspend fun registerCourse(course: Course, userId: String): String =
+        courseDao.insert(with(course) {
+            CourseEntity(
+                id, name, nameProfessor, color, LocalDateTime.now(), userId = userId
+            )
+        }).toString()
 
-    override fun getAllCourse(): Flow<List<Course>> {
-        return courseDao.getAll().map { it.map(CourseEntity::asExternalModel) }
+    override suspend fun registerCourseEntity(courseEntity: CourseEntity) {
+        TODO("Not yet implemented")
     }
 
-    override suspend fun updateCourse(course: Course) = courseDao.update(with(course) {
+    override fun getAllCourse(shouldSync: Boolean, userId: String): Flow<List<Course>> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun updateCourse(course: Course, userId: String) = courseDao.update(with(course) {
         CourseEntity(
-            id, name, nameProfessor, color, LocalDateTime.now()
+            id, name, nameProfessor, color, LocalDateTime.now(), userId = userId
         )
     })
 
-    override suspend fun deleteCourse(courseId: Int) {
+    override suspend fun updateCourseEntity(courseEntity: CourseEntity) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun deleteCourse(courseId: String) {
         TODO("Not yet implemented")
     }
 
     override fun getCoursesByIds(courseIds: List<String>): Flow<List<Course>> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getAllCourseEntity(userId: String): Flow<List<CourseEntity>> {
         TODO("Not yet implemented")
     }
 

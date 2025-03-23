@@ -27,6 +27,8 @@ dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:data"))
     implementation(project(":core:common"))
+    implementation(project(":core:network"))
+    implementation(project(":core:database"))
     implementation(project(":sync"))
 
     implementation(libs.androidx.appcompat)
@@ -36,6 +38,8 @@ dependencies {
     implementation(libs.firebase.analytics)
     implementation(libs.androidx.hilt.work)
     implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.firestore.ktx)
 
     kapt("androidx.hilt:hilt-compiler:1.2.0")
 

@@ -6,10 +6,12 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.google.firebase.auth.FirebaseAuth
-import com.studentsapps.data.repository.CourseRepository
 import com.studentsapps.data.repository.PendingOperationRepository
 import com.studentsapps.database.datasources.CourseLocalDataSource
+import com.studentsapps.database.datasources.ScheduleLocalDataSource
 import com.studentsapps.database.model.CourseEntity
+import com.studentsapps.database.model.ScheduleEntity
+import com.studentsapps.model.PendingOperation
 import com.studentsapps.network.datasources.CourseNetworkDataSource
 import com.studentsapps.network.datasources.ScheduleNetworkDataSource
 import com.studentsapps.network.model.NetworkCourse
@@ -28,136 +30,201 @@ class SyncPendingOperationsWorker @AssistedInject constructor(
     private val scheduleNetworkDataSource: ScheduleNetworkDataSource,
     private val auth: FirebaseAuth,
     private val courseLocalDataSource: CourseLocalDataSource,
+    private val scheduleLocalDataSource: ScheduleLocalDataSource,
     @Assisted private val context: Context,
     @Assisted private val params: WorkerParameters
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
         val userId = auth.currentUser?.uid
-            ?: return Result.failure()
+            ?: return Result.retry()
 
-        val pendingOperations =
-            pendingOperationRepository.getPendingOperations("PENDING").firstOrNull()
+        val operation =
+            pendingOperationRepository.getFirstPendingOperation("PENDING", userId).firstOrNull()
                 ?: return Result.success()
 
-        pendingOperations.forEach { operation ->
-            try {
-                when (operation.operationType) {
-                    "REGISTER", "UPDATE" -> {
-                        val isCourse = operation.entityType == "COURSE"
-                        if (isCourse) {
-                            val course = deserializeCourse(operation.payload, operation.timestamp)
-                            courseNetworkDataSource.updateOrCreateCourse(userId = userId, course)
-                        } else {
-                            val schedule =
-                                deserializeSchedule(operation.payload, operation.timestamp)
-                            scheduleNetworkDataSource.updateOrCreateSchedule(userId, schedule)
-                        }
-                    }
+        return try {
+            processOperation(userId, operation)
+            Result.success()
+        } catch (e: Exception) {
+            Log.e("SyncWorker", "Error processing operation", e)
+            Result.retry()
+        }
+    }
 
-                    "DELETE" -> {
-                        val isCourse = operation.entityType == "COURSE"
-                        if (isCourse) {
-                            val course = deserializeCourse(operation.payload, operation.timestamp)
-                            courseNetworkDataSource.deleteCourse(
-                                userId = userId,
-                                courseId = course.id
-                            )
-                        } else {
-                            val schedule =
-                                deserializeSchedule(operation.payload, operation.timestamp)
-                            scheduleNetworkDataSource.deleteSchedule(
-                                userId = userId,
-                                scheduleId = schedule.id
-                            )
-                        }
-                    }
+    private suspend fun processOperation(userId: String, operation: PendingOperation) {
+        when (operation.operationType) {
+            "REGISTER", "UPDATE" -> syncEntity(userId, operation, isDelete = false)
+            "DELETE" -> syncEntity(userId, operation, isDelete = true)
+            "READ" -> syncSingleEntity(userId, operation)
+            "READ_LIST" -> syncEntityList(userId, operation)
+        }
+    }
 
-                    "READ" -> {
-                        if (operation.entityType == "COURSE") {
-                            // Deserealizar el course y obtener el courseId.
-                            val courseId =
-                                deserializeCourse(operation.payload, operation.timestamp).id
-                            // Comunicarse con courseNetworkDataSource para obtener el curso de firebase mediante el courseId.
-                            val remoteCourse =
-                                courseNetworkDataSource.getCourseById(userId, courseId.toString())
-                            // Obtener la version mas reciente del course de la base de datos local.
-                            val localCourse = courseLocalDataSource.getCourse(courseId).first()
-                            Log.e(
-                                "SyncPendingOperationsWorker",
-                                "remoteCourse: $remoteCourse, localCourse: $localCourse"
-                            )
-                            // Verificar su atributo lastModified, si el lastModified de firebase es mayor al del local, entonces se
-                            // debe actualizar el curso de la base de datos local con la info de firebase.
-                            if (remoteCourse != null && remoteCourse.lastModified.isAfter(
-                                    localCourse.lastModified
-                                )
-                            ) {
-                                courseLocalDataSource.updateCourse(with(remoteCourse) {
-                                    CourseEntity(
-                                        id,
-                                        name,
-                                        nameProfessor,
-                                        color,
-                                        lastModified
-                                    )
-                                })
-                            }
-                        } else {
-                            // para Schedules
-                        }
-                    }
+    private suspend fun syncEntity(userId: String, operation: PendingOperation, isDelete: Boolean) {
+        val isCourse = operation.entityType == "COURSE"
+        if (isCourse) {
+            val course = deserializeCourse(operation.payload, operation.timestamp)
+            if (isDelete) {
+                courseNetworkDataSource.deleteCourse(userId, course.id)
+            } else {
+                courseNetworkDataSource.updateOrCreateCourse(userId, course)
+            }
+        } else {
+            val schedule = deserializeSchedule(operation.payload, operation.timestamp)
+            if (isDelete) {
+                scheduleNetworkDataSource.deleteSchedule(userId, schedule.id)
+            } else {
+                scheduleNetworkDataSource.updateOrCreateSchedule(userId, schedule)
+            }
+        }
+        pendingOperationRepository.updateStatus(operation.id, "SYNCED")
+    }
 
-                    "READ_LIST" -> {
-                        if (operation.entityType == "COURSE") {
-                            // Deserealizar la lista de cursos y obtener sus coursesIds.
-                            val courseIds =
-                                deserializeCourses(
-                                    operation.payload,
-                                    operation.timestamp
-                                ).map { it.id.toString() }
-                            // Comunicarse con courseNetworkDataSource para obtener los cursos de firebase mediante el courseId.
-                            val remoteCourses =
-                                courseNetworkDataSource.getCoursesByIds(userId, courseIds)
-                            // Obtener la version mas reciente de los courses de la base de datos local.
-                            val localCourses =
-                                courseLocalDataSource.getCoursesByIds(courseIds).first()
-                            // Por cada curso de la base de datos local, buscar por el courseId en la lista de remoteCourses,
-                            // si el lastModified de firebase es mayor al del local, entonces se
-                            // debe actualizar el curso de la base de datos local con la info de firebase.
-                            remoteCourses.forEach { remoteCourse ->
-                                val localCourse = localCourses.find { it.id == remoteCourse.id }
+    private suspend fun syncSingleEntity(userId: String, operation: PendingOperation) {
+        val isCourse = operation.entityType == "COURSE"
+        if (isCourse) {
+            val courseId = deserializeCourse(operation.payload, operation.timestamp).id
+            val remoteCourse = courseNetworkDataSource.getCourseById(userId, courseId)
 
-                                if (localCourse == null || remoteCourse.lastModified.isAfter(
-                                        localCourse.lastModified
-                                    )
-                                ) {
-                                    courseLocalDataSource.updateCourse(
-                                        CourseEntity(
-                                            id = remoteCourse.id,
-                                            name = remoteCourse.name,
-                                            nameProfessor = remoteCourse.nameProfessor,
-                                            color = remoteCourse.color,
-                                            lastModified = remoteCourse.lastModified
-                                        )
-                                    )
-                                    Log.d("SyncWorker", "Updated course: ${remoteCourse.id}")
-                                }
-                            }
-                        } else {
-                            // Para schedules
-                        }
-                    }
+            if (remoteCourse != null) {
+                val localCourse = courseLocalDataSource.getCourse(remoteCourse.id).first()
+                if (remoteCourse.lastModified.isAfter(localCourse.lastModified)) {
+                    courseLocalDataSource.updateCourse(remoteCourse.toCourseEntity())
                 }
-                pendingOperationRepository.updateStatus(operation.id, "SYNCED")
-            } catch (e: Exception) {
-                pendingOperationRepository.updateStatus(operation.id, "FAILED")
-                Log.e("SyncPendingOperationsWorker", "Error en el Worker: ${e.message}", e)
+            }
+        } else {
+            val scheduleId = deserializeSchedule(operation.payload, operation.timestamp).id
+            val remoteSchedule =
+                scheduleNetworkDataSource.getScheduleById(userId, scheduleId)
+
+            if (remoteSchedule != null) {
+                val localSchedule =
+                    scheduleLocalDataSource.getScheduleById(remoteSchedule.id).first()
+                if (remoteSchedule.lastModified.isAfter(localSchedule.lastModified)) {
+                    scheduleLocalDataSource.updateSchedule(remoteSchedule.toScheduleEntity())
+                }
             }
         }
 
-        return Result.success()
+        markOperationsAsSynced(operation, userId)
     }
+
+    private suspend fun syncEntityList(userId: String, operation: PendingOperation) {
+        val isCourse = operation.entityType == "COURSE"
+        if (isCourse) {
+            val ids = deserializeCourses(operation.payload, operation.timestamp).map { it.id }
+            val remoteCourses = courseNetworkDataSource.getCoursesByIds(userId, ids)
+            val localCourses = courseLocalDataSource.getCoursesByIds(ids).first()
+
+            remoteCourses.forEach { remoteCourse ->
+                val localCourse = localCourses.find { it.id == remoteCourse.id }
+                if (localCourse == null || remoteCourse.lastModified.isAfter(localCourse.lastModified)) {
+                    courseLocalDataSource.updateCourse(remoteCourse.toCourseEntity())
+                }
+            }
+        } else {
+            val ids = deserializeSchedules(operation.payload, operation.timestamp).map { it.id }
+            val remoteSchedules = scheduleNetworkDataSource.getSchedulesByIds(userId, ids)
+            val localSchedules = scheduleLocalDataSource.getSchedulesByIds(ids).first()
+
+            remoteSchedules.forEach { remoteSchedule ->
+                val localSchedule = localSchedules.find { it.id == remoteSchedule.id }
+                if (localSchedule == null || remoteSchedule.lastModified.isAfter(localSchedule.lastModified)) {
+                    scheduleLocalDataSource.updateSchedule(remoteSchedule.toScheduleEntity())
+                }
+            }
+        }
+
+        markOperationsAsSynced(operation, userId)
+    }
+
+    private suspend fun markOperationsAsSynced(operation: PendingOperation, userId: String) {
+        val pendingOperations = pendingOperationRepository.getPendingReadOperations(
+            operation.operationType, operation.entityType, userId
+        ).first()
+
+        when (operation.operationType) {
+            "READ" -> {
+                if (operation.entityType == "COURSE") {
+                    val targetCourse = deserializeCourse(operation.payload, operation.timestamp)
+
+                    pendingOperations.filter { pendingOp ->
+                        try {
+                            val entity = deserializeCourse(pendingOp.payload, pendingOp.timestamp)
+                            entity.id == targetCourse.id
+                        } catch (e: Exception) {
+                            false
+                        }
+                    }.forEach { pendingOp ->
+                        pendingOperationRepository.updateStatus(pendingOp.id, "SYNCED")
+                    }
+                } else { // Para "SCHEDULE"
+                    val targetSchedule = deserializeSchedule(operation.payload, operation.timestamp)
+
+                    pendingOperations.filter { pendingOp ->
+                        try {
+                            val entity = deserializeSchedule(pendingOp.payload, pendingOp.timestamp)
+                            entity.id == targetSchedule.id
+                        } catch (e: Exception) {
+                            false
+                        }
+                    }.forEach { pendingOp ->
+                        pendingOperationRepository.updateStatus(pendingOp.id, "SYNCED")
+                    }
+                }
+            }
+
+            "READ_LIST" -> {
+                if (operation.entityType == "COURSE") {
+                    val targetCourseIds = deserializeCourses(operation.payload, operation.timestamp)
+                        .map { it.id }.sorted()
+
+                    pendingOperations.filter { pendingOp ->
+                        try {
+                            val storedCourses = deserializeCourses(pendingOp.payload, pendingOp.timestamp)
+                            val storedCourseIds = storedCourses.map { it.id }.sorted()
+                            storedCourseIds == targetCourseIds
+                        } catch (e: Exception) {
+                            false
+                        }
+                    }.forEach { pendingOp ->
+                        pendingOperationRepository.updateStatus(pendingOp.id, "SYNCED")
+                    }
+                } else { // Para "SCHEDULE"
+                    val targetScheduleIds = deserializeSchedules(operation.payload, operation.timestamp)
+                        .map { it.id }.sorted()
+
+                    pendingOperations.filter { pendingOp ->
+                        try {
+                            val storedSchedules = deserializeSchedules(pendingOp.payload, pendingOp.timestamp)
+                            val storedScheduleIds = storedSchedules.map { it.id }.sorted()
+                            storedScheduleIds == targetScheduleIds
+                        } catch (e: Exception) {
+                            false
+                        }
+                    }.forEach { pendingOp ->
+                        pendingOperationRepository.updateStatus(pendingOp.id, "SYNCED")
+                    }
+                }
+            }
+        }
+    }
+
+    private fun NetworkCourse.toCourseEntity() =
+        CourseEntity(id, name, nameProfessor, color, lastModified, userId)
+
+    private fun NetworkSchedule.toScheduleEntity() = ScheduleEntity(
+        id,
+        startTime,
+        endTime,
+        classPlace,
+        dayOfWeek,
+        specificDate,
+        lastModified,
+        courseId,
+        userId
+    )
 }
 
 private fun deserializeCourse(payload: String, lastModified: LocalDateTime): NetworkCourse {
@@ -165,7 +232,10 @@ private fun deserializeCourse(payload: String, lastModified: LocalDateTime): Net
     return course.copy(lastModified = lastModified)
 }
 
-private fun deserializeCourses(payload: String, lastModified: LocalDateTime): List<NetworkCourse> {
+private fun deserializeCourses(
+    payload: String,
+    lastModified: LocalDateTime
+): List<NetworkCourse> {
     val courses = Json.decodeFromString<List<NetworkCourse>>(payload)
     return courses.map { it.copy(lastModified = lastModified) }
 }
@@ -173,4 +243,12 @@ private fun deserializeCourses(payload: String, lastModified: LocalDateTime): Li
 private fun deserializeSchedule(payload: String, lastModified: LocalDateTime): NetworkSchedule {
     val schedule = Json.decodeFromString<NetworkSchedule>(payload)
     return schedule.copy(lastModified = lastModified)
+}
+
+private fun deserializeSchedules(
+    payload: String,
+    lastModified: LocalDateTime
+): List<NetworkSchedule> {
+    val schedules = Json.decodeFromString<List<NetworkSchedule>>(payload)
+    return schedules.map { it.copy(lastModified = lastModified) }
 }

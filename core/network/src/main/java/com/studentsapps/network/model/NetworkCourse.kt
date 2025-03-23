@@ -6,9 +6,10 @@ import java.time.LocalDateTime
 
 @Serializable
 data class NetworkCourse(
-    val id: Int,
+    val id: String,
     val name: String,
     val nameProfessor: String?,
     val color: Int,
-    @Contextual val lastModified: LocalDateTime = LocalDateTime.now()
+    @Contextual val lastModified: LocalDateTime = LocalDateTime.now(),
+    val userId: String
 )

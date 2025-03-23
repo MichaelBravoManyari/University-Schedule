@@ -7,75 +7,75 @@ import java.time.LocalTime
 
 val scheduleDetailsList = mutableListOf(
     createTestScheduleDetailsView(
-        id = 1,
+        id = "1",
         dayOfWeek = DayOfWeek.MONDAY,
         courseName = "Math",
-        courseId = 1
+        courseId = "1"
     ),
     createTestScheduleDetailsView(
-        id = 2,
+        id = "2",
         dayOfWeek = DayOfWeek.TUESDAY,
         courseName = "Math1",
-        courseId = 2
+        courseId = "2"
     ),
     createTestScheduleDetailsView(
-        id = 3,
+        id = "3",
         dayOfWeek = DayOfWeek.WEDNESDAY,
         courseName = "Math2",
-        courseId = 3
+        courseId = "3"
     ),
     createTestScheduleDetailsView(
-        id = 4,
+        id = "4",
         dayOfWeek = DayOfWeek.THURSDAY,
         courseName = "Math3",
-        courseId = 4
+        courseId = "4"
     ),
     createTestScheduleDetailsView(
-        id = 5,
+        id = "5",
         dayOfWeek = DayOfWeek.FRIDAY,
         courseName = "Math4",
-        courseId = 5
+        courseId = "5"
     ),
     createTestScheduleDetailsView(
-        id = 6,
+        id = "6",
         dayOfWeek = DayOfWeek.SATURDAY,
         courseName = "Math5",
-        courseId = 6
+        courseId = "6"
     ),
     createTestScheduleDetailsView(
-        id = 7,
+        id = "7",
         dayOfWeek = DayOfWeek.SUNDAY,
         courseName = "Math6",
-        courseId = 7
+        courseId = "7"
     ),
     createTestScheduleDetailsView(
-        id = 8,
+        id = "8",
         dayOfWeek = DayOfWeek.MONDAY,
-        specificDate = LocalDate.of(2023, 11, 20), courseName = "Math7", courseId = 8
+        specificDate = LocalDate.of(2023, 11, 20), courseName = "Math7", courseId = "8"
     ),
     createTestScheduleDetailsView(
-        id = 9,
+        id = "9",
         dayOfWeek = DayOfWeek.MONDAY,
-        specificDate = LocalDate.of(2023, 11, 20), courseName = "Math8", courseId = 9
+        specificDate = LocalDate.of(2023, 11, 20), courseName = "Math8", courseId = "9"
     ),
     createTestScheduleDetailsView(
-        id = 10,
+        id = "10",
         dayOfWeek = DayOfWeek.THURSDAY,
-        specificDate = LocalDate.of(2023, 11, 23), courseName = "Math9", courseId = 10
+        specificDate = LocalDate.of(2023, 11, 23), courseName = "Math9", courseId = "10"
     ),
     createTestScheduleDetailsView(
-        id = 11,
+        id = "11",
         dayOfWeek = DayOfWeek.SUNDAY,
-        specificDate = LocalDate.of(2023, 11, 19), courseName = "Math10", courseId = 11
+        specificDate = LocalDate.of(2023, 11, 19), courseName = "Math10", courseId = "11"
     ),
 )
 
 private fun createTestScheduleDetailsView(
-    id: Int,
+    id: String,
     dayOfWeek: DayOfWeek,
     specificDate: LocalDate? = null,
     courseName: String = "Math",
-    courseId: Int
+    courseId: String
 ) =
     ScheduleDetailsView(
         scheduleId = id,
@@ -87,4 +87,5 @@ private fun createTestScheduleDetailsView(
         specificDate = specificDate,
         courseName = courseName,
         courseColor = 1234,
+        userId = ""
     )

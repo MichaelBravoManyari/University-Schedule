@@ -11,12 +11,13 @@ import java.time.LocalTime
 
 @Serializable
 data class NetworkSchedule(
-    val id: Int,
+    val id: String,
     @Serializable(with = LocalTimeSerializer::class) val startTime: LocalTime,
     @Serializable(with = LocalTimeSerializer::class) val endTime: LocalTime,
     val classPlace: String?,
     val dayOfWeek: DayOfWeek,
     @Serializable(with = LocalDateSerializer::class) val specificDate: LocalDate? = null,
     @Contextual val lastModified: LocalDateTime = LocalDateTime.now(),
-    val courseId: Int
+    val courseId: String,
+    val userId: String
 )
