@@ -36,10 +36,16 @@ class BottomSheetScheduleViewModel @Inject constructor(
     fun deleteSchedule(scheduleId: String) {
         viewModelScope.launch {
             scheduleRepository.deleteSchedule(scheduleId, userId)
+            _uiState.update { currentState ->
+                currentState.copy(
+                    isScheduleDeleted = true
+                )
+            }
         }
     }
 }
 
 data class BottomSheetScheduleUiState(
-    val scheduleDetails: ScheduleDetails? = null
+    val scheduleDetails: ScheduleDetails? = null,
+    val isScheduleDeleted: Boolean = false
 )

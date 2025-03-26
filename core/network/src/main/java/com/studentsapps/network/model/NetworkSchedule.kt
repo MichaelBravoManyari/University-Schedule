@@ -19,5 +19,5 @@ data class NetworkSchedule(
     @Serializable(with = LocalDateSerializer::class) val specificDate: LocalDate? = null,
     @Contextual val lastModified: LocalDateTime = LocalDateTime.now(),
     val courseId: String,
-    val userId: String
+    val userId: String = ""
 )

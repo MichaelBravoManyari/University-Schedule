@@ -11,5 +11,5 @@ data class NetworkCourse(
     val nameProfessor: String?,
     val color: Int,
     @Contextual val lastModified: LocalDateTime = LocalDateTime.now(),
-    val userId: String
+    val userId: String = ""
 )

@@ -1,6 +1,7 @@
 package com.studentsapps.data.repository
 
 import android.content.Context
+import android.util.Log
 import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
@@ -127,24 +128,23 @@ class ScheduleRepositoryImp @Inject constructor(
         userId: String
     ) {
         val timestamp = LocalDateTime.now(ZoneOffset.UTC)
-        val scheduleEntity = with(schedule) {
-            ScheduleEntity(
-                startTime = startTime,
-                endTime = endTime,
-                classPlace = classPlace,
-                dayOfWeek = dayOfWeek,
-                specificDate = specificDate,
-                lastModified = timestamp,
-                courseId = courseId,
-                userId = userId
-            )
-        }
+        val scheduleEntity = ScheduleEntity(
+            startTime = schedule.startTime,
+            endTime = schedule.endTime,
+            classPlace = schedule.classPlace,
+            dayOfWeek = schedule.dayOfWeek,
+            specificDate = specificDate,
+            lastModified = timestamp,
+            courseId = schedule.courseId,
+            userId = userId
+        )
+
         scheduleLocalDataSource.insert(scheduleEntity)
 
         val pendingOperation = PendingOperationEntity(
             operationType = "REGISTER", entityType = "SCHEDULE", payload = serializeSchedule(
                 schedule.copy(
-                    id = schedule.id, specificDate = specificDate
+                    id = scheduleEntity.id, specificDate = specificDate
                 )
             ), status = "PENDING", timestamp = timestamp, userId = userId
         )
@@ -306,7 +306,8 @@ class ScheduleRepositoryImp @Inject constructor(
     }
 
     override suspend fun getAllScheduleDetails(userId: String): List<ScheduleDetails> {
-        return scheduleLocalDataSource.getAllSchedules(userId).map(ScheduleDetailsView::asExternalModel)
+        return scheduleLocalDataSource.getAllSchedules(userId)
+            .map(ScheduleDetailsView::asExternalModel)
     }
 
     override fun getAllScheduleEntity(userId: String): Flow<List<ScheduleEntity>> {
