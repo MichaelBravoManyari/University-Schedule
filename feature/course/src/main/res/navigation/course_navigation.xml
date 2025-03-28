@@ -25,8 +25,8 @@
         <deepLink app:uri="android-app://studentsapps.app/registerCourseFragment/{navigatedFromTimeLoggingDestination}" />
         <argument
             android:name="courseId"
-            android:defaultValue="&quot;&quot;"
-            app:argType="string" />
+            app:argType="string"
+            android:defaultValue="" />
         <argument
             android:name="navigatedFromTimeLoggingDestination"
             android:defaultValue="false"

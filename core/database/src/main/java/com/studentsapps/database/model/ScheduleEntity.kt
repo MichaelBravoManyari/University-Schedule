@@ -3,7 +3,6 @@ package com.studentsapps.database.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.studentsapps.model.Schedule
 import java.time.DayOfWeek

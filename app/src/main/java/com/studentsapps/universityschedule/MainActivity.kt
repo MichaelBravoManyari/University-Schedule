@@ -199,37 +199,4 @@ class MainActivity : AppCompatActivity() {
             .setCancelable(false)
             .create()
     }
-
-    private fun NetworkCourse.toCourseEntity() =
-        CourseEntity(id, name, nameProfessor, color, lastModified, userId)
-
-    private fun NetworkSchedule.toScheduleEntity() = ScheduleEntity(
-        id,
-        startTime,
-        endTime,
-        classPlace,
-        dayOfWeek,
-        specificDate,
-        lastModified,
-        courseId,
-        userId
-    )
-
-    /*private fun checkPendingWorkManagers() {
-        val workManager = WorkManager.getInstance(this)
-
-        workManager.getWorkInfosForUniqueWorkLiveData("SyncPendingOperations")
-            .observeForever { workInfos ->
-                val pendingWork = workInfos.any { workInfo ->
-                    workInfo.state == WorkInfo.State.ENQUEUED || workInfo.state == WorkInfo.State.RUNNING
-                }
-
-                // Que se ejecute esto una sola vez al inicio de la app.
-                if (pendingWork) {
-                    Log.d("MyApplication", "Aún hay WorkManagers en cola o ejecutándose.")
-                } else {
-                    Log.d("MyApplication", "Todos los WorkManagers han finalizado.")
-                }
-            }
-    }*/
 }

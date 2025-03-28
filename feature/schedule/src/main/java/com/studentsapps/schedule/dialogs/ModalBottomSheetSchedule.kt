@@ -5,6 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -14,6 +17,8 @@ import com.studentsapps.schedule.databinding.ModalBottomSheetScheduleBinding
 import com.studentsapps.schedule.viewmodels.BottomSheetScheduleViewModel
 import com.studentsapps.ui.dialogs.BaseBottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ModalBottomSheetSchedule : BaseBottomSheetDialogFragment() {
@@ -54,12 +59,24 @@ class ModalBottomSheetSchedule : BaseBottomSheetDialogFragment() {
                 .setMessage(R.string.delete_schedule)
                 .setPositiveButton(R.string.accept_dialog) { _, _ ->
                     viewModel.deleteSchedule(args.scheduleId)
-                    navController.previousBackStackEntry?.savedStateHandle?.set("updateScheduleList", true)
-                    this.dismiss()
+                    navController.previousBackStackEntry?.savedStateHandle?.set(
+                        "updateScheduleList",
+                        true
+                    )
                 }
                 .setNegativeButton(R.string.cancel) { dialog, _ ->
                     dialog.dismiss()
                 }.show()
+        }
+
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { uiState ->
+                    if (uiState.isScheduleDeleted) {
+                        this@ModalBottomSheetSchedule.dismiss()
+                    }
+                }
+            }
         }
     }
 

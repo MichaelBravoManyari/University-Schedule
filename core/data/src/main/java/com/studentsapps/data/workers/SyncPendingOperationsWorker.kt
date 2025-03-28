@@ -64,14 +64,14 @@ class SyncPendingOperationsWorker @AssistedInject constructor(
     private suspend fun syncEntity(userId: String, operation: PendingOperation, isDelete: Boolean) {
         val isCourse = operation.entityType == "COURSE"
         if (isCourse) {
-            val course = deserializeCourse(operation.payload, operation.timestamp)
+            val course = deserializeCourse(operation.payload, operation.timestamp, userId)
             if (isDelete) {
                 courseNetworkDataSource.deleteCourse(userId, course.id)
             } else {
                 courseNetworkDataSource.updateOrCreateCourse(userId, course)
             }
         } else {
-            val schedule = deserializeSchedule(operation.payload, operation.timestamp)
+            val schedule = deserializeSchedule(operation.payload, operation.timestamp, userId)
             if (isDelete) {
                 scheduleNetworkDataSource.deleteSchedule(userId, schedule.id)
             } else {
@@ -84,7 +84,7 @@ class SyncPendingOperationsWorker @AssistedInject constructor(
     private suspend fun syncSingleEntity(userId: String, operation: PendingOperation) {
         val isCourse = operation.entityType == "COURSE"
         if (isCourse) {
-            val courseId = deserializeCourse(operation.payload, operation.timestamp).id
+            val courseId = deserializeCourse(operation.payload, operation.timestamp, userId).id
             val remoteCourse = courseNetworkDataSource.getCourseById(userId, courseId)
 
             if (remoteCourse != null) {
@@ -94,7 +94,7 @@ class SyncPendingOperationsWorker @AssistedInject constructor(
                 }
             }
         } else {
-            val scheduleId = deserializeSchedule(operation.payload, operation.timestamp).id
+            val scheduleId = deserializeSchedule(operation.payload, operation.timestamp, userId).id
             val remoteSchedule =
                 scheduleNetworkDataSource.getScheduleById(userId, scheduleId)
 
@@ -113,7 +113,8 @@ class SyncPendingOperationsWorker @AssistedInject constructor(
     private suspend fun syncEntityList(userId: String, operation: PendingOperation) {
         val isCourse = operation.entityType == "COURSE"
         if (isCourse) {
-            val ids = deserializeCourses(operation.payload, operation.timestamp).map { it.id }
+            val ids =
+                deserializeCourses(operation.payload, operation.timestamp, userId).map { it.id }
             val remoteCourses = courseNetworkDataSource.getCoursesByIds(userId, ids)
             val localCourses = courseLocalDataSource.getCoursesByIds(ids).first()
 
@@ -124,7 +125,8 @@ class SyncPendingOperationsWorker @AssistedInject constructor(
                 }
             }
         } else {
-            val ids = deserializeSchedules(operation.payload, operation.timestamp).map { it.id }
+            val ids =
+                deserializeSchedules(operation.payload, operation.timestamp, userId).map { it.id }
             val remoteSchedules = scheduleNetworkDataSource.getSchedulesByIds(userId, ids)
             val localSchedules = scheduleLocalDataSource.getSchedulesByIds(ids).first()
 
@@ -147,11 +149,13 @@ class SyncPendingOperationsWorker @AssistedInject constructor(
         when (operation.operationType) {
             "READ" -> {
                 if (operation.entityType == "COURSE") {
-                    val targetCourse = deserializeCourse(operation.payload, operation.timestamp)
+                    val targetCourse =
+                        deserializeCourse(operation.payload, operation.timestamp, userId)
 
                     pendingOperations.filter { pendingOp ->
                         try {
-                            val entity = deserializeCourse(pendingOp.payload, pendingOp.timestamp)
+                            val entity =
+                                deserializeCourse(pendingOp.payload, pendingOp.timestamp, userId)
                             entity.id == targetCourse.id
                         } catch (e: Exception) {
                             false
@@ -160,11 +164,13 @@ class SyncPendingOperationsWorker @AssistedInject constructor(
                         pendingOperationRepository.updateStatus(pendingOp.id, "SYNCED")
                     }
                 } else { // Para "SCHEDULE"
-                    val targetSchedule = deserializeSchedule(operation.payload, operation.timestamp)
+                    val targetSchedule =
+                        deserializeSchedule(operation.payload, operation.timestamp, userId)
 
                     pendingOperations.filter { pendingOp ->
                         try {
-                            val entity = deserializeSchedule(pendingOp.payload, pendingOp.timestamp)
+                            val entity =
+                                deserializeSchedule(pendingOp.payload, pendingOp.timestamp, userId)
                             entity.id == targetSchedule.id
                         } catch (e: Exception) {
                             false
@@ -177,12 +183,14 @@ class SyncPendingOperationsWorker @AssistedInject constructor(
 
             "READ_LIST" -> {
                 if (operation.entityType == "COURSE") {
-                    val targetCourseIds = deserializeCourses(operation.payload, operation.timestamp)
-                        .map { it.id }.sorted()
+                    val targetCourseIds =
+                        deserializeCourses(operation.payload, operation.timestamp, userId)
+                            .map { it.id }.sorted()
 
                     pendingOperations.filter { pendingOp ->
                         try {
-                            val storedCourses = deserializeCourses(pendingOp.payload, pendingOp.timestamp)
+                            val storedCourses =
+                                deserializeCourses(pendingOp.payload, pendingOp.timestamp, userId)
                             val storedCourseIds = storedCourses.map { it.id }.sorted()
                             storedCourseIds == targetCourseIds
                         } catch (e: Exception) {
@@ -192,12 +200,14 @@ class SyncPendingOperationsWorker @AssistedInject constructor(
                         pendingOperationRepository.updateStatus(pendingOp.id, "SYNCED")
                     }
                 } else { // Para "SCHEDULE"
-                    val targetScheduleIds = deserializeSchedules(operation.payload, operation.timestamp)
-                        .map { it.id }.sorted()
+                    val targetScheduleIds =
+                        deserializeSchedules(operation.payload, operation.timestamp, userId)
+                            .map { it.id }.sorted()
 
                     pendingOperations.filter { pendingOp ->
                         try {
-                            val storedSchedules = deserializeSchedules(pendingOp.payload, pendingOp.timestamp)
+                            val storedSchedules =
+                                deserializeSchedules(pendingOp.payload, pendingOp.timestamp, userId)
                             val storedScheduleIds = storedSchedules.map { it.id }.sorted()
                             storedScheduleIds == targetScheduleIds
                         } catch (e: Exception) {
@@ -227,28 +237,38 @@ class SyncPendingOperationsWorker @AssistedInject constructor(
     )
 }
 
-private fun deserializeCourse(payload: String, lastModified: LocalDateTime): NetworkCourse {
+private fun deserializeCourse(
+    payload: String,
+    lastModified: LocalDateTime,
+    userId: String
+): NetworkCourse {
     val course = Json.decodeFromString<NetworkCourse>(payload)
-    return course.copy(lastModified = lastModified)
+    return course.copy(lastModified = lastModified, userId = userId)
 }
 
 private fun deserializeCourses(
     payload: String,
-    lastModified: LocalDateTime
+    lastModified: LocalDateTime,
+    userId: String
 ): List<NetworkCourse> {
     val courses = Json.decodeFromString<List<NetworkCourse>>(payload)
-    return courses.map { it.copy(lastModified = lastModified) }
+    return courses.map { it.copy(lastModified = lastModified, userId = userId) }
 }
 
-private fun deserializeSchedule(payload: String, lastModified: LocalDateTime): NetworkSchedule {
+private fun deserializeSchedule(
+    payload: String,
+    lastModified: LocalDateTime,
+    userId: String
+): NetworkSchedule {
     val schedule = Json.decodeFromString<NetworkSchedule>(payload)
-    return schedule.copy(lastModified = lastModified)
+    return schedule.copy(lastModified = lastModified, userId = userId)
 }
 
 private fun deserializeSchedules(
     payload: String,
-    lastModified: LocalDateTime
+    lastModified: LocalDateTime,
+    userId: String
 ): List<NetworkSchedule> {
     val schedules = Json.decodeFromString<List<NetworkSchedule>>(payload)
-    return schedules.map { it.copy(lastModified = lastModified) }
+    return schedules.map { it.copy(lastModified = lastModified, userId = userId) }
 }
