@@ -232,8 +232,8 @@ class SyncPendingOperationsWorker @AssistedInject constructor(
         dayOfWeek,
         specificDate,
         lastModified,
-        courseId,
-        userId
+        userId,
+        courseId
     )
 }
 

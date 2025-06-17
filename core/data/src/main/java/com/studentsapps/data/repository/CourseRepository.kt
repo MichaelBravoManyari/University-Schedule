@@ -20,6 +20,8 @@ interface CourseRepository {
 
     suspend fun deleteCourse(courseId: String)
 
+    suspend fun deleteCourseEntity(courseId: String)
+
     fun getCoursesByIds(courseIds: List<String>): Flow<List<Course>>
 
     fun getAllCourseEntity(userId: String): Flow<List<CourseEntity>>

@@ -41,6 +41,7 @@ class CourseRepositoryImp @Inject constructor(
     private val courseLocalDataSource: CourseLocalDataSource,
     private val scheduleLocalDataSource: ScheduleLocalDataSource,
     private val pendingOperationLocalDataSource: PendingOperationLocalDataSource,
+    private val scheduleRepository: ScheduleRepository,
     @ApplicationContext private val context: Context
 ) : CourseRepository {
 
@@ -172,6 +173,20 @@ class CourseRepositoryImp @Inject constructor(
             pendingOperationLocalDataSource.insert(pendingOperationCourse)
 
             scheduleSyncWorker()
+        }
+    }
+
+    override suspend fun deleteCourseEntity(courseId: String) {
+        val courseEntity = courseLocalDataSource.getCourse(courseId).first()
+
+        if (courseEntity != null) {
+            val schedules = scheduleLocalDataSource.getSchedulesByCourseId(courseId)
+
+            for (schedule in schedules) {
+                scheduleRepository.deleteScheduleEntity(schedule.id, schedule.userId)
+            }
+
+            courseLocalDataSource.deleteCourse(courseEntity)
         }
     }
 

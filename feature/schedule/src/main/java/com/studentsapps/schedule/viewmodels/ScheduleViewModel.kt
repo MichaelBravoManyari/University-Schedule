@@ -82,6 +82,12 @@ class ScheduleViewModel @Inject constructor(
             }
         }
     }
+
+    fun cancelUserAlarms() {
+        viewModelScope.launch {
+            scheduleRepository.cancelUserAlarms(userId)
+        }
+    }
 }
 
 sealed interface ScheduleUiState {

@@ -58,6 +58,10 @@ class FakeScheduleRepository @Inject constructor() : ScheduleRepository {
         })
     }
 
+    override suspend fun scheduleAllUserAlarms(userId: String) {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun registerScheduleEntity(scheduleEntity: ScheduleEntity) {
         TODO("Not yet implemented")
     }
@@ -83,6 +87,14 @@ class FakeScheduleRepository @Inject constructor() : ScheduleRepository {
     }
 
     override suspend fun deleteSchedule(scheduleId: String, userId: String) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun deleteScheduleEntity(scheduleId: String, userId: String) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun cancelUserAlarms(userId: String) {
         TODO("Not yet implemented")
     }
 

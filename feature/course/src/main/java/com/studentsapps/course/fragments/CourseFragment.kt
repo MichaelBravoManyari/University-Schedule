@@ -63,6 +63,9 @@ class CourseFragment : Fragment() {
                 viewModel.uiState.collect { currentState ->
                     if (currentState is CourseUiState.Success) {
                         courseAdapter.submitList(currentState.courseList)
+                        val isEmpty = currentState.courseList.isEmpty()
+                        binding.recyclerViewCourse.visibility = if (isEmpty) View.GONE else View.VISIBLE
+                        binding.textViewNoCourses.visibility = if (isEmpty) View.VISIBLE else View.GONE
                     }
                 }
             }
@@ -75,8 +78,8 @@ class CourseFragment : Fragment() {
         navController.navigate(CourseFragmentDirections.actionCourseFragmentToRegisterCourseFragment())
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
         _binding = null
     }
 }

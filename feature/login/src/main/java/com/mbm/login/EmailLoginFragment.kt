@@ -10,9 +10,12 @@ import androidx.core.net.toUri
 import androidx.navigation.NavController
 import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.findNavController
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
+import com.studentsapps.common.UserManager
 import com.studentsapps.login.R
 import com.studentsapps.login.databinding.FragmentEmailLoginBinding
+import com.studentsapps.sync.SynchronizationManager
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -24,6 +27,12 @@ class EmailLoginFragment : Fragment() {
 
     @Inject
     lateinit var auth: FirebaseAuth
+
+    @Inject
+    lateinit var synchronizationManager: SynchronizationManager
+
+    @Inject
+    lateinit var userManager: UserManager
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -65,6 +74,8 @@ class EmailLoginFragment : Fragment() {
     private fun signInWithEmail(email: String, password: String) {
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
             if (task.isSuccessful) {
+                userManager.updateUserId()
+                synchronizationManager.startSyncIfNeeded(createLoadingDialog())
                 val request =
                     NavDeepLinkRequest.Builder.fromUri("android-app://studentsapps.app/scheduleFragment".toUri())
                         .build()
@@ -93,6 +104,14 @@ class EmailLoginFragment : Fragment() {
         if (password.isEmpty()) {
             binding.editTextLayoutPassword.error = getString(R.string.enter_your_password)
         }
+    }
+
+    private fun createLoadingDialog(): AlertDialog {
+        return MaterialAlertDialogBuilder(requireActivity())
+            .setView(com.studentsapps.common.R.layout.dialog_progress)
+            .setTitle(this.getText(com.studentsapps.common.R.string.synchronizing))
+            .setCancelable(false)
+            .create()
     }
 
     override fun onDestroyView() {

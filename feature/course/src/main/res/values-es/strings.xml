@@ -11,4 +11,5 @@
     <string name="message_delete_course">Si se elimina este curso, también se eliminarán los horarios que contiene. ¿Quieres eliminarlo?</string>
     <string name="accept_dialog">Aceptar</string>
     <string name="cancel">Cancelar</string>
+    <string name="no_courses_registered">No hay cursos registrados.</string>
 </resources>

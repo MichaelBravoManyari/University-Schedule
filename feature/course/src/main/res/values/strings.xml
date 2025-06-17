@@ -10,4 +10,5 @@
     <string name="message_delete_course">If this course is deleted, the schedules it contains will also be removed. Do you want to delete it?</string>
     <string name="accept_dialog">Accept</string>
     <string name="cancel">Cancel</string>
+    <string name="no_courses_registered">No courses registered.</string>
 </resources>

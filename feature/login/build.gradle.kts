@@ -19,6 +19,7 @@ dependencies {
     implementation(project(":core:data"))
     implementation(project(":core:model"))
     implementation(project(":core:common"))
+    implementation(project(":sync"))
     testImplementation(project(":core:testing"))
     testImplementation(project(":core:data-test"))
 

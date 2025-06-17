@@ -5,7 +5,6 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import androidx.appcompat.app.AlertDialog
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.studentsapps.data.repository.CourseRepository
 import com.studentsapps.data.repository.PendingOperationRepository
@@ -36,13 +35,12 @@ class SynchronizationManager @Inject constructor(
 ) {
     private val coroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
-    fun startSyncIfNeeded() {
+    fun startSyncIfNeeded(dialog: AlertDialog) {
         val userId = auth.currentUser?.uid ?: return
 
         if (!isInternetAvailable()) return
 
         coroutineScope.launch {
-            val dialog = createLoadingDialog()
             dialog.show()
             var hasSynced = false
 
@@ -90,6 +88,20 @@ class SynchronizationManager @Inject constructor(
                     scheduleRepository.registerScheduleEntity(remoteSchedule.toScheduleEntity())
                 }
             }
+
+            val remoteCourseIds = coursesFirebase.map { it.id }.toSet()
+            val toCourseDelete = coursesLocal.filterNot { it.id in remoteCourseIds }
+            toCourseDelete.forEach {
+                courseRepository.deleteCourseEntity(it.id)
+            }
+
+            val remoteScheduleIds = scheduleFirebase.map { it.id }.toSet()
+            val toScheduleDelete = schedulesLocal.filterNot { it.id in remoteScheduleIds }
+            toScheduleDelete.forEach {
+                scheduleRepository.deleteScheduleEntity(it.id, it.userId)
+            }
+
+            scheduleRepository.scheduleAllUserAlarms(userId)
         } finally {
             dialog.dismiss()
         }
@@ -103,14 +115,6 @@ class SynchronizationManager @Inject constructor(
             connectivityManager.getNetworkCapabilities(network) ?: return false
         return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
                 capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
-    }
-
-    private fun createLoadingDialog(): AlertDialog {
-        return MaterialAlertDialogBuilder(context)
-            .setView(com.studentsapps.common.R.layout.dialog_progress)
-            .setTitle(context.getText(com.studentsapps.common.R.string.synchronizing))
-            .setCancelable(false)
-            .create()
     }
 
     private fun NetworkCourse.toCourseEntity() =

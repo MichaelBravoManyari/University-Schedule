@@ -5,6 +5,9 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.studentsapps.network.model.NetworkCourse
 import com.google.firebase.firestore.SetOptions
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import java.time.ZoneOffset
 import javax.inject.Inject
@@ -148,6 +151,50 @@ class CourseNetworkDataSource @Inject constructor() {
         } catch (e: Exception) {
             Log.e("CourseNetworkDataSource", "Error obteniendo todos los cursos: ${e.message}", e)
             emptyList()
+        }
+    }
+
+    fun observeCourses(userId: String): Flow<List<NetworkCourse>> = callbackFlow {
+        val listenerRegistration = FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(userId)
+            .collection("courses")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null) {
+                    val courses = snapshot.documents.mapNotNull { doc ->
+                        try {
+                            val id = doc.getString("id") ?: return@mapNotNull null
+                            val name = doc.getString("name") ?: return@mapNotNull null
+                            val nameProfessor = doc.getString("nameProfessor").orEmpty()
+                            val color = doc.getLong("color")?.toInt() ?: 0
+                            val timestamp = doc.getTimestamp("lastModified")?.toDate()
+                            val lastModified = timestamp?.toInstant()?.atZone(ZoneOffset.UTC)?.toLocalDateTime()
+                                ?: return@mapNotNull null
+
+                            NetworkCourse(
+                                id = id,
+                                name = name,
+                                nameProfessor = nameProfessor,
+                                color = color,
+                                lastModified = lastModified,
+                                userId = userId
+                            )
+                        } catch (e: Exception) {
+                            null
+                        }
+                    }
+
+                    trySend(courses)
+                }
+            }
+
+        awaitClose {
+            listenerRegistration.remove()
         }
     }
 

@@ -32,6 +32,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import androidx.core.view.get
+import com.studentsapps.common.UserManager
 
 @AndroidEntryPoint
 class ScheduleFragment : Fragment() {
@@ -43,6 +45,9 @@ class ScheduleFragment : Fragment() {
 
     @Inject
     lateinit var auth: FirebaseAuth
+
+    @Inject
+    lateinit var userManager: UserManager
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -164,7 +169,7 @@ class ScheduleFragment : Fragment() {
     }
 
     private fun updateToolbarIcon() {
-        binding.toolbar.menu.getItem(0).icon = if (!binding.timetable.isDisplayedAsGrid()) {
+        binding.toolbar.menu[0].icon = if (!binding.timetable.isDisplayedAsGrid()) {
             ContextCompat.getDrawable(requireContext(), R.drawable.ic_grid_view)
         } else {
             ContextCompat.getDrawable(requireContext(), R.drawable.ic_view_list)
@@ -234,7 +239,10 @@ class ScheduleFragment : Fragment() {
                     }
 
                     R.id.sign_out -> {
+                        viewModel.cancelUserAlarms()
                         auth.signOut()
+                        userManager.updateUserId()
+                        navController.popBackStack(navController.graph.startDestinationId, true)
                         val request =
                             NavDeepLinkRequest.Builder.fromUri("android-app://studentsapps.app/authFragment".toUri())
                                 .build()

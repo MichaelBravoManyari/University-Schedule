@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="courseFragment"
             type="com.studentsapps.course.fragments.CourseFragment" />
@@ -33,6 +34,7 @@
             android:id="@+id/recycler_view_course"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:visibility="gone"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -40,14 +42,26 @@
             app:layout_constraintTop_toBottomOf="@id/appbar"
             tools:listitem="@layout/item_course" />
 
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/text_view_no_courses"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no_courses_registered"
+            android:textSize="16sp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_add_course"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:contentDescription="@string/add_course"
-            android:src="@drawable/ic_add"
             android:onClick="@{() -> courseFragment.navigateToCourseRegistrationFragment()}"
+            android:src="@drawable/ic_add"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -62,6 +62,7 @@ class RegisterCourseFragment : Fragment() {
 
         if (courseId != "") {
             viewModel.displayCourseData(courseId)
+            binding.btnDeleteCourse.visibility = View.VISIBLE
         }
 
         lifecycleScope.launch {

@@ -28,6 +28,8 @@ interface ScheduleRepository {
         userId: String
     )
 
+    suspend fun scheduleAllUserAlarms(userId: String)
+
     suspend fun registerScheduleEntity(scheduleEntity: ScheduleEntity)
 
     suspend fun getScheduleDetailsById(scheduleId: String, userId: String): ScheduleDetails
@@ -43,6 +45,10 @@ interface ScheduleRepository {
     suspend fun updateScheduleEntity(scheduleEntity: ScheduleEntity)
 
     suspend fun deleteSchedule(scheduleId: String, userId: String)
+
+    suspend fun deleteScheduleEntity(scheduleId: String, userId: String)
+
+    suspend fun cancelUserAlarms(userId: String)
 
     suspend fun getAllScheduleDetails(userId: String): List<ScheduleDetails>
 

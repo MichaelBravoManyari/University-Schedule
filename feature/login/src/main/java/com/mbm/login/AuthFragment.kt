@@ -1,13 +1,13 @@
 package com.mbm.login
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
@@ -20,11 +20,14 @@ import androidx.navigation.findNavController
 import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
+import com.studentsapps.common.UserManager
 import com.studentsapps.login.R
 import com.studentsapps.login.databinding.FragmentAuthBinding
+import com.studentsapps.sync.SynchronizationManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -38,6 +41,12 @@ class AuthFragment : Fragment() {
 
     @Inject
     lateinit var auth: FirebaseAuth
+
+    @Inject
+    lateinit var synchronizationManager: SynchronizationManager
+
+    @Inject
+    lateinit var userManager: UserManager
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -110,6 +119,7 @@ class AuthFragment : Fragment() {
                             if (it.isSuccessful) {
                                 val userId = auth.currentUser?.uid
                                 if (userId != null) {
+                                    userManager.updateUserId()
                                     checkAndRegisterUser(userId)
                                 } else {
                                     showLoading(false)
@@ -142,11 +152,6 @@ class AuthFragment : Fragment() {
                             getString(R.string.login_error),
                             Toast.LENGTH_SHORT
                         ).show()
-                        Log.e(
-                            "AuthFragment",
-                            "Se recibió una respuesta de token de identificación de Google no válida",
-                            e
-                        )
                     }
                 }
             }
@@ -158,12 +163,12 @@ class AuthFragment : Fragment() {
         val userDocRef = firestore.collection("users").document(userId)
 
         userDocRef.get().addOnSuccessListener { document ->
+            val dialog = createLoadingDialog()
             if (!document.exists()) {
                 userDocRef.set(mapOf("userId" to userId)).addOnSuccessListener {
-                    Log.d("AuthFragment", "Usuario registrado correctamente en Firestore.")
+                    synchronizationManager.startSyncIfNeeded(dialog)
                     navigateToScheduleFragment()
-                }.addOnFailureListener { e ->
-                    Log.e("AuthFragment", "Error al registrar el usuario en Firestore.", e)
+                }.addOnFailureListener { _ ->
                     Toast.makeText(
                         requireContext(),
                         getString(R.string.login_error),
@@ -171,11 +176,10 @@ class AuthFragment : Fragment() {
                     ).show()
                 }
             } else {
-                Log.d("AuthFragment", "Usuario ya existe en Firestore.")
+                synchronizationManager.startSyncIfNeeded(dialog)
                 navigateToScheduleFragment()
             }
-        }.addOnFailureListener { e ->
-            Log.e("AuthFragment", "Error al verificar el usuario en Firestore.", e)
+        }.addOnFailureListener { _ ->
             Toast.makeText(
                 requireContext(),
                 getString(R.string.login_error),
@@ -205,6 +209,14 @@ class AuthFragment : Fragment() {
             NavDeepLinkRequest.Builder.fromUri("android-app://studentsapps.app/scheduleFragment".toUri())
                 .build()
         navController.navigate(request)
+    }
+
+    private fun createLoadingDialog(): AlertDialog {
+        return MaterialAlertDialogBuilder(requireActivity())
+            .setView(com.studentsapps.common.R.layout.dialog_progress)
+            .setTitle(this.getText(com.studentsapps.common.R.string.synchronizing))
+            .setCancelable(false)
+            .create()
     }
 
     override fun onDestroyView() {

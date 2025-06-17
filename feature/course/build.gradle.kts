@@ -22,8 +22,6 @@ dependencies {
     implementation(project(":core:data"))
     implementation(project(":core:network"))
     implementation(project(":sync"))
-    implementation(libs.navigation.fragment.ktx)
-    implementation(libs.navigation.ui.ktx)
     testImplementation(project(":core:testing"))
     testImplementation(project(":core:data-test"))
 
@@ -32,11 +30,14 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+    implementation(libs.androidx.fragment.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.navigation.fragment.ktx)
+    implementation(libs.navigation.ui.ktx)
     implementation(libs.androidx.work.runtime.ktx)
-    implementation(libs.kotlinx.serialization.json)
-    //implementation(libs.kotlinx.serialization.java.time)
-    implementation(libs.androidx.hilt.work)
     implementation(libs.firebase.auth.ktx)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.hilt.work)
 
     // Local test
     testImplementation(libs.junit)

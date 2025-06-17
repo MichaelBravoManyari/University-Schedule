@@ -176,6 +176,14 @@ class ScheduleRepositoryImp @Inject constructor(
         scheduleAlarm(context, scheduleDetails)
     }
 
+    override suspend fun scheduleAllUserAlarms(userId: String) {
+        val schedulesDetails = scheduleLocalDataSource.getAllSchedules(userId)
+            .map(ScheduleDetailsView::asExternalModel)
+        schedulesDetails.forEach { scheduleDetails ->
+            scheduleAlarm(context, scheduleDetails)
+        }
+    }
+
     override suspend fun getScheduleDetailsById(
         scheduleId: String,
         userId: String
@@ -302,6 +310,35 @@ class ScheduleRepositoryImp @Inject constructor(
         pendingOperationLocalDataSource.insert(pendingOperationSchedule)
 
         scheduleSyncWorker()
+    }
+
+    override suspend fun deleteScheduleEntity(scheduleId: String, userId: String) {
+        val timestamp = LocalDateTime.now(ZoneOffset.UTC)
+        val scheduleDetails =
+            scheduleLocalDataSource.getScheduleDetailsView(scheduleId).asExternalModel()
+
+        cancelAlarm(context, scheduleDetails)
+        scheduleLocalDataSource.deleteSchedule(with(scheduleDetails) {
+            ScheduleEntity(
+                id = scheduleId,
+                startTime = startTime,
+                endTime = endTime,
+                classPlace = classPlace,
+                dayOfWeek = dayOfWeek,
+                specificDate = specificDate,
+                timestamp,
+                courseId = courseId,
+                userId = userId
+            )
+        })
+    }
+
+    override suspend fun cancelUserAlarms(userId: String) {
+        val schedulesDetails = scheduleLocalDataSource.getAllSchedules(userId)
+            .map(ScheduleDetailsView::asExternalModel)
+        schedulesDetails.forEach { scheduleDetails ->
+            cancelAlarm(context, scheduleDetails)
+        }
     }
 
     override suspend fun getAllScheduleDetails(userId: String): List<ScheduleDetails> {
