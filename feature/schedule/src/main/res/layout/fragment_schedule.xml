@@ -39,8 +39,17 @@
                 app:title="@{timetableView.currentMonth}" />
         </com.google.android.material.appbar.AppBarLayout>
 
-        <com.studentsapps.ui.timetable.Timetable
+        <!--<com.studentsapps.ui.timetable.Timetable
             android:id="@+id/timetable"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/appbar" />-->
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_view"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"

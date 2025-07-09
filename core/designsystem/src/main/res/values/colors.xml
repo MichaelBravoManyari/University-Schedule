@@ -6,4 +6,11 @@
     <color name="text_color">#1D1F23</color>
     <color name="secondary_text_color">#747476</color>
     <color name="background_registration_option">#DDDDDF</color>
+
+    <color name="primary_color_black">#262930</color>
+    <color name="secondary_color_black">#1B1B1D</color>
+    <color name="accent_color_black">#ACC6FF</color>
+    <color name="text_color_black">#EAEAEA</color>
+    <color name="secondary_text_color_black">#EAEAEA</color>
+    <color name="background_registration_option_black">#222328</color>
 </resources>

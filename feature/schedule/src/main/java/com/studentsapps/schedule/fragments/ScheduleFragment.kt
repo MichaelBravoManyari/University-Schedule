@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
-import androidx.core.content.ContextCompat
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -23,7 +23,6 @@ import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupWithNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.studentsapps.model.asScheduleView
 import com.studentsapps.schedule.R
 import com.studentsapps.schedule.databinding.FragmentScheduleBinding
 import com.studentsapps.schedule.viewmodels.ScheduleUiState
@@ -32,8 +31,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import androidx.core.view.get
 import com.studentsapps.common.UserManager
+import com.studentsapps.ui.theme.UniversityScheduleTheme
+import com.studentsapps.schedule.CabezeraHorario
+import com.studentsapps.schedule.TimetableCompose
 
 @AndroidEntryPoint
 class ScheduleFragment : Fragment() {
@@ -57,8 +58,20 @@ class ScheduleFragment : Fragment() {
         binding.apply {
             lifecycleOwner = viewLifecycleOwner
             scheduleFragment = this@ScheduleFragment
-            timetableView = timetable
+            //timetableView = timetable
             scheduleViewModel = viewModel
+        }
+
+        binding.composeView.apply {
+            setViewCompositionStrategy(
+                ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+            )
+
+            setContent {
+                UniversityScheduleTheme {
+                    TimetableCompose(viewModel)
+                }
+            }
         }
 
         return binding.root
@@ -110,7 +123,7 @@ class ScheduleFragment : Fragment() {
     private fun handleSavedState(savedStateHandle: SavedStateHandle) {
         with(savedStateHandle) {
             get<Boolean>("updateScheduleList")?.let { updateScheduleList ->
-                if (updateScheduleList) with(binding.timetable) {
+                /*if (updateScheduleList) with(binding.timetable) {
                     if (isDisplayedAsGrid()) {
                         viewModel.updateScheduleDetailsListInGridMode(
                             displaySaturday(),
@@ -121,7 +134,7 @@ class ScheduleFragment : Fragment() {
                     } else {
                         viewModel.updateScheduleDetailsListInListMode(date.value)
                     }
-                }
+                }*/
             }
             remove<Boolean>("updateScheduleList")
         }
@@ -131,14 +144,14 @@ class ScheduleFragment : Fragment() {
         val observer = Observer<String> { currentMonth ->
             navController.currentDestination?.label = currentMonth
         }
-        binding.timetable.currentMonth.observe(viewLifecycleOwner, observer)
+        //binding.timetable.currentMonth.observe(viewLifecycleOwner, observer)
     }
 
     private fun CoroutineScope.observeScheduleUiState() {
         launch {
             viewModel.uiState.collect { currentState ->
                 if (currentState is ScheduleUiState.Success) {
-                    binding.timetable.apply {
+                    /*binding.timetable.apply {
                         date.collect { selectedDate ->
                             if (isDisplayedAsGrid()) {
                                 viewModel.updateScheduleDetailsListInGridMode(
@@ -151,7 +164,7 @@ class ScheduleFragment : Fragment() {
                                 viewModel.updateScheduleDetailsListInListMode(selectedDate)
                             }
                         }
-                    }
+                    }*/
                 }
             }
         }
@@ -169,11 +182,11 @@ class ScheduleFragment : Fragment() {
     }
 
     private fun updateToolbarIcon() {
-        binding.toolbar.menu[0].icon = if (!binding.timetable.isDisplayedAsGrid()) {
+        /*binding.toolbar.menu[0].icon = if (!binding.timetable.isDisplayedAsGrid()) {
             ContextCompat.getDrawable(requireContext(), R.drawable.ic_grid_view)
         } else {
             ContextCompat.getDrawable(requireContext(), R.drawable.ic_view_list)
-        }
+        }*/
     }
 
     private fun CoroutineScope.launchScheduleListUpdates() {
@@ -187,7 +200,7 @@ class ScheduleFragment : Fragment() {
     }
 
     private fun handleScheduleDetailsUpdate(currentState: ScheduleUiState.Success) {
-        with(binding.timetable) {
+        /*with(binding.timetable) {
             setTimetableUserPreferences(currentState.timetableUserPreferences)
             if (isDisplayedAsGrid()) {
                 viewModel.updateScheduleDetailsListInGridMode(
@@ -199,11 +212,11 @@ class ScheduleFragment : Fragment() {
             } else {
                 viewModel.updateScheduleDetailsListInListMode(date.value)
             }
-        }
+        }*/
     }
 
     private fun handleScheduleListUpdate(currentState: ScheduleUiState.Success) {
-        with(binding.timetable) {
+        /*with(binding.timetable) {
             if (currentState.scheduleDetailsList != null) {
                 showSchedules(
                     currentState.scheduleDetailsList.map { it.asScheduleView() }
@@ -215,7 +228,7 @@ class ScheduleFragment : Fragment() {
                     )
                 }
             }
-        }
+        }*/
     }
 
     private fun configureMenuOptionsInAppBar() {
@@ -229,7 +242,7 @@ class ScheduleFragment : Fragment() {
                     }
 
                     R.id.timetable_today -> {
-                        binding.timetable.selectCurrentDay()
+                        //binding.timetable.selectCurrentDay()
                         true
                     }
 
@@ -258,12 +271,12 @@ class ScheduleFragment : Fragment() {
 
     private fun toggleTimetableView() {
         viewModel.setShowAsGrid()
-        binding.toolbar.menu.findItem(R.id.change_timetable_view)?.icon =
+        /*binding.toolbar.menu.findItem(R.id.change_timetable_view)?.icon =
             if (binding.timetable.isDisplayedAsGrid()) {
                 ContextCompat.getDrawable(requireContext(), R.drawable.ic_grid_view)
             } else {
                 ContextCompat.getDrawable(requireContext(), R.drawable.ic_view_list)
-            }
+            }*/
     }
 
     fun goToRegisterSchedule() {
