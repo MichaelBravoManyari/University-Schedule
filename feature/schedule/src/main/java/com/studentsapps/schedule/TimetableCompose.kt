@@ -2,9 +2,11 @@ package com.studentsapps.schedule
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.absoluteOffset
@@ -15,6 +17,8 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -249,13 +253,31 @@ fun TimetableCompose(viewModel: ScheduleViewModel) {
                 modifier = Modifier.fillMaxSize()
             ) {
                 CabezeraHorario(diasMap, currentDate, prefs.showAsGrid)
-                TimetableGrid(
-                    showSaturday = prefs.showSaturday,
-                    showSunday = prefs.showSunday,
-                    is12HoursFormat = prefs.is12HoursFormat,
-                    isMondayFirstDayOfWeek = prefs.isMondayFirstDayOfWeek,
-                    schedules = successState.scheduleDetailsList.map { it.asScheduleView() }
-                )
+                if (prefs.showAsGrid) {
+                    TimetableGrid(
+                        showSaturday = prefs.showSaturday,
+                        showSunday = prefs.showSunday,
+                        is12HoursFormat = prefs.is12HoursFormat,
+                        isMondayFirstDayOfWeek = prefs.isMondayFirstDayOfWeek,
+                        schedules = successState.scheduleDetailsList.map { it.asScheduleView() }
+                    )
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(successState.scheduleDetailsList.map { it.asScheduleView() }) { schedule ->
+                            HorarioListItem(
+                                nombreCurso = schedule.courseName,
+                                horaInicioFin = schedule.startTime.toString() + "-" + schedule.endTime.toString(),
+                                aula = schedule.classPlace
+                            )
+                        }
+                    }
+
+                }
+
             }
         }
     } else {
@@ -588,7 +610,7 @@ fun getNumVerticalGridLines(showSaturday: Boolean, showSunday: Boolean): Int {
 @Composable
 fun HorarioListItemPreview() {
     UniversityScheduleTheme {
-        HorarioListItem("Curso prueba", "10:00", "Edificio 1")
+        HorarioListItem("Curso prueba", "10:00 a.m. - 11:00 a.m.", "Edificio 1")
     }
 }
 
