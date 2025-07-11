@@ -70,6 +70,7 @@ import java.time.temporal.ChronoUnit
 import androidx.compose.material3.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.runtime.LaunchedEffect
 
 @Composable
 fun DiaSemana(dia: String, numero: Int, ancho: Dp, select: Boolean) {
@@ -235,6 +236,14 @@ fun TimetableCompose(viewModel: ScheduleViewModel) {
                     LocalDate.now().plusWeeks(weekOffset.toLong())
                 else
                     LocalDate.now().plusDays(weekOffset.toLong())
+
+            LaunchedEffect(pagerState.currentPage) {
+                if (prefs.showAsGrid) {
+                    viewModel.updateScheduleDetailsListInGridMode(currentDate)
+                } else {
+                    viewModel.updateScheduleDetailsListInListMode(currentDate)
+                }
+            }
 
             val daysOfWeekOfMonth = viewModel.getDaysOfMonthOfWeek(
                 isMondayFirstDayOfWeek = prefs.isMondayFirstDayOfWeek,

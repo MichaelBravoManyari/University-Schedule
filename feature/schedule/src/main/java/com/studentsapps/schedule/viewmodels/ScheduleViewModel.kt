@@ -54,9 +54,15 @@ class ScheduleViewModel @Inject constructor(
                                 userId
                             )
                         } else {
-                            scheduleRepository.getSchedulesForTimetableInListMode(LocalDate.now(), userId)
+                            scheduleRepository.getSchedulesForTimetableInListMode(
+                                LocalDate.now(),
+                                userId
+                            )
                         }
-                        currentState.copy(timetableUserPreferences = timetableUserPreferences, scheduleDetailsList)
+                        currentState.copy(
+                            timetableUserPreferences = timetableUserPreferences,
+                            scheduleDetailsList
+                        )
                     } else {
                         val scheduleDetailsList = if (timetableUserPreferences.showAsGrid) {
                             scheduleRepository.getSchedulesForTimetableInGridMode(
@@ -96,17 +102,27 @@ class ScheduleViewModel @Inject constructor(
     }
 
     fun updateScheduleDetailsListInGridMode(
-        showSaturday: Boolean,
-        showSunday: Boolean,
-        startDate: LocalDate,
-        endDate: LocalDate
+        currentDate: LocalDate
     ) {
         viewModelScope.launch {
             _uiState.update { currentState ->
                 if (currentState is ScheduleUiState.Success) {
+                    val startDate = getStartDate(
+                        currentState.timetableUserPreferences.isMondayFirstDayOfWeek,
+                        currentState.timetableUserPreferences.showSaturday,
+                        currentState.timetableUserPreferences.showSunday,
+                        currentDate
+                    )
+
+                    val endDate = getEndDate(
+                        currentState.timetableUserPreferences.isMondayFirstDayOfWeek,
+                        currentState.timetableUserPreferences.showSaturday,
+                        currentState.timetableUserPreferences.showSunday,
+                        currentDate
+                    )
                     val scheduleDetails = scheduleRepository.getSchedulesForTimetableInGridMode(
-                        showSaturday,
-                        showSunday,
+                        currentState.timetableUserPreferences.showSaturday,
+                        currentState.timetableUserPreferences.showSunday,
                         startDate,
                         endDate,
                         userId
