@@ -32,8 +32,8 @@ class ScheduleViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            timetableUserPreferencesRepository.userData.collect { timetableUserPreferences ->
-                _uiState.update { currentState ->
+            timetableUserPreferencesRepository.userData.collect { prefs ->
+                /*_uiState.update { currentState ->
                     if (currentState is ScheduleUiState.Success) {
                         val scheduleDetailsList = if (timetableUserPreferences.showAsGrid) {
                             scheduleRepository.getSchedulesForTimetableInGridMode(
@@ -90,7 +90,23 @@ class ScheduleViewModel @Inject constructor(
                         }
                         ScheduleUiState.Success(timetableUserPreferences, scheduleDetailsList)
                     }
+                }*/
+                val initialDate = LocalDate.now()
+                val initialScheduleList = if (prefs.showAsGrid) {
+                    val startDate = getStartDate(prefs, initialDate)
+                    val endDate = getEndDate(prefs, initialDate)
+                    scheduleRepository.getSchedulesForTimetableInGridMode(
+                        prefs.showSaturday, prefs.showSunday, startDate, endDate, userId
+                    )
+                } else {
+                    scheduleRepository.getSchedulesForTimetableInListMode(initialDate, userId)
                 }
+
+                _uiState.value = ScheduleUiState.Success(
+                    timetableUserPreferences = prefs,
+                    scheduleByDate = mapOf(initialDate to initialScheduleList),
+                    currentDate = initialDate
+                )
             }
         }
     }
@@ -101,7 +117,33 @@ class ScheduleViewModel @Inject constructor(
         }
     }
 
-    fun updateScheduleDetailsListInGridMode(
+    fun loadScheduleForDate(date: LocalDate) {
+        viewModelScope.launch {
+            _uiState.update { currentState ->
+                if (currentState is ScheduleUiState.Success &&
+                    !currentState.scheduleByDate.containsKey(date)
+                ) {
+                    val prefs = currentState.timetableUserPreferences
+                    val scheduleList = if (prefs.showAsGrid) {
+                        val startDate = getStartDate(prefs, date)
+                        val endDate = getEndDate(prefs, date)
+                        scheduleRepository.getSchedulesForTimetableInGridMode(
+                            prefs.showSaturday, prefs.showSunday, startDate, endDate, userId
+                        )
+                    } else {
+                        scheduleRepository.getSchedulesForTimetableInListMode(date, userId)
+                    }
+
+                    currentState.copy(
+                        scheduleByDate = currentState.scheduleByDate + (date to scheduleList),
+                        currentDate = date
+                    )
+                } else currentState
+            }
+        }
+    }
+
+    /*fun updateScheduleDetailsListInGridMode(
         currentDate: LocalDate
     ) {
         viewModelScope.launch {
@@ -132,9 +174,9 @@ class ScheduleViewModel @Inject constructor(
                     ScheduleUiState.Loading
             }
         }
-    }
+    }*/
 
-    fun updateScheduleDetailsListInListMode(date: LocalDate) {
+    /*fun updateScheduleDetailsListInListMode(date: LocalDate) {
         viewModelScope.launch {
             _uiState.update { currentState ->
                 if (currentState is ScheduleUiState.Success) {
@@ -145,7 +187,7 @@ class ScheduleViewModel @Inject constructor(
                     ScheduleUiState.Loading
             }
         }
-    }
+    }*/
 
     fun cancelUserAlarms() {
         viewModelScope.launch {
@@ -175,10 +217,10 @@ class ScheduleViewModel @Inject constructor(
         return timetableUtils.getDaysOfWeekOrder(isMondayFirstDayOfWeek, showSaturday, showSunday)
     }
 
-    fun goToNextWeek() {
+    /*fun goToNextWeek() {
         _uiState.update { currentState ->
             if (currentState is ScheduleUiState.Success) {
-                currentState.copy(currentWeekDate = currentState.currentWeekDate.plusWeeks(1))
+                currentState.copy(currentDate = currentState.currentDate.plusWeeks(1))
             } else currentState
         }
     }
@@ -186,12 +228,12 @@ class ScheduleViewModel @Inject constructor(
     fun goToPreviousWeek() {
         _uiState.update { currentState ->
             if (currentState is ScheduleUiState.Success) {
-                currentState.copy(currentWeekDate = currentState.currentWeekDate.minusWeeks(1))
+                currentState.copy(currentDate = currentState.currentWkDate.minusWeeks(1))
             } else currentState
         }
-    }
+    }*/
 
-    private fun getStartDate(
+    /*private fun getStartDate(
         isMondayFirstDayOfWeek: Boolean,
         showSaturday: Boolean,
         showSunday: Boolean,
@@ -217,7 +259,17 @@ class ScheduleViewModel @Inject constructor(
             showSunday,
             date
         ).last()
-    }
+    }*/
+
+    private fun getStartDate(prefs: TimetableUserPreferences, date: LocalDate) =
+        getDaysOfMonthOfWeek(
+            prefs.isMondayFirstDayOfWeek, prefs.showSaturday, prefs.showSunday, date
+        ).first()
+
+    private fun getEndDate(prefs: TimetableUserPreferences, date: LocalDate) =
+        getDaysOfMonthOfWeek(
+            prefs.isMondayFirstDayOfWeek, prefs.showSaturday, prefs.showSunday, date
+        ).last()
 }
 
 sealed interface ScheduleUiState {
@@ -226,7 +278,7 @@ sealed interface ScheduleUiState {
 
     data class Success(
         val timetableUserPreferences: TimetableUserPreferences,
-        val scheduleDetailsList: List<ScheduleDetails>,
-        val currentWeekDate: LocalDate = LocalDate.now()
+        val scheduleByDate: Map<LocalDate, List<ScheduleDetails>>,
+        val currentDate: LocalDate = LocalDate.now()
     ) : ScheduleUiState
 }

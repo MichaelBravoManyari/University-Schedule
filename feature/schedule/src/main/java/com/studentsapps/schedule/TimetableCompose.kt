@@ -71,6 +71,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 
 @Composable
 fun DiaSemana(dia: String, numero: Int, ancho: Dp, select: Boolean) {
@@ -227,29 +230,51 @@ fun TimetableCompose(viewModel: ScheduleViewModel) {
         val pagerState = rememberPagerState(
             initialPage = initialPage, pageCount = { totalPages })
 
-        HorizontalPager(
-            state = pagerState, key = { it }, modifier = Modifier.fillMaxSize()
-        ) { pageIndex ->
-            val weekOffset = pageIndex - initialPage
-            val currentDate =
+        /*val weekOffset by remember {
+            derivedStateOf { pagerState.currentPage - initialPage }
+        }
+
+        val currentDate by remember(weekOffset, prefs.showAsGrid) {
+            mutableStateOf(
                 if (prefs.showAsGrid)
                     LocalDate.now().plusWeeks(weekOffset.toLong())
                 else
                     LocalDate.now().plusDays(weekOffset.toLong())
+            )
+        }
 
-            LaunchedEffect(pagerState.currentPage) {
-                if (prefs.showAsGrid) {
-                    viewModel.updateScheduleDetailsListInGridMode(currentDate)
-                } else {
-                    viewModel.updateScheduleDetailsListInListMode(currentDate)
-                }
+        LaunchedEffect(currentDate) {
+            if (prefs.showAsGrid) {
+                viewModel.updateScheduleDetailsListInGridMode(currentDate)
+            } else {
+                viewModel.updateScheduleDetailsListInListMode(currentDate)
             }
+        }*/
+
+        HorizontalPager(
+            state = pagerState,
+            key = { it },
+            modifier = Modifier.fillMaxSize(),
+            beyondViewportPageCount = 1
+        ) { pageIndex ->
+            val date = remember(pageIndex, prefs.showAsGrid) {
+                if (prefs.showAsGrid)
+                    LocalDate.now().plusWeeks((pageIndex - initialPage).toLong())
+                else
+                    LocalDate.now().plusDays((pageIndex - initialPage).toLong())
+            }
+
+            LaunchedEffect(date) {
+                viewModel.loadScheduleForDate(date)
+            }
+
+            val scheduleList = successState.scheduleByDate[date].orEmpty()
 
             val daysOfWeekOfMonth = viewModel.getDaysOfMonthOfWeek(
                 isMondayFirstDayOfWeek = prefs.isMondayFirstDayOfWeek,
                 showSaturday = prefs.showSaturday,
                 showSunday = prefs.showSunday,
-                date = currentDate
+                date = date
             )
 
             val daysOfWeek = viewModel.getDaysOfWeekOrder(
@@ -261,14 +286,14 @@ fun TimetableCompose(viewModel: ScheduleViewModel) {
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
-                CabezeraHorario(diasMap, currentDate, prefs.showAsGrid)
+                CabezeraHorario(diasMap, date, prefs.showAsGrid)
                 if (prefs.showAsGrid) {
                     TimetableGrid(
                         showSaturday = prefs.showSaturday,
                         showSunday = prefs.showSunday,
                         is12HoursFormat = prefs.is12HoursFormat,
                         isMondayFirstDayOfWeek = prefs.isMondayFirstDayOfWeek,
-                        schedules = successState.scheduleDetailsList.map { it.asScheduleView() }
+                        schedules = scheduleList.map { it.asScheduleView() }
                     )
                 } else {
                     LazyColumn(
@@ -276,7 +301,7 @@ fun TimetableCompose(viewModel: ScheduleViewModel) {
                         contentPadding = PaddingValues(16.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(successState.scheduleDetailsList.map { it.asScheduleView() }) { schedule ->
+                        items(scheduleList.map { it.asScheduleView() }) { schedule ->
                             HorarioListItem(
                                 nombreCurso = schedule.courseName,
                                 horaInicioFin = schedule.startTime.toString() + "-" + schedule.endTime.toString(),
