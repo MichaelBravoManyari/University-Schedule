@@ -74,11 +74,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import com.studentsapps.model.ScheduleDetails
 import com.studentsapps.model.TimetableUserPreferences
 
 @Composable
-fun DiaSemana(dia: String, numero: Int, ancho: Dp, select: Boolean) {
+fun DiaSemana(dia: String, numero: Int, ancho: Dp, select: Boolean, isNow: Boolean) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -109,13 +110,24 @@ fun DiaSemana(dia: String, numero: Int, ancho: Dp, select: Boolean) {
         Box(
             modifier = Modifier
                 .background(
-                    color = if (select) Color.Blue else Color.White, shape = CircleShape
+                    color =
+                        if (select)
+                            Color.Blue
+                        else
+                            Color.White,
+                    shape = CircleShape
                 )
                 .size(25.dp), contentAlignment = Alignment.Center
         ) {
             Text(
                 text = numero.toString(),
-                color = if (select) Color.White else MaterialTheme.colorScheme.onPrimary,
+                color =
+                    if (select)
+                        Color.White
+                    else if (isNow)
+                        Color.Blue
+                    else
+                        MaterialTheme.colorScheme.onPrimary,
                 fontSize = 13.sp,
                 fontFamily = customFont1
             )
@@ -186,8 +198,14 @@ fun CabezeraHorario(
                     dia.key,
                     dia.value.dayOfMonth,
                     anchoDiaSemana,
-                    if (isTimetableModeGrid) dia.value == LocalDate.now()
-                    else dia.value == currentDate
+                    if (isTimetableModeGrid)
+                        dia.value == LocalDate.now()
+                    else
+                        dia.value == currentDate,
+                    if (!isTimetableModeGrid)
+                        dia.value == LocalDate.now()
+                    else
+                        false
                 )
             }
         }
@@ -424,29 +442,60 @@ fun TimetableList(
         LocalDate.now().plusDays((pagerState.currentPage - initialPage).toLong())
     }
 
-    val daysOfWeekOfMonth = getDaysOfMonthOfWeek(
-        prefs.isMondayFirstDayOfWeek,
-        prefs.showSaturday,
-        prefs.showSunday,
-        date1
-    )
-
-    val daysOfWeek = getDaysOfWeekOrder(
-        prefs.isMondayFirstDayOfWeek, prefs.showSaturday, prefs.showSunday
-    ).map { stringResource(it) }
-
-    val diasMap = daysOfWeek.zip(daysOfWeekOfMonth).toMap()
+    val date2 = remember(pagerCabezeraState.currentPage) {
+        LocalDate.now().plusWeeks((pagerCabezeraState.currentPage - initialPage).toLong())
+    }
 
     LaunchedEffect(date1) {
         //viewModel.loadScheduleForDate(date)
         changePag(date1)
     }
 
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.settledPage }
+            .collect { page ->
+                val dateContent = LocalDate.now().plusDays((page - initialPage).toLong())
+                val curentDateCabezera = LocalDate.now()
+                    .plusWeeks((pagerCabezeraState.currentPage - initialPage).toLong())
+                val rangeDate = getDaysOfMonthOfWeek(
+                    prefs.isMondayFirstDayOfWeek,
+                    prefs.showSaturday,
+                    prefs.showSunday,
+                    curentDateCabezera
+                )
+                if (!rangeDate.contains(dateContent)) {
+                    if (pagerCabezeraState.currentPage != page) {
+                        val navigatePageCabezeraPager =
+                            if (dateContent < rangeDate.first()) pagerCabezeraState.currentPage - 1 else pagerCabezeraState.currentPage + 1
+                        pagerCabezeraState.animateScrollToPage(navigatePageCabezeraPager)
+                    }
+                }
+            }
+    }
+
     HorizontalPager(
         state = pagerCabezeraState,
         key = { it },
-        userScrollEnabled = false
-    ) {
+        userScrollEnabled = false,
+        beyondViewportPageCount = 1
+    ) { pageIndex ->
+        val date = remember(pageIndex) {
+            LocalDate.now().plusWeeks((pageIndex - initialPage).toLong())
+        }
+
+        val daysOfWeekOfMonth = getDaysOfMonthOfWeek(
+            prefs.isMondayFirstDayOfWeek,
+            prefs.showSaturday,
+            prefs.showSunday,
+            date
+        )
+
+        val daysOfWeek = getDaysOfWeekOrder(
+            prefs.isMondayFirstDayOfWeek, prefs.showSaturday, prefs.showSunday
+        ).map { stringResource(it) }
+
+        val diasMap = daysOfWeek.zip(daysOfWeekOfMonth).toMap()
+
         CabezeraHorario(diasMap, date1, prefs.showAsGrid)
     }
 
@@ -457,7 +506,46 @@ fun TimetableList(
         beyondViewportPageCount = 1
     ) { pageIndex ->
         val date = remember(pageIndex) {
-            LocalDate.now().plusDays((pageIndex - initialPage).toLong())
+            val currentDate = LocalDate.now().plusDays((pageIndex - initialPage).toLong())
+            // Verificar si es sabado o domingo y verificar si se debe mostrar los dias sabados o domingos en el horario
+            if ((currentDate.dayOfWeek == DayOfWeek.SATURDAY || currentDate.dayOfWeek == DayOfWeek.SUNDAY) && (!prefs.showSunday || !prefs.showSaturday)) {
+                if (currentDate.dayOfWeek == DayOfWeek.SUNDAY && !prefs.showSunday) {
+                    if (pageIndex < initialPage) {
+                        if (!prefs.showSaturday) {
+                            currentDate.minusDays(2)
+                        } else {
+                            currentDate.minusDays(1)
+                        }
+                    }
+
+                    if (pageIndex > initialPage) {
+                        if (!prefs.showSaturday) {
+                            currentDate.plusDays(2)
+                        } else {
+                            currentDate.plusDays(1)
+                        }
+                    }
+                }
+
+                if (currentDate.dayOfWeek == DayOfWeek.SATURDAY && !prefs.showSaturday) {
+                    if (pageIndex < initialPage) {
+                        if (!prefs.showSaturday) {
+                            currentDate.minusDays(2)
+                        } else {
+                            currentDate.minusDays(1)
+                        }
+                    }
+
+                    if (pageIndex > initialPage) {
+                        if (!prefs.showSaturday) {
+                            currentDate.plusDays(2)
+                        } else {
+                            currentDate.plusDays(1)
+                        }
+                    }
+                }
+            }
+            currentDate
         }
 
         val scheduleList = scheduleByDate[date].orEmpty()
@@ -828,6 +916,6 @@ fun CabezeraHorarioPreview() {
 @Composable
 fun DiaSemanaSelectPreview() {
     UniversityScheduleTheme {
-        DiaSemana("Lun", 7, 40.dp, true)
+        DiaSemana("Lun", 7, 40.dp, true, false)
     }
 }
