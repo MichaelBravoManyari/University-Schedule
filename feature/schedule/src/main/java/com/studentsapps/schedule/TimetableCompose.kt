@@ -72,9 +72,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
+import com.studentsapps.model.ScheduleDetails
+import com.studentsapps.model.TimetableUserPreferences
 
 @Composable
-fun DiaSemana(dia: String, numero: Int, ancho: Dp, select: Boolean) {
+fun DiaSemana(dia: String, numero: Int, ancho: Dp, select: Boolean, isNow: Boolean) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -105,13 +108,24 @@ fun DiaSemana(dia: String, numero: Int, ancho: Dp, select: Boolean) {
         Box(
             modifier = Modifier
                 .background(
-                    color = if (select) Color.Blue else Color.White, shape = CircleShape
+                    color =
+                        if (select)
+                            Color.Blue
+                        else
+                            Color.White,
+                    shape = CircleShape
                 )
                 .size(25.dp), contentAlignment = Alignment.Center
         ) {
             Text(
                 text = numero.toString(),
-                color = if (select) Color.White else MaterialTheme.colorScheme.onPrimary,
+                color =
+                    if (select)
+                        Color.White
+                    else if (isNow)
+                        Color.Blue
+                    else
+                        MaterialTheme.colorScheme.onPrimary,
                 fontSize = 13.sp,
                 fontFamily = customFont1
             )
@@ -121,10 +135,7 @@ fun DiaSemana(dia: String, numero: Int, ancho: Dp, select: Boolean) {
 
 @Composable
 fun HorarioListItem(
-    nombreCurso: String,
-    horaInicioFin: String,
-    aula: String? = null,
-    modifier: Modifier = Modifier
+    nombreCurso: String, horaInicioFin: String, aula: String? = null, modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -167,9 +178,7 @@ fun HorarioListItem(
 
 @Composable
 fun CabezeraHorario(
-    dias: Map<String, LocalDate>,
-    currentDate: LocalDate,
-    isTimetableModeGrid: Boolean
+    dias: Map<String, LocalDate>, currentDate: LocalDate, isTimetableModeGrid: Boolean
 ) {
     BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
         val hoursCellWidth = dimensionResource(R.dimen.timetable_hours_cell_width)
@@ -190,7 +199,11 @@ fun CabezeraHorario(
                     if (isTimetableModeGrid)
                         dia.value == LocalDate.now()
                     else
-                        dia.value == currentDate
+                        dia.value == currentDate,
+                    if (!isTimetableModeGrid)
+                        dia.value == LocalDate.now()
+                    else
+                        false
                 )
             }
         }
@@ -199,11 +212,7 @@ fun CabezeraHorario(
 
 @Composable
 fun HorarioTimetableGrid(
-    modifier: Modifier = Modifier,
-    nombreCurso: String,
-    lugar: String?,
-    altura: Dp,
-    anchura: Dp
+    modifier: Modifier = Modifier, nombreCurso: String, lugar: String?, altura: Dp, anchura: Dp
 ) {
     Column(
         modifier = modifier
@@ -223,10 +232,10 @@ fun TimetableCompose(viewModel: ScheduleViewModel) {
         val successState = uiState as ScheduleUiState.Success
         val prefs = successState.timetableUserPreferences
 
-        val totalPages = Int.MAX_VALUE
+        /*val totalPages = Int.MAX_VALUE
         val initialPage = totalPages / 2
         val pagerState = rememberPagerState(
-            initialPage = initialPage, pageCount = { totalPages })
+            initialPage = initialPage, pageCount = { totalPages })*/
 
         /*val weekOffset by remember {
             derivedStateOf { pagerState.currentPage - initialPage }
@@ -249,17 +258,15 @@ fun TimetableCompose(viewModel: ScheduleViewModel) {
             }
         }*/
 
-        HorizontalPager(
+        /*HorizontalPager(
             state = pagerState,
             key = { it },
             modifier = Modifier.fillMaxSize(),
             beyondViewportPageCount = 1
         ) { pageIndex ->
             val date = remember(pageIndex, prefs.showAsGrid) {
-                if (prefs.showAsGrid)
-                    LocalDate.now().plusWeeks((pageIndex - initialPage).toLong())
-                else
-                    LocalDate.now().plusDays((pageIndex - initialPage).toLong())
+                if (prefs.showAsGrid) LocalDate.now().plusWeeks((pageIndex - initialPage).toLong())
+                else LocalDate.now().plusDays((pageIndex - initialPage).toLong())
             }
 
             LaunchedEffect(date) {
@@ -286,13 +293,12 @@ fun TimetableCompose(viewModel: ScheduleViewModel) {
             ) {
                 CabezeraHorario(diasMap, date, prefs.showAsGrid)
                 if (prefs.showAsGrid) {
-                    TimetableGrid(
+                    SchedulesGrid(
                         showSaturday = prefs.showSaturday,
                         showSunday = prefs.showSunday,
                         is12HoursFormat = prefs.is12HoursFormat,
                         isMondayFirstDayOfWeek = prefs.isMondayFirstDayOfWeek,
-                        schedules = scheduleList.map { it.asScheduleView() }
-                    )
+                        schedules = scheduleList.map { it.asScheduleView() })
                 } else {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
@@ -311,6 +317,45 @@ fun TimetableCompose(viewModel: ScheduleViewModel) {
                 }
 
             }
+        }*/
+        if (prefs.showAsGrid) {
+            TimetableGrid(
+                prefs,
+                { date ->
+                    viewModel.loadScheduleForDate(date)
+                },
+                successState.scheduleByDate,
+                { isMondayFirstDayOfWeek, showSaturday, showSunday, date ->
+                    viewModel.getDaysOfMonthOfWeek(
+                        isMondayFirstDayOfWeek,
+                        showSaturday,
+                        showSunday,
+                        date
+                    )
+                },
+                { isMondayFirstDayOfWeek, showSaturday, showSunday ->
+                    viewModel.getDaysOfWeekOrder(isMondayFirstDayOfWeek, showSaturday, showSunday)
+                }
+            )
+        } else {
+            TimetableList(
+                prefs,
+                { date ->
+                    viewModel.loadScheduleForDate(date)
+                },
+                successState.scheduleByDate,
+                { isMondayFirstDayOfWeek, showSaturday, showSunday, date ->
+                    viewModel.getDaysOfMonthOfWeek(
+                        isMondayFirstDayOfWeek,
+                        showSaturday,
+                        showSunday,
+                        date
+                    )
+                },
+                { isMondayFirstDayOfWeek, showSaturday, showSunday ->
+                    viewModel.getDaysOfWeekOrder(isMondayFirstDayOfWeek, showSaturday, showSunday)
+                }
+            )
         }
     } else {
         Text("Cargando preferencias...")
@@ -319,6 +364,226 @@ fun TimetableCompose(viewModel: ScheduleViewModel) {
 
 @Composable
 fun TimetableGrid(
+    prefs: TimetableUserPreferences,
+    changePag: (LocalDate) -> Unit,
+    scheduleByDate: Map<LocalDate, List<ScheduleDetails>>,
+    getDaysOfMonthOfWeek: (isMondayFirstDayOfWeek: Boolean, showSaturday: Boolean, showSunday: Boolean, date: LocalDate) -> List<LocalDate>,
+    getDaysOfWeekOrder: (isMondayFirstDayOfWeek: Boolean, showSaturday: Boolean, showSunday: Boolean) -> List<Int>,
+    modifier: Modifier = Modifier,
+) {
+    val totalPages = Int.MAX_VALUE
+    val initialPage = totalPages / 2
+    val pagerState = rememberPagerState(
+        initialPage = initialPage, pageCount = { totalPages })
+
+    HorizontalPager(
+        state = pagerState,
+        key = { it },
+        modifier = Modifier.fillMaxSize(),
+        beyondViewportPageCount = 1
+    ) { pageIndex ->
+        val date = remember(pageIndex) {
+            LocalDate.now().plusWeeks((pageIndex - initialPage).toLong())
+        }
+
+        LaunchedEffect(date) {
+            //viewModel.loadScheduleForDate(date)
+            changePag(date)
+        }
+
+        //val scheduleList = successState.scheduleByDate[date].orEmpty()
+        val scheduleList = scheduleByDate[date].orEmpty()
+
+        val daysOfWeekOfMonth = getDaysOfMonthOfWeek(
+            prefs.isMondayFirstDayOfWeek, prefs.showSaturday, prefs.showSunday, date
+        )
+
+        val daysOfWeek = getDaysOfWeekOrder(
+            prefs.isMondayFirstDayOfWeek, prefs.showSaturday, prefs.showSunday
+        ).map { stringResource(it) }
+
+        val diasMap = daysOfWeek.zip(daysOfWeekOfMonth).toMap()
+
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            CabezeraHorario(diasMap, date, prefs.showAsGrid)
+            SchedulesGrid(
+                showSaturday = prefs.showSaturday,
+                showSunday = prefs.showSunday,
+                is12HoursFormat = prefs.is12HoursFormat,
+                isMondayFirstDayOfWeek = prefs.isMondayFirstDayOfWeek,
+                schedules = scheduleList.map { it.asScheduleView() })
+        }
+    }
+}
+
+@Composable
+fun TimetableList(
+    prefs: TimetableUserPreferences,
+    changePag: (LocalDate) -> Unit,
+    scheduleByDate: Map<LocalDate, List<ScheduleDetails>>,
+    getDaysOfMonthOfWeek: (isMondayFirstDayOfWeek: Boolean, showSaturday: Boolean, showSunday: Boolean, date: LocalDate) -> List<LocalDate>,
+    getDaysOfWeekOrder: (isMondayFirstDayOfWeek: Boolean, showSaturday: Boolean, showSunday: Boolean) -> List<Int>,
+    modifier: Modifier = Modifier,
+) {
+    val totalPages = Int.MAX_VALUE
+    val initialPage = totalPages / 2
+    val pagerState = rememberPagerState(
+        initialPage = initialPage, pageCount = { totalPages })
+
+    val pagerCabezeraState = rememberPagerState(
+        initialPage = initialPage, pageCount = { totalPages }
+    )
+
+    val date1 = remember(pagerState.currentPage) {
+        LocalDate.now().plusDays((pagerState.currentPage - initialPage).toLong())
+    }
+
+    val date2 = remember(pagerCabezeraState.currentPage) {
+        LocalDate.now().plusWeeks((pagerCabezeraState.currentPage - initialPage).toLong())
+    }
+
+    LaunchedEffect(date1) {
+        //viewModel.loadScheduleForDate(date)
+        changePag(date1)
+    }
+
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.settledPage }
+            .collect { page ->
+                val dateContent = LocalDate.now().plusDays((page - initialPage).toLong())
+                val curentDateCabezera = LocalDate.now()
+                    .plusWeeks((pagerCabezeraState.currentPage - initialPage).toLong())
+                val rangeDate = getDaysOfMonthOfWeek(
+                    prefs.isMondayFirstDayOfWeek,
+                    prefs.showSaturday,
+                    prefs.showSunday,
+                    curentDateCabezera
+                )
+                if (!rangeDate.contains(dateContent)) {
+                    if (pagerCabezeraState.currentPage != page) {
+                        val navigatePageCabezeraPager =
+                            if (dateContent < rangeDate.first()) pagerCabezeraState.currentPage - 1 else pagerCabezeraState.currentPage + 1
+                        pagerCabezeraState.animateScrollToPage(navigatePageCabezeraPager)
+                    }
+                }
+            }
+    }
+
+    HorizontalPager(
+        state = pagerCabezeraState,
+        key = { it },
+        userScrollEnabled = false,
+        beyondViewportPageCount = 1
+    ) { pageIndex ->
+        val date = remember(pageIndex) {
+            LocalDate.now().plusWeeks((pageIndex - initialPage).toLong())
+        }
+
+        val daysOfWeekOfMonth = getDaysOfMonthOfWeek(
+            prefs.isMondayFirstDayOfWeek,
+            prefs.showSaturday,
+            prefs.showSunday,
+            date
+        )
+
+        val daysOfWeek = getDaysOfWeekOrder(
+            prefs.isMondayFirstDayOfWeek, prefs.showSaturday, prefs.showSunday
+        ).map { stringResource(it) }
+
+        val diasMap = daysOfWeek.zip(daysOfWeekOfMonth).toMap()
+
+        CabezeraHorario(diasMap, date1, prefs.showAsGrid)
+    }
+
+    HorizontalPager(
+        state = pagerState,
+        key = { it },
+        modifier = Modifier.fillMaxSize(),
+        beyondViewportPageCount = 1
+    ) { pageIndex ->
+        val date = remember(pageIndex) {
+            val currentDate = LocalDate.now().plusDays((pageIndex - initialPage).toLong())
+            // Verificar si es sabado o domingo y verificar si se debe mostrar los dias sabados o domingos en el horario
+            if ((currentDate.dayOfWeek == DayOfWeek.SATURDAY || currentDate.dayOfWeek == DayOfWeek.SUNDAY) && (!prefs.showSunday || !prefs.showSaturday)) {
+                if (currentDate.dayOfWeek == DayOfWeek.SUNDAY && !prefs.showSunday) {
+                    if (pageIndex < initialPage) {
+                        if (!prefs.showSaturday) {
+                            currentDate.minusDays(2)
+                        } else {
+                            currentDate.minusDays(1)
+                        }
+                    }
+
+                    if (pageIndex > initialPage) {
+                        if (!prefs.showSaturday) {
+                            currentDate.plusDays(2)
+                        } else {
+                            currentDate.plusDays(1)
+                        }
+                    }
+                }
+
+                if (currentDate.dayOfWeek == DayOfWeek.SATURDAY && !prefs.showSaturday) {
+                    if (pageIndex < initialPage) {
+                        if (!prefs.showSaturday) {
+                            currentDate.minusDays(2)
+                        } else {
+                            currentDate.minusDays(1)
+                        }
+                    }
+
+                    if (pageIndex > initialPage) {
+                        if (!prefs.showSaturday) {
+                            currentDate.plusDays(2)
+                        } else {
+                            currentDate.plusDays(1)
+                        }
+                    }
+                }
+            }
+            currentDate
+        }
+
+        val scheduleList = scheduleByDate[date].orEmpty()
+
+        /*val daysOfWeekOfMonth = getDaysOfMonthOfWeek(
+            prefs.isMondayFirstDayOfWeek,
+            prefs.showSaturday,
+            prefs.showSunday,
+            date
+        )
+
+        val daysOfWeek = getDaysOfWeekOrder(
+            prefs.isMondayFirstDayOfWeek, prefs.showSaturday, prefs.showSunday
+        ).map { stringResource(it) }
+
+        val diasMap = daysOfWeek.zip(daysOfWeekOfMonth).toMap()*/
+
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            //CabezeraHorario(diasMap, date, prefs.showAsGrid)
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(scheduleList.map { it.asScheduleView() }) { schedule ->
+                    HorarioListItem(
+                        nombreCurso = schedule.courseName,
+                        horaInicioFin = schedule.startTime.toString() + "-" + schedule.endTime.toString(),
+                        aula = schedule.classPlace
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun SchedulesGrid(
     modifier: Modifier = Modifier,
     showSaturday: Boolean,
     showSunday: Boolean,
@@ -405,8 +670,7 @@ fun TimetableGrid(
                     val parts = hour.split(" ")
                     parts.forEachIndexed { partIndex, part ->
                         val layoutResult = textMeasurer.measure(
-                            text = AnnotatedString(part),
-                            style = TextStyle(
+                            text = AnnotatedString(part), style = TextStyle(
                                 color = hoursTextColor,
                                 fontSize = hoursTextSize,
                                 textAlign = TextAlign.Center
@@ -424,8 +688,7 @@ fun TimetableGrid(
             } else {
                 hoursText.forEachIndexed { index, hour ->
                     val layoutResult = textMeasurer.measure(
-                        text = AnnotatedString(hour),
-                        style = TextStyle(
+                        text = AnnotatedString(hour), style = TextStyle(
                             color = hoursTextColor,
                             fontSize = hoursTextSize,
                             textAlign = TextAlign.Center
@@ -563,12 +826,7 @@ fun calculateStartMarginCrossScheduleView(
     crossScheduleIndex: Int
 ): Dp {
     return calculateStartMarginSingleScheduleView(
-        hoursCellWidth,
-        gridCellWidth,
-        day,
-        isMondayFirstDayOfWeek,
-        showSaturday,
-        showSunday
+        hoursCellWidth, gridCellWidth, day, isMondayFirstDayOfWeek, showSaturday, showSunday
     ) + ((gridCellWidth / crossedSchedulesCount) * crossScheduleIndex)
 }
 
@@ -586,16 +844,12 @@ fun calculateStartMarginSingleScheduleView(
     } else {
         if (day == DayOfWeek.SUNDAY) {
             hoursCellWidth
-        } else
-            hoursCellWidth + (gridCellWidth * day.value)
+        } else hoursCellWidth + (gridCellWidth * day.value)
     }
 }
 
 fun calculateScheduleViewHeight(
-    startTime: LocalTime,
-    endTime: LocalTime,
-    cellHeight: Dp,
-    scheduleBottomMargin: Dp
+    startTime: LocalTime, endTime: LocalTime, cellHeight: Dp, scheduleBottomMargin: Dp
 ): Dp {
     val minutesDifference = ChronoUnit.MINUTES.between(startTime, endTime)
     val minutesInDecimals = convertMinutesToDecimals(minutesDifference)
@@ -607,9 +861,7 @@ private fun convertMinutesToDecimals(minutes: Long): Double {
 }
 
 fun calculateCrossScheduleViewWidth(
-    gridCellWidth: Dp,
-    crossedSchedulesCount: Int,
-    scheduleEndMargin: Dp
+    gridCellWidth: Dp, crossedSchedulesCount: Int, scheduleEndMargin: Dp
 ): Dp {
     return (gridCellWidth / crossedSchedulesCount) - scheduleEndMargin
 }
@@ -662,6 +914,6 @@ fun CabezeraHorarioPreview() {
 @Composable
 fun DiaSemanaSelectPreview() {
     UniversityScheduleTheme {
-        DiaSemana("Lun", 7, 40.dp, true)
+        DiaSemana("Lun", 7, 40.dp, true, false)
     }
 }
