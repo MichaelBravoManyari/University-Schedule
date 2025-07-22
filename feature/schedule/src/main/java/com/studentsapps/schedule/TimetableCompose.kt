@@ -75,6 +75,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
+import androidx.core.util.toRange
 import com.studentsapps.model.ScheduleDetails
 import com.studentsapps.model.TimetableUserPreferences
 
@@ -429,32 +430,64 @@ fun TimetableList(
     getDaysOfWeekOrder: (isMondayFirstDayOfWeek: Boolean, showSaturday: Boolean, showSunday: Boolean) -> List<Int>,
     modifier: Modifier = Modifier,
 ) {
-    val totalPages = Int.MAX_VALUE
-    val initialPage = totalPages / 2
-    val pagerState = rememberPagerState(
-        initialPage = initialPage, pageCount = { totalPages })
+    //val totalPages = Int.MAX_VALUE
+    val visibleDates = remember(prefs) {
+        val daysBefore = 365
+        val daysAfter = 365
+        val today = LocalDate.now()
+        val range = (0 - daysBefore)..daysAfter
+
+        range.map { today.plusDays(it.toLong()) }
+            .filter { date ->
+                when (date.dayOfWeek) {
+                    DayOfWeek.SATURDAY -> prefs.showSaturday
+                    DayOfWeek.SUNDAY -> prefs.showSunday
+                    else -> true
+                }
+            }
+    }
+
+    val initialPage = remember(visibleDates) {
+        val today = LocalDate.now()
+
+        // 1. Buscar exactamente hoy
+        val indexToday = visibleDates.indexOf(today)
+        if (indexToday != -1) return@remember indexToday
+
+        // 2. Buscar el primer día visible después de hoy
+        val afterToday = visibleDates.indexOfFirst { it.isAfter(today) }
+        if (afterToday != -1) return@remember afterToday
+
+        // 3. Si no hay días posteriores, usar el último anterior a hoy
+        visibleDates.indexOfLast { it.isBefore(today) }.coerceAtLeast(0)
+    }
+
+    val pagerState =
+        rememberPagerState(initialPage = initialPage, pageCount = { visibleDates.size })
 
     val pagerCabezeraState = rememberPagerState(
-        initialPage = initialPage, pageCount = { totalPages }
+        initialPage = initialPage, pageCount = { visibleDates.size }
     )
 
     val date1 = remember(pagerState.currentPage) {
-        LocalDate.now().plusDays((pagerState.currentPage - initialPage).toLong())
-    }
-
-    val date2 = remember(pagerCabezeraState.currentPage) {
-        LocalDate.now().plusWeeks((pagerCabezeraState.currentPage - initialPage).toLong())
+        //LocalDate.now().plusDays((pagerState.currentPage - initialPage).toLong())
+        visibleDates[pagerState.currentPage]
     }
 
     LaunchedEffect(date1) {
-        //viewModel.loadScheduleForDate(date)
         changePag(date1)
     }
+
+    /*LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.currentPage }.collect { page ->
+            changePag(visibleDates[page])
+        }
+    }*/
 
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.settledPage }
             .collect { page ->
-                val dateContent = LocalDate.now().plusDays((page - initialPage).toLong())
+                /*val dateContent = LocalDate.now().plusDays((page - initialPage).toLong())
                 val curentDateCabezera = LocalDate.now()
                     .plusWeeks((pagerCabezeraState.currentPage - initialPage).toLong())
                 val rangeDate = getDaysOfMonthOfWeek(
@@ -469,25 +502,43 @@ fun TimetableList(
                             if (dateContent < rangeDate.first()) pagerCabezeraState.currentPage - 1 else pagerCabezeraState.currentPage + 1
                         pagerCabezeraState.animateScrollToPage(navigatePageCabezeraPager)
                     }
+                }*/
+                val dateContent = visibleDates[page]
+                //val curentDateCabezera = visibleDates[pagerCabezeraState.currentPage]
+                val curentDateCabezera =
+                    visibleDates[initialPage].plusWeeks((pagerCabezeraState.currentPage - initialPage).toLong())
+                val rangeDate = getDaysOfMonthOfWeek(
+                    prefs.isMondayFirstDayOfWeek,
+                    prefs.showSaturday,
+                    prefs.showSunday,
+                    curentDateCabezera
+                )
+                if (!rangeDate.contains(dateContent)) {
+                    if (pagerCabezeraState.currentPage != pagerState.currentPage) {
+                        val navigatePageCabezeraPager =
+                            if (dateContent < rangeDate.first()) pagerCabezeraState.currentPage - 1 else pagerCabezeraState.currentPage + 1
+                        pagerCabezeraState.animateScrollToPage(navigatePageCabezeraPager)
+                    }
                 }
             }
     }
 
     HorizontalPager(
         state = pagerCabezeraState,
-        key = { it },
+        key = { visibleDates[it] },
         userScrollEnabled = false,
         beyondViewportPageCount = 1
     ) { pageIndex ->
-        val date = remember(pageIndex) {
+        /*val date = remember(pageIndex) {
             LocalDate.now().plusWeeks((pageIndex - initialPage).toLong())
-        }
+        }*/
+        val currentDate = visibleDates[initialPage].plusWeeks((pageIndex - initialPage).toLong())
 
         val daysOfWeekOfMonth = getDaysOfMonthOfWeek(
             prefs.isMondayFirstDayOfWeek,
             prefs.showSaturday,
             prefs.showSunday,
-            date
+            currentDate
         )
 
         val daysOfWeek = getDaysOfWeekOrder(
@@ -501,72 +552,20 @@ fun TimetableList(
 
     HorizontalPager(
         state = pagerState,
-        key = { it },
+        key = { visibleDates[it] },
         modifier = Modifier.fillMaxSize(),
         beyondViewportPageCount = 1
     ) { pageIndex ->
-        val date = remember(pageIndex) {
-            val currentDate = LocalDate.now().plusDays((pageIndex - initialPage).toLong())
-            // Verificar si es sabado o domingo y verificar si se debe mostrar los dias sabados o domingos en el horario
-            if ((currentDate.dayOfWeek == DayOfWeek.SATURDAY || currentDate.dayOfWeek == DayOfWeek.SUNDAY) && (!prefs.showSunday || !prefs.showSaturday)) {
-                if (currentDate.dayOfWeek == DayOfWeek.SUNDAY && !prefs.showSunday) {
-                    if (pageIndex < initialPage) {
-                        if (!prefs.showSaturday) {
-                            currentDate.minusDays(2)
-                        } else {
-                            currentDate.minusDays(1)
-                        }
-                    }
+        /*val date = remember(pageIndex) {
+            LocalDate.now().plusDays((pageIndex - initialPage).toLong())
+        }*/
+        val currentDate = visibleDates[pageIndex]
 
-                    if (pageIndex > initialPage) {
-                        if (!prefs.showSaturday) {
-                            currentDate.plusDays(2)
-                        } else {
-                            currentDate.plusDays(1)
-                        }
-                    }
-                }
-
-                if (currentDate.dayOfWeek == DayOfWeek.SATURDAY && !prefs.showSaturday) {
-                    if (pageIndex < initialPage) {
-                        if (!prefs.showSaturday) {
-                            currentDate.minusDays(2)
-                        } else {
-                            currentDate.minusDays(1)
-                        }
-                    }
-
-                    if (pageIndex > initialPage) {
-                        if (!prefs.showSaturday) {
-                            currentDate.plusDays(2)
-                        } else {
-                            currentDate.plusDays(1)
-                        }
-                    }
-                }
-            }
-            currentDate
-        }
-
-        val scheduleList = scheduleByDate[date].orEmpty()
-
-        /*val daysOfWeekOfMonth = getDaysOfMonthOfWeek(
-            prefs.isMondayFirstDayOfWeek,
-            prefs.showSaturday,
-            prefs.showSunday,
-            date
-        )
-
-        val daysOfWeek = getDaysOfWeekOrder(
-            prefs.isMondayFirstDayOfWeek, prefs.showSaturday, prefs.showSunday
-        ).map { stringResource(it) }
-
-        val diasMap = daysOfWeek.zip(daysOfWeekOfMonth).toMap()*/
+        val scheduleList = scheduleByDate[currentDate].orEmpty()
 
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            //CabezeraHorario(diasMap, date, prefs.showAsGrid)
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(16.dp),
