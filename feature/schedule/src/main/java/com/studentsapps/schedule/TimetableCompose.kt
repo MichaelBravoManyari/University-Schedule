@@ -440,9 +440,9 @@ fun TimetableList(
         LocalDate.now().plusDays((pagerState.currentPage - initialPage).toLong())
     }
 
-    val date2 = remember(pagerCabezeraState.currentPage) {
+    /*val date2 = remember(pagerCabezeraState.currentPage) {
         LocalDate.now().plusWeeks((pagerCabezeraState.currentPage - initialPage).toLong())
-    }
+    }*/
 
     LaunchedEffect(date1) {
         //viewModel.loadScheduleForDate(date)
@@ -505,7 +505,7 @@ fun TimetableList(
     ) { pageIndex ->
         val date = remember(pageIndex) {
             val currentDate = LocalDate.now().plusDays((pageIndex - initialPage).toLong())
-            // Verificar si es sabado o domingo y verificar si se debe mostrar los dias sabados o domingos en el horario
+            /*// Verificar si es sabado o domingo y verificar si se debe mostrar los dias sabados o domingos en el horario
             if ((currentDate.dayOfWeek == DayOfWeek.SATURDAY || currentDate.dayOfWeek == DayOfWeek.SUNDAY) && (!prefs.showSunday || !prefs.showSaturday)) {
                 if (currentDate.dayOfWeek == DayOfWeek.SUNDAY && !prefs.showSunday) {
                     if (pageIndex < initialPage) {
@@ -542,7 +542,7 @@ fun TimetableList(
                         }
                     }
                 }
-            }
+            }*/
             currentDate
         }
 
