@@ -20,6 +20,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerScope
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -73,9 +75,13 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.core.util.toRange
 import com.studentsapps.model.ScheduleDetails
 import com.studentsapps.model.TimetableUserPreferences
@@ -236,92 +242,6 @@ fun TimetableCompose(viewModel: ScheduleViewModel) {
         val successState = uiState as ScheduleUiState.Success
         val prefs = successState.timetableUserPreferences
 
-        /*val totalPages = Int.MAX_VALUE
-        val initialPage = totalPages / 2
-        val pagerState = rememberPagerState(
-            initialPage = initialPage, pageCount = { totalPages })*/
-
-        /*val weekOffset by remember {
-            derivedStateOf { pagerState.currentPage - initialPage }
-        }
-
-        val currentDate by remember(weekOffset, prefs.showAsGrid) {
-            mutableStateOf(
-                if (prefs.showAsGrid)
-                    LocalDate.now().plusWeeks(weekOffset.toLong())
-                else
-                    LocalDate.now().plusDays(weekOffset.toLong())
-            )
-        }
-
-        LaunchedEffect(currentDate) {
-            if (prefs.showAsGrid) {
-                viewModel.updateScheduleDetailsListInGridMode(currentDate)
-            } else {
-                viewModel.updateScheduleDetailsListInListMode(currentDate)
-            }
-        }*/
-
-        /*HorizontalPager(
-            state = pagerState,
-            key = { it },
-            modifier = Modifier.fillMaxSize(),
-            beyondViewportPageCount = 1
-        ) { pageIndex ->
-            val date = remember(pageIndex, prefs.showAsGrid) {
-                if (prefs.showAsGrid) LocalDate.now().plusWeeks((pageIndex - initialPage).toLong())
-                else LocalDate.now().plusDays((pageIndex - initialPage).toLong())
-            }
-
-            LaunchedEffect(date) {
-                viewModel.loadScheduleForDate(date)
-            }
-
-            val scheduleList = successState.scheduleByDate[date].orEmpty()
-
-            val daysOfWeekOfMonth = viewModel.getDaysOfMonthOfWeek(
-                isMondayFirstDayOfWeek = prefs.isMondayFirstDayOfWeek,
-                showSaturday = prefs.showSaturday,
-                showSunday = prefs.showSunday,
-                date = date
-            )
-
-            val daysOfWeek = viewModel.getDaysOfWeekOrder(
-                prefs.isMondayFirstDayOfWeek, prefs.showSaturday, prefs.showSunday
-            ).map { stringResource(it) }
-
-            val diasMap = daysOfWeek.zip(daysOfWeekOfMonth).toMap()
-
-            Column(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                CabezeraHorario(diasMap, date, prefs.showAsGrid)
-                if (prefs.showAsGrid) {
-                    SchedulesGrid(
-                        showSaturday = prefs.showSaturday,
-                        showSunday = prefs.showSunday,
-                        is12HoursFormat = prefs.is12HoursFormat,
-                        isMondayFirstDayOfWeek = prefs.isMondayFirstDayOfWeek,
-                        schedules = scheduleList.map { it.asScheduleView() })
-                } else {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        items(scheduleList.map { it.asScheduleView() }) { schedule ->
-                            HorarioListItem(
-                                nombreCurso = schedule.courseName,
-                                horaInicioFin = schedule.startTime.toString() + "-" + schedule.endTime.toString(),
-                                aula = schedule.classPlace
-                            )
-                        }
-                    }
-
-                }
-
-            }
-        }*/
         if (prefs.showAsGrid) {
             TimetableGrid(
                 prefs,
@@ -495,59 +415,126 @@ fun TimetableList(
                 }
         }
 
-        HorizontalPager(
-            state = pagerCabezeraState,
-            key = { visibleDates[it] },
-            userScrollEnabled = false,
-            beyondViewportPageCount = 1
-        ) { pageIndex ->
-            val currentDate =
-                visibleDates[initialPage].plusWeeks((pageIndex - initialPage).toLong())
+        Column(modifier = Modifier.fillMaxSize()) {
+            /*HorizontalPager(
+                state = pagerCabezeraState,
+                key = { visibleDates[it] },
+                userScrollEnabled = false,
+                beyondViewportPageCount = 1
+            ) { pageIndex ->
+                val currentDate =
+                    visibleDates[initialPage].plusWeeks((pageIndex - initialPage).toLong())
 
-            val daysOfWeekOfMonth = getDaysOfMonthOfWeek(
-                prefs.isMondayFirstDayOfWeek,
-                prefs.showSaturday,
-                prefs.showSunday,
-                currentDate
-            )
+                val daysOfWeekOfMonth = getDaysOfMonthOfWeek(
+                    prefs.isMondayFirstDayOfWeek,
+                    prefs.showSaturday,
+                    prefs.showSunday,
+                    currentDate
+                )
 
-            val daysOfWeek = getDaysOfWeekOrder(
-                prefs.isMondayFirstDayOfWeek, prefs.showSaturday, prefs.showSunday
-            ).map { stringResource(it) }
+                val daysOfWeek = getDaysOfWeekOrder(
+                    prefs.isMondayFirstDayOfWeek, prefs.showSaturday, prefs.showSunday
+                ).map { stringResource(it) }
 
-            val diasMap = daysOfWeek.zip(daysOfWeekOfMonth).toMap()
+                val diasMap = daysOfWeek.zip(daysOfWeekOfMonth).toMap()
 
-            CabezeraHorario(diasMap, date1, prefs.showAsGrid)
-        }
+                CabezeraHorario(diasMap, date1, prefs.showAsGrid)
+            }*/
 
-        HorizontalPager(
-            state = pagerState,
-            key = { visibleDates[it] },
-            modifier = Modifier.fillMaxSize(),
-            beyondViewportPageCount = 1
-        ) { pageIndex ->
-            val currentDate = visibleDates[pageIndex]
+            WrapContentHorizontalPager(
+                state = pagerCabezeraState,
+                key = { visibleDates[it] },
+                modifier = Modifier.fillMaxWidth(),
+                userScrollEnabled = false,
+                beyondViewportPageCount = 1
+            ) { pageIndex ->
+                val currentDate =
+                    visibleDates[initialPage].plusWeeks((pageIndex - initialPage).toLong())
 
-            val scheduleList = scheduleByDate[currentDate].orEmpty()
+                val daysOfWeekOfMonth = getDaysOfMonthOfWeek(
+                    prefs.isMondayFirstDayOfWeek,
+                    prefs.showSaturday,
+                    prefs.showSunday,
+                    currentDate
+                )
 
-            Column(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                val daysOfWeek = getDaysOfWeekOrder(
+                    prefs.isMondayFirstDayOfWeek, prefs.showSaturday, prefs.showSunday
+                ).map { stringResource(it) }
+
+                val diasMap = daysOfWeek.zip(daysOfWeekOfMonth).toMap()
+
+                CabezeraHorario(diasMap, date1, prefs.showAsGrid)
+            }
+
+            HorizontalPager(
+                state = pagerState,
+                key = { visibleDates[it] },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                beyondViewportPageCount = 1
+            ) { pageIndex ->
+                val currentDate = visibleDates[pageIndex]
+
+                val scheduleList = scheduleByDate[currentDate].orEmpty()
+
+                Column(
+                    modifier = Modifier.fillMaxSize()
                 ) {
-                    items(scheduleList.map { it.asScheduleView() }) { schedule ->
-                        HorarioListItem(
-                            nombreCurso = schedule.courseName,
-                            horaInicioFin = schedule.startTime.toString() + "-" + schedule.endTime.toString(),
-                            aula = schedule.classPlace
-                        )
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(scheduleList.map { it.asScheduleView() }) { schedule ->
+                            HorarioListItem(
+                                nombreCurso = schedule.courseName,
+                                horaInicioFin = schedule.startTime.toString() + "-" + schedule.endTime.toString(),
+                                aula = schedule.classPlace
+                            )
+                        }
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun WrapContentHorizontalPager(
+    state: PagerState,
+    modifier: Modifier = Modifier,
+    key: ((index: Int) -> Any)? = null,
+    userScrollEnabled: Boolean = true,
+    beyondViewportPageCount: Int = 0,
+    content: @Composable (page: Int) -> Unit
+) {
+    var pageHeight by remember { mutableIntStateOf(0) }
+
+    SubcomposeLayout(modifier = modifier) { constraints ->
+        val placeables = subcompose("measure") {
+            Box(Modifier.fillMaxWidth()) {
+                content(state.currentPage)
+            }
+        }.map { it.measure(constraints) }
+
+        val measuredHeight = placeables.maxOfOrNull { it.height } ?: constraints.minHeight
+        pageHeight = measuredHeight
+
+        layout(0, 0) {}
+    }
+
+    HorizontalPager(
+        state = state,
+        key = key,
+        userScrollEnabled = userScrollEnabled,
+        beyondViewportPageCount = beyondViewportPageCount,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(with(LocalDensity.current) { pageHeight.toDp() })
+    ) { pageIndex ->
+        content(pageIndex)
     }
 }
 
