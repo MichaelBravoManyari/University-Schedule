@@ -18,7 +18,7 @@ fun UniversityScheduleTheme(
         onPrimary = colorResource(id = R.color.text_color),
         secondary = colorResource(id = R.color.secondary_color),
         onSecondary = colorResource(id = R.color.secondary_text_color),
-        background = colorResource(id = R.color.background_registration_option),
+        background = colorResource(id = R.color.accent_color),
         onBackground = colorResource(id = R.color.text_color),
         surface = colorResource(id = R.color.primary_color),
         onSurface = colorResource(id = R.color.text_color)

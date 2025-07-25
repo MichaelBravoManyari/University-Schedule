@@ -1,7 +1,11 @@
 package com.studentsapps.schedule
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -72,12 +76,15 @@ import java.time.temporal.ChronoUnit
 import androidx.compose.material3.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.layout.SubcomposeLayout
@@ -85,31 +92,59 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.core.util.toRange
 import com.studentsapps.model.ScheduleDetails
 import com.studentsapps.model.TimetableUserPreferences
+import kotlinx.coroutines.launch
 
 @Composable
-fun DiaSemana(dia: String, numero: Int, ancho: Dp, select: Boolean, isNow: Boolean) {
+fun DiaSemana(
+    dia: String,
+    numero: Int,
+    ancho: Dp,
+    select: Boolean,
+    isNow: Boolean,
+    onClick: () -> Unit
+) {
+    val customFont = FontFamily(
+        Font(
+            com.studentsapps.designsystem.R.font.roboto_regular, FontWeight.Normal
+        )
+    )
+
+    val customFont1 = FontFamily(
+        Font(
+            com.studentsapps.designsystem.R.font.roboto_medium, FontWeight.Normal
+        )
+    )
+
+    val interactionSource = remember { MutableInteractionSource() }
+
+    val backgroundColor by animateColorAsState(
+        targetValue = when {
+            select && isNow -> MaterialTheme.colorScheme.background
+            select -> MaterialTheme.colorScheme.onPrimary
+            else -> Color.Transparent
+        },
+        animationSpec = tween(durationMillis = 250)
+    )
+
+    val textColor by animateColorAsState(
+        targetValue = when {
+            select -> MaterialTheme.colorScheme.secondary
+            isNow -> MaterialTheme.colorScheme.background
+            else -> MaterialTheme.colorScheme.onPrimary
+        },
+        animationSpec = tween(durationMillis = 250)
+    )
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .width(ancho)
             .padding(horizontal = 5.dp)
     ) {
-        val customFont = FontFamily(
-            Font(
-                com.studentsapps.designsystem.R.font.roboto_regular, FontWeight.Normal
-            )
-        )
-
-        val customFont1 = FontFamily(
-            Font(
-                com.studentsapps.designsystem.R.font.roboto_medium, FontWeight.Normal
-            )
-        )
-
         Text(
             text = dia,
             color = MaterialTheme.colorScheme.onPrimary,
-            fontSize = 15.sp,
+            fontSize = 13.sp,
             fontFamily = customFont
         )
 
@@ -118,25 +153,21 @@ fun DiaSemana(dia: String, numero: Int, ancho: Dp, select: Boolean, isNow: Boole
         Box(
             modifier = Modifier
                 .background(
-                    color =
-                        if (select)
-                            Color.Blue
-                        else
-                            Color.White,
+                    color = backgroundColor,
                     shape = CircleShape
                 )
-                .size(25.dp), contentAlignment = Alignment.Center
+                .size(30.dp)
+                .clickable(
+                    interactionSource = interactionSource,
+                    indication = null,
+                    onClick = onClick
+                ),
+            contentAlignment = Alignment.Center
         ) {
             Text(
                 text = numero.toString(),
-                color =
-                    if (select)
-                        Color.White
-                    else if (isNow)
-                        Color.Blue
-                    else
-                        MaterialTheme.colorScheme.onPrimary,
-                fontSize = 13.sp,
+                color = textColor,
+                fontSize = 15.sp,
                 fontFamily = customFont1
             )
         }
@@ -145,12 +176,20 @@ fun DiaSemana(dia: String, numero: Int, ancho: Dp, select: Boolean, isNow: Boole
 
 @Composable
 fun HorarioListItem(
-    nombreCurso: String, horaInicioFin: String, aula: String? = null, modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    nombreCurso: String,
+    horaInicioFin: String,
+    aula: String? = null,
+    backgroundColor: Int
 ) {
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(backgroundColor)
+        )
     ) {
         Column(
             modifier = Modifier
@@ -188,9 +227,19 @@ fun HorarioListItem(
 
 @Composable
 fun CabezeraHorario(
-    dias: Map<String, LocalDate>, currentDate: LocalDate, isTimetableModeGrid: Boolean
+    dias: Map<String, LocalDate>,
+    currentDate: LocalDate,
+    isTimetableModeGrid: Boolean,
+    onDayClick: (LocalDate) -> Unit
 ) {
-    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+    BoxWithConstraints(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                color = MaterialTheme.colorScheme.primary
+            )
+            .padding(bottom = 10.dp)
+    ) {
         val hoursCellWidth = dimensionResource(R.dimen.timetable_hours_cell_width)
 
         val anchoDiaSemana = if (isTimetableModeGrid) {
@@ -200,7 +249,10 @@ fun CabezeraHorario(
             maxWidth / dias.size
         }
 
-        Row(modifier = Modifier.padding(start = if (isTimetableModeGrid) hoursCellWidth else 0.dp)) {
+        Row(
+            modifier = Modifier
+                .padding(start = if (isTimetableModeGrid) hoursCellWidth else 0.dp)
+        ) {
             for (dia in dias) {
                 DiaSemana(
                     dia.key,
@@ -210,10 +262,14 @@ fun CabezeraHorario(
                         dia.value == LocalDate.now()
                     else
                         dia.value == currentDate,
-                    if (!isTimetableModeGrid)
-                        dia.value == LocalDate.now()
+                    if (isTimetableModeGrid && dia.value == LocalDate.now())
+                        true
                     else
-                        false
+                        if (!isTimetableModeGrid)
+                            dia.value == LocalDate.now()
+                        else
+                            false,
+                    onClick = { onDayClick(dia.value) }
                 )
             }
         }
@@ -311,11 +367,9 @@ fun TimetableGrid(
         }
 
         LaunchedEffect(date) {
-            //viewModel.loadScheduleForDate(date)
             changePag(date)
         }
 
-        //val scheduleList = successState.scheduleByDate[date].orEmpty()
         val scheduleList = scheduleByDate[date].orEmpty()
 
         val daysOfWeekOfMonth = getDaysOfMonthOfWeek(
@@ -331,7 +385,7 @@ fun TimetableGrid(
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            CabezeraHorario(diasMap, date, prefs.showAsGrid)
+            CabezeraHorario(diasMap, date, prefs.showAsGrid) {}
             SchedulesGrid(
                 showSaturday = prefs.showSaturday,
                 showSunday = prefs.showSunday,
@@ -379,6 +433,8 @@ fun TimetableList(
         visibleDates.indexOfLast { it.isBefore(today) }.coerceAtLeast(0)
     }
 
+    val coroutineScope = rememberCoroutineScope()
+
     key(prefs) {
         val pagerState =
             rememberPagerState(initialPage = initialPage, pageCount = { visibleDates.size })
@@ -416,31 +472,6 @@ fun TimetableList(
         }
 
         Column(modifier = Modifier.fillMaxSize()) {
-            /*HorizontalPager(
-                state = pagerCabezeraState,
-                key = { visibleDates[it] },
-                userScrollEnabled = false,
-                beyondViewportPageCount = 1
-            ) { pageIndex ->
-                val currentDate =
-                    visibleDates[initialPage].plusWeeks((pageIndex - initialPage).toLong())
-
-                val daysOfWeekOfMonth = getDaysOfMonthOfWeek(
-                    prefs.isMondayFirstDayOfWeek,
-                    prefs.showSaturday,
-                    prefs.showSunday,
-                    currentDate
-                )
-
-                val daysOfWeek = getDaysOfWeekOrder(
-                    prefs.isMondayFirstDayOfWeek, prefs.showSaturday, prefs.showSunday
-                ).map { stringResource(it) }
-
-                val diasMap = daysOfWeek.zip(daysOfWeekOfMonth).toMap()
-
-                CabezeraHorario(diasMap, date1, prefs.showAsGrid)
-            }*/
-
             WrapContentHorizontalPager(
                 state = pagerCabezeraState,
                 key = { visibleDates[it] },
@@ -464,7 +495,14 @@ fun TimetableList(
 
                 val diasMap = daysOfWeek.zip(daysOfWeekOfMonth).toMap()
 
-                CabezeraHorario(diasMap, date1, prefs.showAsGrid)
+                CabezeraHorario(diasMap, date1, prefs.showAsGrid) { clickedDate ->
+                    val index = visibleDates.indexOf(clickedDate)
+                    if (index != -1) {
+                        coroutineScope.launch {
+                            pagerState.animateScrollToPage(index)
+                        }
+                    }
+                }
             }
 
             HorizontalPager(
@@ -491,7 +529,8 @@ fun TimetableList(
                             HorarioListItem(
                                 nombreCurso = schedule.courseName,
                                 horaInicioFin = schedule.startTime.toString() + "-" + schedule.endTime.toString(),
-                                aula = schedule.classPlace
+                                aula = schedule.classPlace,
+                                backgroundColor = schedule.color
                             )
                         }
                     }
@@ -568,9 +607,9 @@ fun SchedulesGrid(
         stringArrayResource(if (is12HoursFormat) R.array.hours_in_12_hour_format else R.array.hours_in_24_hour_format).toList()
     val xDrawText = hoursCellWidthPx / 2
     val scheduleEndPadding = dimensionResource(R.dimen.timetable_schedule_end_margin)
-    val scheduleEndPaddingPx = with(density) { scheduleEndPadding.toPx() }
+    //val scheduleEndPaddingPx = with(density) { scheduleEndPadding.toPx() }
     val scheduleBottomPadding = dimensionResource(R.dimen.timetable_schedule_bottom_margin)
-    val scheduleBottomPaddingPx = with(density) { scheduleBottomPadding.toPx() }
+    //val scheduleBottomPaddingPx = with(density) { scheduleBottomPadding.toPx() }
 
     BoxWithConstraints(
         modifier = modifier
@@ -746,19 +785,6 @@ fun SchedulesGrid(
                 }
             }
         }
-
-        /*val xCurso = with(density) { (hoursCellWidthPx + 0 * gridCellWidthPx).toDp() }
-        val yCurso = with(density) { (10 * gridCellHeight.toPx()).toDp() }
-        val anchoCurso = with(density) { gridCellWidthPx.toDp() }
-        val altoCurso = gridCellHeight * 2 // 2 horas
-
-        HorarioTimetableGrid(
-            nombreCurso = "Matemáticas",
-            lugar = "Aula 1",
-            altura = altoCurso,
-            anchura = anchoCurso,
-            modifier = Modifier.absoluteOffset(x = xCurso, y = yCurso)
-        )*/
     }
 }
 
@@ -850,7 +876,7 @@ fun getNumVerticalGridLines(showSaturday: Boolean, showSunday: Boolean): Int {
 @Composable
 fun HorarioListItemPreview() {
     UniversityScheduleTheme {
-        HorarioListItem("Curso prueba", "10:00 a.m. - 11:00 a.m.", "Edificio 1")
+        HorarioListItem(Modifier, "Curso prueba", "10:00 a.m. - 11:00 a.m.", "Edificio 1", 1234)
     }
 }
 
@@ -862,7 +888,7 @@ fun CabezeraHorarioPreview() {
     val daysOfWeek = timetableUtils.getDaysOfWeekOrder(true, true, true).map { stringResource(it) }
     val diasMap = daysOfWeek.zip(daysOfMonth).toMap()
     UniversityScheduleTheme {
-        CabezeraHorario(diasMap, LocalDate.now(), true)
+        CabezeraHorario(diasMap, LocalDate.now(), true) { }
     }
 }
 
@@ -870,6 +896,6 @@ fun CabezeraHorarioPreview() {
 @Composable
 fun DiaSemanaSelectPreview() {
     UniversityScheduleTheme {
-        DiaSemana("Lun", 7, 40.dp, true, false)
+        DiaSemana("Lun", 7, 40.dp, true, false) { }
     }
 }
