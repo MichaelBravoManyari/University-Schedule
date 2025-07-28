@@ -69,7 +69,13 @@ class ScheduleFragment : Fragment() {
 
             setContent {
                 UniversityScheduleTheme {
-                    TimetableCompose(viewModel)
+                    TimetableCompose(viewModel) { scheduleId ->
+                        navController.navigate(
+                            ScheduleFragmentDirections.actionScheduleFragmentToModalBottomSheetSchedule(
+                                scheduleId
+                            )
+                        )
+                    }
                 }
             }
         }

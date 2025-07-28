@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerScope
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -76,23 +75,20 @@ import java.time.temporal.ChronoUnit
 import androidx.compose.material3.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.SubcomposeLayout
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.core.util.toRange
+import androidx.core.graphics.ColorUtils
 import com.studentsapps.model.ScheduleDetails
 import com.studentsapps.model.TimetableUserPreferences
 import kotlinx.coroutines.launch
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun DiaSemana(
@@ -180,7 +176,8 @@ fun HorarioListItem(
     nombreCurso: String,
     horaInicioFin: String,
     aula: String? = null,
-    backgroundColor: Int
+    backgroundColor: Int,
+    onClickSchedule: () -> Unit
 ) {
     Card(
         modifier = modifier
@@ -189,20 +186,24 @@ fun HorarioListItem(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color(backgroundColor)
-        )
+        ),
+        onClick = onClickSchedule
     ) {
-        Column(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
-                .padding(15.dp)
-        ) {
+        Column(modifier = Modifier.padding(15.dp)) {
+            val textColor = if (ColorUtils.calculateLuminance(backgroundColor) < 0.5)
+                colorResource(R.color.timetable_schedule_view_light_text_color)
+            else
+                colorResource(R.color.timetable_schedule_view_dark_text_color)
             Text(
                 text = nombreCurso,
-                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                color = textColor,
+                modifier = Modifier.padding(bottom = 5.dp)
             )
             Text(
                 text = horaInicioFin,
-                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                color = textColor
             )
             if (!aula.isNullOrBlank()) {
                 Row(
@@ -212,12 +213,14 @@ fun HorarioListItem(
                     Icon(
                         imageVector = Icons.Default.LocationOn,
                         contentDescription = null,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(18.dp),
+                        tint = textColor
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = aula,
-                        style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold)
+                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                        color = textColor
                     )
                 }
             }
@@ -278,20 +281,53 @@ fun CabezeraHorario(
 
 @Composable
 fun HorarioTimetableGrid(
-    modifier: Modifier = Modifier, nombreCurso: String, lugar: String?, altura: Dp, anchura: Dp
+    modifier: Modifier = Modifier,
+    nombreCurso: String,
+    lugar: String?,
+    altura: Dp,
+    anchura: Dp,
+    backgroundColor: Int,
+    onClick: () -> Unit
 ) {
+    val textColor = if (ColorUtils.calculateLuminance(backgroundColor) < 0.5)
+        colorResource(R.color.timetable_schedule_view_light_text_color)
+    else
+        colorResource(R.color.timetable_schedule_view_dark_text_color)
+
+    val customFont1 = FontFamily(
+        Font(
+            com.studentsapps.designsystem.R.font.roboto_medium, FontWeight.Normal
+        )
+    )
+
     Column(
         modifier = modifier
             .size(anchura, altura)
-            .background(Color.LightGray)
+            .clip(RoundedCornerShape(5.dp))
+            .background(Color(backgroundColor))
+            .padding(5.dp)
+            .clickable { onClick() }
     ) {
-        Text(text = nombreCurso)
-        lugar?.let { Text(it) }
+        Text(
+            text = nombreCurso,
+            fontFamily = customFont1,
+            color = textColor,
+            fontWeight = FontWeight.Bold,
+            fontSize = 12.sp
+        )
+        lugar?.let {
+            Text(
+                text = it,
+                fontFamily = customFont1,
+                color = textColor,
+                fontSize = 12.sp
+            )
+        }
     }
 }
 
 @Composable
-fun TimetableCompose(viewModel: ScheduleViewModel) {
+fun TimetableCompose(viewModel: ScheduleViewModel, onClickSchedule: (String) -> Unit) {
     val uiState by viewModel.uiState.collectAsState()
 
     if (uiState is ScheduleUiState.Success) {
@@ -315,7 +351,8 @@ fun TimetableCompose(viewModel: ScheduleViewModel) {
                 },
                 { isMondayFirstDayOfWeek, showSaturday, showSunday ->
                     viewModel.getDaysOfWeekOrder(isMondayFirstDayOfWeek, showSaturday, showSunday)
-                }
+                },
+                onClickSchedule = onClickSchedule
             )
         } else {
             TimetableList(
@@ -334,7 +371,8 @@ fun TimetableCompose(viewModel: ScheduleViewModel) {
                 },
                 { isMondayFirstDayOfWeek, showSaturday, showSunday ->
                     viewModel.getDaysOfWeekOrder(isMondayFirstDayOfWeek, showSaturday, showSunday)
-                }
+                },
+                onClickSchedule = onClickSchedule
             )
         }
     } else {
@@ -349,7 +387,7 @@ fun TimetableGrid(
     scheduleByDate: Map<LocalDate, List<ScheduleDetails>>,
     getDaysOfMonthOfWeek: (isMondayFirstDayOfWeek: Boolean, showSaturday: Boolean, showSunday: Boolean, date: LocalDate) -> List<LocalDate>,
     getDaysOfWeekOrder: (isMondayFirstDayOfWeek: Boolean, showSaturday: Boolean, showSunday: Boolean) -> List<Int>,
-    modifier: Modifier = Modifier,
+    onClickSchedule: (String) -> Unit,
 ) {
     val totalPages = Int.MAX_VALUE
     val initialPage = totalPages / 2
@@ -391,7 +429,9 @@ fun TimetableGrid(
                 showSunday = prefs.showSunday,
                 is12HoursFormat = prefs.is12HoursFormat,
                 isMondayFirstDayOfWeek = prefs.isMondayFirstDayOfWeek,
-                schedules = scheduleList.map { it.asScheduleView() })
+                schedules = scheduleList.map { it.asScheduleView() },
+                onClickSchedule = onClickSchedule
+            )
         }
     }
 }
@@ -403,7 +443,7 @@ fun TimetableList(
     scheduleByDate: Map<LocalDate, List<ScheduleDetails>>,
     getDaysOfMonthOfWeek: (isMondayFirstDayOfWeek: Boolean, showSaturday: Boolean, showSunday: Boolean, date: LocalDate) -> List<LocalDate>,
     getDaysOfWeekOrder: (isMondayFirstDayOfWeek: Boolean, showSaturday: Boolean, showSunday: Boolean) -> List<Int>,
-    modifier: Modifier = Modifier,
+    onClickSchedule: (String) -> Unit,
 ) {
     val visibleDates = remember(prefs) {
         val daysBefore = 365
@@ -526,11 +566,16 @@ fun TimetableList(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         items(scheduleList.map { it.asScheduleView() }) { schedule ->
+                            val horaInicio =
+                                if (prefs.is12HoursFormat) formatLocalTime(schedule.startTime) else schedule.startTime.toString()
+                            val horaFin =
+                                if (prefs.is12HoursFormat) formatLocalTime(schedule.endTime) else schedule.endTime.toString()
                             HorarioListItem(
                                 nombreCurso = schedule.courseName,
-                                horaInicioFin = schedule.startTime.toString() + "-" + schedule.endTime.toString(),
+                                horaInicioFin = "$horaInicio-$horaFin",
                                 aula = schedule.classPlace,
-                                backgroundColor = schedule.color
+                                backgroundColor = schedule.color,
+                                onClickSchedule = { onClickSchedule(schedule.id) }
                             )
                         }
                     }
@@ -538,6 +583,11 @@ fun TimetableList(
             }
         }
     }
+}
+
+private fun formatLocalTime(localTime: LocalTime): String {
+    val formatter = DateTimeFormatter.ofPattern("h:mm a")
+    return localTime.format(formatter)
 }
 
 @Composable
@@ -584,7 +634,8 @@ fun SchedulesGrid(
     showSunday: Boolean,
     is12HoursFormat: Boolean,
     isMondayFirstDayOfWeek: Boolean,
-    schedules: List<ScheduleView>
+    schedules: List<ScheduleView>,
+    onClickSchedule: (String) -> Unit
 ) {
     val density = LocalDensity.current
     val textMeasurer = rememberTextMeasurer()
@@ -748,7 +799,9 @@ fun SchedulesGrid(
                             lugar = schedule.classPlace,
                             altura = height,
                             anchura = width,
-                            modifier = Modifier.absoluteOffset(x = xSchedule, y = ySchedule)
+                            modifier = Modifier.absoluteOffset(x = xSchedule, y = ySchedule),
+                            backgroundColor = schedule.color,
+                            onClick = { onClickSchedule(schedule.id) }
                         )
                     }
                 }
@@ -780,7 +833,9 @@ fun SchedulesGrid(
                         lugar = uniqueSchedule.classPlace,
                         altura = height,
                         anchura = width,
-                        modifier = Modifier.absoluteOffset(x = xSchedule, y = ySchedule)
+                        modifier = Modifier.absoluteOffset(x = xSchedule, y = ySchedule),
+                        backgroundColor = uniqueSchedule.color,
+                        onClick = { onClickSchedule(uniqueSchedule.id) }
                     )
                 }
             }
@@ -876,7 +931,7 @@ fun getNumVerticalGridLines(showSaturday: Boolean, showSunday: Boolean): Int {
 @Composable
 fun HorarioListItemPreview() {
     UniversityScheduleTheme {
-        HorarioListItem(Modifier, "Curso prueba", "10:00 a.m. - 11:00 a.m.", "Edificio 1", 1234)
+        HorarioListItem(Modifier, "Curso prueba", "10:00 a.m. - 11:00 a.m.", "Edificio 1", 1234, {})
     }
 }
 
