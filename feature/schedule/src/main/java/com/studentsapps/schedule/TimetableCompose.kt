@@ -78,12 +78,15 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInWindow
 import androidx.core.graphics.ColorUtils
 import com.studentsapps.model.ScheduleDetails
 import com.studentsapps.model.TimetableUserPreferences
@@ -661,10 +664,16 @@ fun SchedulesGrid(
     //val scheduleEndPaddingPx = with(density) { scheduleEndPadding.toPx() }
     val scheduleBottomPadding = dimensionResource(R.dimen.timetable_schedule_bottom_margin)
     //val scheduleBottomPaddingPx = with(density) { scheduleBottomPadding.toPx() }
+    val scrollState = rememberScrollState()
+    var targetOffsetY by remember { mutableStateOf(0) }
+
+    LaunchedEffect(targetOffsetY) {
+        scrollState.scrollTo(targetOffsetY)
+    }
 
     BoxWithConstraints(
         modifier = modifier
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(scrollState)
             .heightIn(min = canvasHeight)
     ) {
         val totalWidthPx = with(density) { maxWidth.toPx() }
@@ -840,7 +849,34 @@ fun SchedulesGrid(
                 }
             }
         }
+
+        val topCurrentHour = calculateSelectorTopMargin(gridCellHeightPx)
+
+        Box(
+            modifier = Modifier
+                .absoluteOffset(x = hoursCellWidth, y = with(density) { topCurrentHour.toDp() })
+                .size(width = maxWidth - hoursCellWidth, 1.dp)
+                .background(MaterialTheme.colorScheme.background)
+        )
+
+        Box(
+            modifier = Modifier
+                .absoluteOffset(
+                    x = hoursCellWidth,
+                    y = with(density) { topCurrentHour.toDp() - 3.dp })
+                .size(8.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.background)
+        )
+
+        targetOffsetY = topCurrentHour.toInt() - (gridCellHeightPx * 4).toInt()
     }
+}
+
+private fun calculateSelectorTopMargin(gridCellHeight: Float): Float {
+    val currentHour = LocalTime.now().hour
+    val currentMinute = LocalTime.now().minute
+    return (gridCellHeight * currentHour) + (gridCellHeight * (currentMinute / 60f)).toInt()
 }
 
 fun calculateTopMarginScheduleView(startTime: LocalTime, cellHeight: Dp): Dp {
