@@ -355,7 +355,10 @@ fun TimetableCompose(viewModel: ScheduleViewModel, onClickSchedule: (String) -> 
                 { isMondayFirstDayOfWeek, showSaturday, showSunday ->
                     viewModel.getDaysOfWeekOrder(isMondayFirstDayOfWeek, showSaturday, showSunday)
                 },
-                onClickSchedule = onClickSchedule
+                onClickSchedule = onClickSchedule,
+                updateCurrentMonth = { currentDate ->
+                    viewModel.setCurrentMonth(currentDate)
+                }
             )
         } else {
             TimetableList(
@@ -375,7 +378,10 @@ fun TimetableCompose(viewModel: ScheduleViewModel, onClickSchedule: (String) -> 
                 { isMondayFirstDayOfWeek, showSaturday, showSunday ->
                     viewModel.getDaysOfWeekOrder(isMondayFirstDayOfWeek, showSaturday, showSunday)
                 },
-                onClickSchedule = onClickSchedule
+                onClickSchedule = onClickSchedule,
+                updateCurrentMonth = { currentDate ->
+                    viewModel.setCurrentMonth(currentDate)
+                }
             )
         }
     } else {
@@ -391,11 +397,20 @@ fun TimetableGrid(
     getDaysOfMonthOfWeek: (isMondayFirstDayOfWeek: Boolean, showSaturday: Boolean, showSunday: Boolean, date: LocalDate) -> List<LocalDate>,
     getDaysOfWeekOrder: (isMondayFirstDayOfWeek: Boolean, showSaturday: Boolean, showSunday: Boolean) -> List<Int>,
     onClickSchedule: (String) -> Unit,
+    updateCurrentMonth: (LocalDate) -> Unit
 ) {
     val totalPages = Int.MAX_VALUE
     val initialPage = totalPages / 2
     val pagerState = rememberPagerState(
         initialPage = initialPage, pageCount = { totalPages })
+
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.settledPage }
+            .collect { page ->
+                val currentDate = LocalDate.now().plusWeeks((page - initialPage).toLong())
+                updateCurrentMonth(currentDate)
+            }
+    }
 
     HorizontalPager(
         state = pagerState,
@@ -447,6 +462,7 @@ fun TimetableList(
     getDaysOfMonthOfWeek: (isMondayFirstDayOfWeek: Boolean, showSaturday: Boolean, showSunday: Boolean, date: LocalDate) -> List<LocalDate>,
     getDaysOfWeekOrder: (isMondayFirstDayOfWeek: Boolean, showSaturday: Boolean, showSunday: Boolean) -> List<Int>,
     onClickSchedule: (String) -> Unit,
+    updateCurrentMonth: (LocalDate) -> Unit
 ) {
     val visibleDates = remember(prefs) {
         val daysBefore = 365
@@ -506,6 +522,7 @@ fun TimetableList(
                         prefs.showSunday,
                         curentDateCabezera
                     )
+                    updateCurrentMonth(dateContent)
                     if (!rangeDate.contains(dateContent)) {
                         val navigatePageCabezeraPager =
                             if (dateContent < rangeDate.first()) pagerCabezeraState.currentPage - 1 else pagerCabezeraState.currentPage + 1

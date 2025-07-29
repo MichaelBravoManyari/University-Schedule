@@ -36,7 +36,7 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:title="@{timetableView.currentMonth}" />
+                app:title="@{scheduleViewModel.currentMonth}" />
         </com.google.android.material.appbar.AppBarLayout>
 
         <!--<com.studentsapps.ui.timetable.Timetable

@@ -147,10 +147,10 @@ class ScheduleFragment : Fragment() {
     }
 
     private fun observeCurrentMonth() {
-        val observer = Observer<String> { currentMonth ->
+        /*val observer = Observer<String> { currentMonth ->
             navController.currentDestination?.label = currentMonth
         }
-        //binding.timetable.currentMonth.observe(viewLifecycleOwner, observer)
+        viewModel.currentMonth.observe(viewLifecycleOwner, observer)*/
     }
 
     private fun CoroutineScope.observeScheduleUiState() {
@@ -171,6 +171,7 @@ class ScheduleFragment : Fragment() {
                             }
                         }
                     }*/
+                    //navController.currentDestination?.label = currentState.currentMonth
                 }
             }
         }
