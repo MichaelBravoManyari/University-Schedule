@@ -358,7 +358,9 @@ fun TimetableCompose(viewModel: ScheduleViewModel, onClickSchedule: (String) -> 
                 onClickSchedule = onClickSchedule,
                 updateCurrentMonth = { currentDate ->
                     viewModel.setCurrentMonth(currentDate)
-                }
+                },
+                successState.selectNowDay,
+                { viewModel.selectNowDay(false) }
             )
         } else {
             TimetableList(
@@ -381,7 +383,9 @@ fun TimetableCompose(viewModel: ScheduleViewModel, onClickSchedule: (String) -> 
                 onClickSchedule = onClickSchedule,
                 updateCurrentMonth = { currentDate ->
                     viewModel.setCurrentMonth(currentDate)
-                }
+                },
+                successState.selectNowDay,
+                { viewModel.selectNowDay(false) }
             )
         }
     } else {
@@ -397,7 +401,9 @@ fun TimetableGrid(
     getDaysOfMonthOfWeek: (isMondayFirstDayOfWeek: Boolean, showSaturday: Boolean, showSunday: Boolean, date: LocalDate) -> List<LocalDate>,
     getDaysOfWeekOrder: (isMondayFirstDayOfWeek: Boolean, showSaturday: Boolean, showSunday: Boolean) -> List<Int>,
     onClickSchedule: (String) -> Unit,
-    updateCurrentMonth: (LocalDate) -> Unit
+    updateCurrentMonth: (LocalDate) -> Unit,
+    selectNowDay: Boolean,
+    updateSelectNowDay: () -> Unit
 ) {
     val totalPages = Int.MAX_VALUE
     val initialPage = totalPages / 2
@@ -410,6 +416,17 @@ fun TimetableGrid(
                 val currentDate = LocalDate.now().plusWeeks((page - initialPage).toLong())
                 updateCurrentMonth(currentDate)
             }
+    }
+
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(selectNowDay) {
+        if (selectNowDay) {
+            coroutineScope.launch {
+                pagerState.animateScrollToPage(initialPage)
+                updateSelectNowDay()
+            }
+        }
     }
 
     HorizontalPager(
@@ -462,7 +479,9 @@ fun TimetableList(
     getDaysOfMonthOfWeek: (isMondayFirstDayOfWeek: Boolean, showSaturday: Boolean, showSunday: Boolean, date: LocalDate) -> List<LocalDate>,
     getDaysOfWeekOrder: (isMondayFirstDayOfWeek: Boolean, showSaturday: Boolean, showSunday: Boolean) -> List<Int>,
     onClickSchedule: (String) -> Unit,
-    updateCurrentMonth: (LocalDate) -> Unit
+    updateCurrentMonth: (LocalDate) -> Unit,
+    selectNowDay: Boolean,
+    updateSelectNowDay: () -> Unit
 ) {
     val visibleDates = remember(prefs) {
         val daysBefore = 365
@@ -529,6 +548,16 @@ fun TimetableList(
                         pagerCabezeraState.animateScrollToPage(navigatePageCabezeraPager)
                     }
                 }
+        }
+
+        LaunchedEffect(selectNowDay) {
+            if (selectNowDay) {
+                coroutineScope.launch {
+                    pagerCabezeraState.animateScrollToPage(initialPage)
+                    pagerState.animateScrollToPage(initialPage)
+                    updateSelectNowDay()
+                }
+            }
         }
 
         Column(modifier = Modifier.fillMaxSize()) {

@@ -106,11 +106,11 @@ class ScheduleFragment : Fragment() {
                 viewModel.uiState.collect { currentState ->
                     if (currentState is ScheduleUiState.Success) {
                         binding.toolbar.menu.findItem(R.id.change_timetable_view)?.icon =
-                        if (currentState.timetableUserPreferences.showAsGrid) {
-                            ContextCompat.getDrawable(requireContext(), R.drawable.ic_view_list)
-                        } else {
-                            ContextCompat.getDrawable(requireContext(), R.drawable.ic_grid_view)
-                        }
+                            if (currentState.timetableUserPreferences.showAsGrid) {
+                                ContextCompat.getDrawable(requireContext(), R.drawable.ic_view_list)
+                            } else {
+                                ContextCompat.getDrawable(requireContext(), R.drawable.ic_grid_view)
+                            }
                     }
                 }
             }
@@ -261,6 +261,7 @@ class ScheduleFragment : Fragment() {
 
                     R.id.timetable_today -> {
                         //binding.timetable.selectCurrentDay()
+                        viewModel.selectNowDay(true)
                         true
                     }
 

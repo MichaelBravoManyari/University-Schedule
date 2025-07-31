@@ -123,6 +123,16 @@ class ScheduleViewModel @Inject constructor(
         return timetableUtils.getDaysOfWeekOrder(isMondayFirstDayOfWeek, showSaturday, showSunday)
     }
 
+    fun selectNowDay(select: Boolean) {
+        viewModelScope.launch {
+            _uiState.update { currentState ->
+                if (currentState is ScheduleUiState.Success) {
+                    currentState.copy(selectNowDay = select)
+                } else currentState
+            }
+        }
+    }
+
     private fun getStartDate(prefs: TimetableUserPreferences, date: LocalDate) =
         getDaysOfMonthOfWeek(
             prefs.isMondayFirstDayOfWeek, prefs.showSaturday, prefs.showSunday, date
@@ -147,6 +157,7 @@ sealed interface ScheduleUiState {
 
     data class Success(
         val timetableUserPreferences: TimetableUserPreferences,
-        val scheduleByDate: Map<LocalDate, List<ScheduleDetails>>
+        val scheduleByDate: Map<LocalDate, List<ScheduleDetails>>,
+        val selectNowDay: Boolean = false
     ) : ScheduleUiState
 }
