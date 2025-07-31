@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -102,6 +103,16 @@ class ScheduleFragment : Fragment() {
                 launchScheduleDetailsUpdates()
                 launchScheduleListUpdates()
                 observeScheduleUiState()
+                viewModel.uiState.collect { currentState ->
+                    if (currentState is ScheduleUiState.Success) {
+                        binding.toolbar.menu.findItem(R.id.change_timetable_view)?.icon =
+                        if (currentState.timetableUserPreferences.showAsGrid) {
+                            ContextCompat.getDrawable(requireContext(), R.drawable.ic_view_list)
+                        } else {
+                            ContextCompat.getDrawable(requireContext(), R.drawable.ic_grid_view)
+                        }
+                    }
+                }
             }
         }
 
