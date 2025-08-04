@@ -12,9 +12,7 @@ import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.Observer
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
@@ -29,12 +27,10 @@ import com.studentsapps.schedule.databinding.FragmentScheduleBinding
 import com.studentsapps.schedule.viewmodels.ScheduleUiState
 import com.studentsapps.schedule.viewmodels.ScheduleViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.studentsapps.common.UserManager
 import com.studentsapps.ui.theme.UniversityScheduleTheme
-import com.studentsapps.schedule.CabezeraHorario
 import com.studentsapps.schedule.TimetableCompose
 
 @AndroidEntryPoint
@@ -59,7 +55,6 @@ class ScheduleFragment : Fragment() {
         binding.apply {
             lifecycleOwner = viewLifecycleOwner
             scheduleFragment = this@ScheduleFragment
-            //timetableView = timetable
             scheduleViewModel = viewModel
         }
 
@@ -100,9 +95,6 @@ class ScheduleFragment : Fragment() {
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                launchScheduleDetailsUpdates()
-                launchScheduleListUpdates()
-                observeScheduleUiState()
                 viewModel.uiState.collect { currentState ->
                     if (currentState is ScheduleUiState.Success) {
                         binding.toolbar.menu.findItem(R.id.change_timetable_view)?.icon =
@@ -117,136 +109,14 @@ class ScheduleFragment : Fragment() {
         }
 
         binding.toolbar.setupWithNavController(navController)
-        setupNavigationObservers()
         configureMenuOptionsInAppBar()
     }
 
-    private fun setupNavigationObservers() {
-        val navBackStackEntry = navController.getBackStackEntry(R.id.scheduleFragment)
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                handleSavedState(navBackStackEntry.savedStateHandle)
-            }
-        }
-
-        navBackStackEntry.lifecycle.addObserver(observer)
-        viewLifecycleOwner.lifecycle.addObserver(LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_DESTROY) {
-                navBackStackEntry.lifecycle.removeObserver(observer)
-            }
-        })
-    }
-
-    private fun handleSavedState(savedStateHandle: SavedStateHandle) {
-        with(savedStateHandle) {
-            get<Boolean>("updateScheduleList")?.let { updateScheduleList ->
-                /*if (updateScheduleList) with(binding.timetable) {
-                    if (isDisplayedAsGrid()) {
-                        viewModel.updateScheduleDetailsListInGridMode(
-                            displaySaturday(),
-                            displaySunday(),
-                            getStartDate(),
-                            getEndDate()
-                        )
-                    } else {
-                        viewModel.updateScheduleDetailsListInListMode(date.value)
-                    }
-                }*/
-            }
-            remove<Boolean>("updateScheduleList")
-        }
-    }
-
     private fun observeCurrentMonth() {
-        /*val observer = Observer<String> { currentMonth ->
+        val observer = Observer<String> { currentMonth ->
             navController.currentDestination?.label = currentMonth
         }
-        viewModel.currentMonth.observe(viewLifecycleOwner, observer)*/
-    }
-
-    private fun CoroutineScope.observeScheduleUiState() {
-        launch {
-            viewModel.uiState.collect { currentState ->
-                if (currentState is ScheduleUiState.Success) {
-                    /*binding.timetable.apply {
-                        date.collect { selectedDate ->
-                            if (isDisplayedAsGrid()) {
-                                viewModel.updateScheduleDetailsListInGridMode(
-                                    displaySaturday(),
-                                    displaySunday(),
-                                    getStartDate(),
-                                    getEndDate()
-                                )
-                            } else {
-                                viewModel.updateScheduleDetailsListInListMode(selectedDate)
-                            }
-                        }
-                    }*/
-                    //navController.currentDestination?.label = currentState.currentMonth
-                }
-            }
-        }
-    }
-
-    private fun CoroutineScope.launchScheduleDetailsUpdates() {
-        launch {
-            viewModel.uiState.collect { currentState ->
-                if (currentState is ScheduleUiState.Success) {
-                    handleScheduleDetailsUpdate(currentState)
-                    updateToolbarIcon()
-                }
-            }
-        }
-    }
-
-    private fun updateToolbarIcon() {
-        /*binding.toolbar.menu[0].icon = if (!binding.timetable.isDisplayedAsGrid()) {
-            ContextCompat.getDrawable(requireContext(), R.drawable.ic_grid_view)
-        } else {
-            ContextCompat.getDrawable(requireContext(), R.drawable.ic_view_list)
-        }*/
-    }
-
-    private fun CoroutineScope.launchScheduleListUpdates() {
-        launch {
-            viewModel.uiState.collect { currentState ->
-                if (currentState is ScheduleUiState.Success) {
-                    handleScheduleListUpdate(currentState)
-                }
-            }
-        }
-    }
-
-    private fun handleScheduleDetailsUpdate(currentState: ScheduleUiState.Success) {
-        /*with(binding.timetable) {
-            setTimetableUserPreferences(currentState.timetableUserPreferences)
-            if (isDisplayedAsGrid()) {
-                viewModel.updateScheduleDetailsListInGridMode(
-                    displaySaturday(),
-                    displaySunday(),
-                    getStartDate(),
-                    getEndDate()
-                )
-            } else {
-                viewModel.updateScheduleDetailsListInListMode(date.value)
-            }
-        }*/
-    }
-
-    private fun handleScheduleListUpdate(currentState: ScheduleUiState.Success) {
-        /*with(binding.timetable) {
-            if (currentState.scheduleDetailsList != null) {
-                showSchedules(
-                    currentState.scheduleDetailsList.map { it.asScheduleView() }
-                ) { scheduleId ->
-                    navController.navigate(
-                        ScheduleFragmentDirections.actionScheduleFragmentToModalBottomSheetSchedule(
-                            scheduleId
-                        )
-                    )
-                }
-            }
-        }*/
+        viewModel.currentMonth.observe(viewLifecycleOwner, observer)
     }
 
     private fun configureMenuOptionsInAppBar() {
@@ -260,7 +130,6 @@ class ScheduleFragment : Fragment() {
                     }
 
                     R.id.timetable_today -> {
-                        //binding.timetable.selectCurrentDay()
                         viewModel.selectNowDay(true)
                         true
                     }
@@ -290,12 +159,6 @@ class ScheduleFragment : Fragment() {
 
     private fun toggleTimetableView() {
         viewModel.setShowAsGrid()
-        /*binding.toolbar.menu.findItem(R.id.change_timetable_view)?.icon =
-            if (binding.timetable.isDisplayedAsGrid()) {
-                ContextCompat.getDrawable(requireContext(), R.drawable.ic_grid_view)
-            } else {
-                ContextCompat.getDrawable(requireContext(), R.drawable.ic_view_list)
-            }*/
     }
 
     fun goToRegisterSchedule() {

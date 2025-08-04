@@ -52,13 +52,13 @@ abstract class ScheduleDao : BaseDao<ScheduleEntity> {
                 user_id = :userId
         """
     )
-    abstract suspend fun getSchedulesForTimetableInGridMode(
+    abstract fun getSchedulesForTimetableInGridMode(
         showSaturday: Boolean,
         showSunday: Boolean,
         startDate: LocalDate,
         endDate: LocalDate,
         userId: String
-    ): List<ScheduleDetailsView>
+    ): Flow<List<ScheduleDetailsView>>
 
     @Query(
         value = """
@@ -71,11 +71,11 @@ abstract class ScheduleDao : BaseDao<ScheduleEntity> {
                 user_id = :userId
         """
     )
-    abstract suspend fun getSchedulesForTimetableInListMode(
+    abstract fun getSchedulesForTimetableInListMode(
         dayOfWeek: DayOfWeek,
         specificDate: LocalDate,
         userId: String
-    ): List<ScheduleDetailsView>
+    ): Flow<List<ScheduleDetailsView>>
 
     @Query("SELECT * FROM schedule_details WHERE user_id = :userId")
     abstract suspend fun getAllSchedule(userId: String): List<ScheduleDetailsView>

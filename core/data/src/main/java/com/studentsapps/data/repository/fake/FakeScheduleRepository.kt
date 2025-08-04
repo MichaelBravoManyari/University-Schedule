@@ -8,6 +8,7 @@ import com.studentsapps.database.test.data.testdoubles.TestScheduleDao
 import com.studentsapps.model.Schedule
 import com.studentsapps.model.ScheduleDetails
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -16,24 +17,24 @@ class FakeScheduleRepository @Inject constructor() : ScheduleRepository {
 
     private val scheduleDao = TestScheduleDao()
 
-    override suspend fun getSchedulesForTimetableInGridMode(
+    override fun getSchedulesForTimetableInGridMode(
         showSaturday: Boolean,
         showSunday: Boolean,
         startDate: LocalDate,
         endDate: LocalDate,
         userId: String
-    ): List<ScheduleDetails> {
+    ): Flow<List<ScheduleDetails>> {
         return scheduleDao.getSchedulesForTimetableInGridMode(
             showSaturday, showSunday, startDate, endDate, userId
-        ).map(ScheduleDetailsView::asExternalModel)
+        ).map{list -> list.map(ScheduleDetailsView::asExternalModel)}
     }
 
-    override suspend fun getSchedulesForTimetableInListMode(
+    override fun getSchedulesForTimetableInListMode(
         date: LocalDate,
         userId: String
-    ): List<ScheduleDetails> {
+    ): Flow<List<ScheduleDetails>> {
         return scheduleDao.getSchedulesForTimetableInListMode(date.dayOfWeek, date, userId)
-            .map(ScheduleDetailsView::asExternalModel)
+            .map{list -> list.map(ScheduleDetailsView::asExternalModel)}
     }
 
     override suspend fun registerSchedule(

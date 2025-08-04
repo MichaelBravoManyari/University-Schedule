@@ -30,6 +30,8 @@ import com.studentsapps.model.ScheduleDetails
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import java.lang.reflect.Type
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -45,14 +47,14 @@ class ScheduleRepositoryImp @Inject constructor(
     private val pendingOperationLocalDataSource: PendingOperationLocalDataSource,
     @ApplicationContext private val context: Context
 ) : ScheduleRepository {
-    override suspend fun getSchedulesForTimetableInGridMode(
+    override fun getSchedulesForTimetableInGridMode(
         showSaturday: Boolean,
         showSunday: Boolean,
         startDate: LocalDate,
         endDate: LocalDate,
         userId: String
-    ): List<ScheduleDetails> {
-        val schedules = scheduleLocalDataSource.getSchedulesForTimetableInGridMode(
+    ): Flow<List<ScheduleDetails>> {
+        /*val schedules = scheduleLocalDataSource.getSchedulesForTimetableInGridMode(
             showSaturday, showSunday, startDate, endDate, userId
         ).map(ScheduleDetailsView::asExternalModel)
 
@@ -81,13 +83,46 @@ class ScheduleRepositoryImp @Inject constructor(
             scheduleSyncWorker()
         }
 
-        return schedules
+        return schedules*/
+        return scheduleLocalDataSource.getSchedulesForTimetableInGridMode(
+            showSaturday,
+            showSunday,
+            startDate,
+            endDate,
+            userId
+        )
+            .onEach { schedules ->
+                if (schedules.isNotEmpty()) {
+                    val pendingOperation = PendingOperationEntity(
+                        operationType = "READ_LIST",
+                        entityType = "SCHEDULE",
+                        payload = serializeSchedules(schedules.map { scheduleDetails ->
+                            with(scheduleDetails) {
+                                Schedule(
+                                    id = scheduleId,
+                                    startTime,
+                                    endTime,
+                                    classPlace,
+                                    dayOfWeek,
+                                    specificDate,
+                                    courseId
+                                )
+                            }
+                        }),
+                        status = "PENDING",
+                        timestamp = LocalDateTime.now(ZoneOffset.UTC),
+                        userId = userId
+                    )
+                    pendingOperationLocalDataSource.insert(pendingOperation)
+                    scheduleSyncWorker()
+                }
+            }.map { it.map(ScheduleDetailsView::asExternalModel) }
     }
 
-    override suspend fun getSchedulesForTimetableInListMode(
+    override fun getSchedulesForTimetableInListMode(
         date: LocalDate, userId: String
-    ): List<ScheduleDetails> {
-        val schedules =
+    ): Flow<List<ScheduleDetails>> {
+        /*val schedules =
             scheduleLocalDataSource.getSchedulesForTimetableInListMode(date.dayOfWeek, date, userId)
                 .map(ScheduleDetailsView::asExternalModel)
 
@@ -116,7 +151,38 @@ class ScheduleRepositoryImp @Inject constructor(
             scheduleSyncWorker()
         }
 
-        return schedules
+        return schedules*/
+        return scheduleLocalDataSource.getSchedulesForTimetableInListMode(
+            date.dayOfWeek,
+            date,
+            userId
+        )
+            .onEach { schedules ->
+                if (schedules.isNotEmpty()) {
+                    val pendingOperation = PendingOperationEntity(
+                        operationType = "READ_LIST",
+                        entityType = "SCHEDULE",
+                        payload = serializeSchedules(schedules.map { scheduleDetails ->
+                            with(scheduleDetails) {
+                                Schedule(
+                                    id = scheduleId,
+                                    startTime,
+                                    endTime,
+                                    classPlace,
+                                    dayOfWeek,
+                                    specificDate,
+                                    courseId
+                                )
+                            }
+                        }),
+                        status = "PENDING",
+                        timestamp = LocalDateTime.now(ZoneOffset.UTC),
+                        userId = userId
+                    )
+                    pendingOperationLocalDataSource.insert(pendingOperation)
+                    scheduleSyncWorker()
+                }
+            }.map { it.map(ScheduleDetailsView::asExternalModel) }
     }
 
     override suspend fun registerSchedule(

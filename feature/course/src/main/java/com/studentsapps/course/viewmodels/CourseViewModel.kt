@@ -34,40 +34,6 @@ class CourseViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = CourseUiState.Loading
         )
-
-    /*init {
-        observeAndSyncCourses()
-    }*/
-
-    /*@OptIn(ExperimentalCoroutinesApi::class)
-    private fun observeAndSyncCourses() {
-        userManager.userId
-            .filterNotNull()
-            .distinctUntilChanged()
-            .flatMapLatest { userId ->
-                courseNetworkDataSource.observeCourses(userId).onEach { remoteCourses ->
-                    val localCourses = courseRepository.getAllCourseEntity(userId).lastOrNull()
-
-                    remoteCourses.forEach { remoteCourse ->
-                        val local = localCourses?.find { it.id == remoteCourse.id }
-                        if (local != null) {
-                            if (remoteCourse.lastModified.isAfter(local.lastModified)) {
-                                courseRepository.updateCourseEntity(remoteCourse.toCourseEntity())
-                            }
-                        } else {
-                            courseRepository.registerCourseEntity(remoteCourse.toCourseEntity())
-                        }
-                    }
-
-                    val remoteIds = remoteCourses.map { it.id }.toSet()
-                    val toDelete = localCourses?.filterNot { it.id in remoteIds }
-                    toDelete?.forEach {
-                        courseRepository.deleteCourseEntity(it.id)
-                    }
-                }
-            }
-            .launchIn(viewModelScope)
-    }*/
 }
 
 sealed interface CourseUiState {

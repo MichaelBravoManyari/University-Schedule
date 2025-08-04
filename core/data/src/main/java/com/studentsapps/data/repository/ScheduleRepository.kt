@@ -8,17 +8,17 @@ import java.time.LocalDate
 
 interface ScheduleRepository {
 
-    suspend fun getSchedulesForTimetableInGridMode(
+    fun getSchedulesForTimetableInGridMode(
         showSaturday: Boolean,
         showSunday: Boolean,
         startDate: LocalDate,
         endDate: LocalDate,
         userId: String
-    ): List<ScheduleDetails>
+    ): Flow<List<ScheduleDetails>>
 
-    suspend fun getSchedulesForTimetableInListMode(
+    fun getSchedulesForTimetableInListMode(
         date: LocalDate, userId: String
-    ): List<ScheduleDetails>
+    ): Flow<List<ScheduleDetails>>
 
     suspend fun registerSchedule(
         schedule: Schedule,

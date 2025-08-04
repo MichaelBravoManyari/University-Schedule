@@ -11,8 +11,12 @@ import com.studentsapps.model.ScheduleDetails
 import com.studentsapps.model.TimetableUserPreferences
 import com.studentsapps.ui.timetable.TimetableUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -20,6 +24,7 @@ import java.time.format.TextStyle
 import java.util.Locale
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class ScheduleViewModel @Inject constructor(
     private val timetableUserPreferencesRepository: TimetableUserPreferencesRepository,
@@ -40,7 +45,7 @@ class ScheduleViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            timetableUserPreferencesRepository.userData.collect { prefs ->
+            /*timetableUserPreferencesRepository.userData.collect { prefs ->
                 val initialDate = LocalDate.now()
                 val initialScheduleList = if (prefs.showAsGrid) {
                     val startDate = getStartDate(prefs, initialDate)
@@ -56,7 +61,32 @@ class ScheduleViewModel @Inject constructor(
                     timetableUserPreferences = prefs,
                     scheduleByDate = mapOf(initialDate to initialScheduleList)
                 )
-            }
+            }*/
+            timetableUserPreferencesRepository.userData
+                .flatMapLatest { prefs ->
+                    val initialDate = LocalDate.now()
+
+                    val scheduleFlow: Flow<List<ScheduleDetails>> = if (prefs.showAsGrid) {
+                        val startDate = getStartDate(prefs, initialDate)
+                        val endDate = getEndDate(prefs, initialDate)
+                        scheduleRepository.getSchedulesForTimetableInGridMode(
+                            prefs.showSaturday, prefs.showSunday, startDate, endDate, userId
+                        )
+                    } else {
+                        scheduleRepository.getSchedulesForTimetableInListMode(initialDate, userId)
+                    }
+
+                    scheduleFlow.map { scheduleList ->
+                        ScheduleUiState.Success(
+                            timetableUserPreferences = prefs,
+                            scheduleByDate = mapOf(initialDate to scheduleList),
+                            selectNowDay = false
+                        )
+                    }
+                }
+                .collect { uiState ->
+                    _uiState.value = uiState
+                }
         }
     }
 
@@ -72,7 +102,7 @@ class ScheduleViewModel @Inject constructor(
 
     fun loadScheduleForDate(date: LocalDate) {
         viewModelScope.launch {
-            _uiState.update { currentState ->
+            /*_uiState.update { currentState ->
                 if (currentState is ScheduleUiState.Success &&
                     !currentState.scheduleByDate.containsKey(date)
                 ) {
@@ -91,6 +121,34 @@ class ScheduleViewModel @Inject constructor(
                         scheduleByDate = currentState.scheduleByDate + (date to scheduleList)
                     )
                 } else currentState
+            }*/
+            val currentState = _uiState.value
+            if (currentState is ScheduleUiState.Success && !currentState.scheduleByDate.containsKey(date)) {
+                val prefs = currentState.timetableUserPreferences
+
+                val scheduleFlow: Flow<List<ScheduleDetails>> =
+                    if (prefs.showAsGrid) {
+                        val startDate = getStartDate(prefs, date)
+                        val endDate = getEndDate(prefs, date)
+                        scheduleRepository.getSchedulesForTimetableInGridMode(
+                            prefs.showSaturday, prefs.showSunday, startDate, endDate, userId
+                        )
+                    } else {
+                        scheduleRepository.getSchedulesForTimetableInListMode(date, userId)
+                    }
+
+                // Observar el flujo y actualizar el UiState cada vez que cambie
+                launch {
+                    scheduleFlow.collect { updatedList ->
+                        _uiState.update { ui ->
+                            if (ui is ScheduleUiState.Success) {
+                                ui.copy(
+                                    scheduleByDate = ui.scheduleByDate + (date to updatedList)
+                                )
+                            } else ui
+                        }
+                    }
+                }
             }
         }
     }

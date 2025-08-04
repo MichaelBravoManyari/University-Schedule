@@ -5,6 +5,7 @@ import com.studentsapps.database.model.ScheduleDetailsView
 import com.studentsapps.database.model.ScheduleEntity
 import com.studentsapps.database.test.data.scheduleDetailsList
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import java.time.DayOfWeek
 import java.time.LocalDate
 
@@ -15,13 +16,13 @@ class TestScheduleDao : ScheduleDao() {
 
     override suspend fun getScheduleDetailsById(scheduleId: String): ScheduleDetailsView = scheduleDetailsList.find { it.scheduleId == scheduleId }!!
 
-    override suspend fun getSchedulesForTimetableInGridMode(
+    override fun getSchedulesForTimetableInGridMode(
         showSaturday: Boolean,
         showSunday: Boolean,
         startDate: LocalDate,
         endDate: LocalDate,
         userId: String
-    ): List<ScheduleDetailsView> {
+    ): Flow<List<ScheduleDetailsView>> {
         val filteredByDayOfWeek = scheduleDetailsList.filter {
             it.specificDate == null && (showSaturday || it.dayOfWeek != DayOfWeek.SATURDAY) && (showSunday || it.dayOfWeek != DayOfWeek.SUNDAY)
         }
@@ -30,17 +31,19 @@ class TestScheduleDao : ScheduleDao() {
             it.specificDate != null && (showSaturday || it.dayOfWeek != DayOfWeek.SATURDAY) && (showSunday || it.dayOfWeek != DayOfWeek.SUNDAY) && it.specificDate!! in startDate..endDate
         }
 
-        return filteredByDayOfWeek + filteredBySpecificDate
+        return flow { filteredByDayOfWeek + filteredBySpecificDate }
     }
 
-    override suspend fun getSchedulesForTimetableInListMode(
+    override fun getSchedulesForTimetableInListMode(
         dayOfWeek: DayOfWeek,
         specificDate: LocalDate,
         userId: String
-    ): List<ScheduleDetailsView> {
-        return scheduleDetailsList.filter {
-            (it.dayOfWeek == dayOfWeek && it.specificDate == null) ||
-                    it.specificDate == specificDate
+    ): Flow<List<ScheduleDetailsView>> {
+        return flow {
+            scheduleDetailsList.filter {
+                (it.dayOfWeek == dayOfWeek && it.specificDate == null) ||
+                        it.specificDate == specificDate
+            }
         }
     }
 

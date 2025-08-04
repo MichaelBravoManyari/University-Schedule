@@ -7,6 +7,7 @@ import com.studentsapps.database.model.ScheduleDetailsView
 import com.studentsapps.database.model.ScheduleEntity
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -17,24 +18,22 @@ class ScheduleLocalDataSource @Inject constructor(
     @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher
 ) {
 
-    suspend fun getSchedulesForTimetableInGridMode(
+    fun getSchedulesForTimetableInGridMode(
         showSaturday: Boolean,
         showSunday: Boolean,
         startDate: LocalDate,
         endDate: LocalDate,
         userId: String
-    ): List<ScheduleDetailsView> = withContext(ioDispatcher) {
+    ): Flow<List<ScheduleDetailsView>> =
         scheduleDao.getSchedulesForTimetableInGridMode(
             showSaturday, showSunday, startDate, endDate, userId
         )
-    }
 
-    suspend fun getSchedulesForTimetableInListMode(
+    fun getSchedulesForTimetableInListMode(
         dayOfWeek: DayOfWeek, date: LocalDate, userId: String
-    ): List<ScheduleDetailsView> = withContext(ioDispatcher) {
+    ): Flow<List<ScheduleDetailsView>> =
         scheduleDao.getSchedulesForTimetableInListMode(dayOfWeek, date, userId)
-            .sortedBy { it.startTime }
-    }
+            .map { list -> list.sortedBy { it.startTime } }
 
     suspend fun insert(schedule: ScheduleEntity): Long = withContext(ioDispatcher) {
         scheduleDao.insert(schedule)
