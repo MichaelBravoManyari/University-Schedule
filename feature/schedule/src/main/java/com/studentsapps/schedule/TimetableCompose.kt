@@ -185,7 +185,7 @@ fun TimetableGrid(props: TimetableProps) {
 
         val scheduleList = props.scheduleByDate[currentDate].orEmpty()
 
-        val daysOfMonth  = props.getDaysOfMonthOfWeek(
+        val daysOfMonth = props.getDaysOfMonthOfWeek(
             prefs.isMondayFirstDayOfWeek, prefs.showSaturday, prefs.showSunday, currentDate
         )
 
@@ -198,30 +198,91 @@ fun TimetableGrid(props: TimetableProps) {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            CabezeraHorario(dayMap, currentDate, prefs.showAsGrid) {}
+            ScheduleHeader(
+                daysMap = dayMap,
+                currentDate = currentDate,
+                isGridMode = prefs.showAsGrid,
+                onDayClick = {}
+            )
             SchedulesGrid(
                 showSaturday = prefs.showSaturday,
                 showSunday = prefs.showSunday,
                 is12HoursFormat = prefs.is12HoursFormat,
                 isMondayFirstDayOfWeek = prefs.isMondayFirstDayOfWeek,
                 schedules = scheduleList.map { it.asScheduleView() },
-                onClickSchedule = props.onClickSchedule
+                onScheduleClick = props.onClickSchedule
             )
         }
     }
 }
 
 @Composable
-fun DiaSemana(
-    dia: String, numero: Int, ancho: Dp, select: Boolean, isNow: Boolean, onClick: () -> Unit
+fun ScheduleHeader(
+    daysMap: Map<String, LocalDate>,
+    currentDate: LocalDate,
+    isGridMode: Boolean,
+    onDayClick: (LocalDate) -> Unit
 ) {
-    val customFont = FontFamily(
+    BoxWithConstraints(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                color = MaterialTheme.colorScheme.primary
+            )
+            .padding(bottom = 10.dp)
+    ) {
+        val hoursCellWidth = dimensionResource(R.dimen.timetable_hours_cell_width)
+
+        val dayCellWidth = if (isGridMode) {
+            val availableWidth = maxWidth - hoursCellWidth
+            availableWidth / daysMap.size
+        } else {
+            maxWidth / daysMap.size
+        }
+
+        Row(
+            modifier = Modifier.padding(start = if (isGridMode) hoursCellWidth else 0.dp)
+        ) {
+            for ((dayName, date) in daysMap) {
+                val isSelected = if (isGridMode) {
+                    date == LocalDate.now()
+                } else {
+                    date == currentDate
+                }
+
+                val isToday = if (isGridMode && date == LocalDate.now()) true
+                else if (!isGridMode) date == LocalDate.now()
+                else false
+
+                WeekDayCell(
+                    dayLabel = dayName,
+                    dayNumber = date.dayOfMonth,
+                    cellWidth = dayCellWidth,
+                    isSelected = isSelected,
+                    isToday = isToday,
+                    onClick = { onDayClick(date) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun WeekDayCell(
+    dayLabel: String,
+    dayNumber: Int,
+    cellWidth: Dp,
+    isSelected: Boolean,
+    isToday: Boolean,
+    onClick: () -> Unit
+) {
+    val regularFont = FontFamily(
         Font(
             com.studentsapps.designsystem.R.font.roboto_regular, FontWeight.Normal
         )
     )
 
-    val customFont1 = FontFamily(
+    val mediumFont = FontFamily(
         Font(
             com.studentsapps.designsystem.R.font.roboto_medium, FontWeight.Normal
         )
@@ -231,16 +292,16 @@ fun DiaSemana(
 
     val backgroundColor by animateColorAsState(
         targetValue = when {
-            select && isNow -> MaterialTheme.colorScheme.background
-            select -> MaterialTheme.colorScheme.onPrimary
+            isSelected && isToday -> MaterialTheme.colorScheme.background
+            isSelected -> MaterialTheme.colorScheme.onPrimary
             else -> Color.Transparent
         }, animationSpec = tween(durationMillis = 250)
     )
 
     val textColor by animateColorAsState(
         targetValue = when {
-            select -> MaterialTheme.colorScheme.secondary
-            isNow -> MaterialTheme.colorScheme.background
+            isSelected -> MaterialTheme.colorScheme.secondary
+            isToday -> MaterialTheme.colorScheme.background
             else -> MaterialTheme.colorScheme.onPrimary
         }, animationSpec = tween(durationMillis = 250)
     )
@@ -248,14 +309,14 @@ fun DiaSemana(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .width(ancho)
+            .width(cellWidth)
             .padding(horizontal = 5.dp)
     ) {
         Text(
-            text = dia,
+            text = dayLabel,
             color = MaterialTheme.colorScheme.onPrimary,
             fontSize = 13.sp,
-            fontFamily = customFont
+            fontFamily = regularFont
         )
 
         Spacer(modifier = Modifier.height(5.dp))
@@ -271,12 +332,251 @@ fun DiaSemana(
                 ), contentAlignment = Alignment.Center
         ) {
             Text(
-                text = numero.toString(),
+                text = dayNumber.toString(),
                 color = textColor,
                 fontSize = 15.sp,
-                fontFamily = customFont1
+                fontFamily = mediumFont
             )
         }
+    }
+}
+
+@Composable
+fun SchedulesGrid(
+    modifier: Modifier = Modifier,
+    showSaturday: Boolean,
+    showSunday: Boolean,
+    is12HoursFormat: Boolean,
+    isMondayFirstDayOfWeek: Boolean,
+    schedules: List<ScheduleView>,
+    onScheduleClick: (String) -> Unit
+) {
+    val density = LocalDensity.current
+    val textMeasurer = rememberTextMeasurer()
+    val hoursCellWidth = dimensionResource(R.dimen.timetable_hours_cell_width)
+    val hoursCellWidthPx = with(density) { hoursCellWidth.toPx() }
+    val columnCount = getColumnsNumber(showSaturday, showSunday)
+    val gridCellHeight = dimensionResource(R.dimen.timetable_grid_cell_height)
+    val gridCellHeightPx = with(density) { gridCellHeight.toPx() }
+    val canvasHeight = gridCellHeight * 24
+    val lineStrokeWidth = dimensionResource(R.dimen.timetable_grid_lines_stroke_width)
+    val lineStrokeWidthPx = with(density) { lineStrokeWidth .toPx() }
+    val verticalLineCount = getNumVerticalGridLines(showSaturday, showSunday)
+    val horizontalLineCount = 24
+    val gridLineColor = colorResource(R.color.timetable_default_grid_stroke_color)
+    val halfHourLineColor =
+        colorResource(R.color.timetable_default_half_hour_grid_stroke_color)
+    val hoursTextSize = dimensionResource(R.dimen.timetable_hours_text_size).value.sp
+    val hoursTextColor = colorResource(R.color.timetable_default_hours_text_color)
+    val hourLabels =
+        stringArrayResource(if (is12HoursFormat) R.array.hours_in_12_hour_format else R.array.hours_in_24_hour_format).toList()
+    val hourTextXPosition = hoursCellWidthPx / 2
+    val scheduleEndPadding = dimensionResource(R.dimen.timetable_schedule_end_margin)
+    val scheduleBottomPadding = dimensionResource(R.dimen.timetable_schedule_bottom_margin)
+    val scrollState = rememberScrollState()
+    var targetOffsetY by remember { mutableStateOf(0) }
+
+    LaunchedEffect(targetOffsetY) {
+        scrollState.scrollTo(targetOffsetY)
+    }
+
+    BoxWithConstraints(
+        modifier = modifier
+            .verticalScroll(scrollState)
+            .heightIn(min = canvasHeight)
+    ) {
+        val totalWidthPx = with(density) { maxWidth.toPx() }
+        val cellWidthPx = calculateGridCellWidth(
+            rootViewWidthPx = totalWidthPx,
+            hoursCellWidthPx = hoursCellWidthPx,
+            columnsNumber = columnCount
+        )
+
+        val cellWidth = with(density) { cellWidthPx.toDp() }
+
+        Canvas(
+            modifier = modifier
+                .fillMaxWidth()
+                .height(canvasHeight)
+        ) {
+            for (i in 1..verticalLineCount) {
+                val x = hoursCellWidthPx + i * cellWidthPx
+                drawLine(
+                    start = Offset(x, 0f),
+                    end = Offset(x, size.height),
+                    color = gridLineColor,
+                    strokeWidth = lineStrokeWidthPx
+                )
+            }
+
+            for (i in 1..horizontalLineCount) {
+                val y = i * gridCellHeightPx
+                drawLine(
+                    start = Offset(hoursCellWidthPx, y),
+                    end = Offset(size.width, y),
+                    color = gridLineColor,
+                    strokeWidth = lineStrokeWidthPx
+                )
+            }
+
+            for (i in 1..horizontalLineCount) {
+                val y = ((i - 1) * gridCellHeightPx) + (gridCellHeightPx / 2)
+                drawLine(
+                    start = Offset(hoursCellWidthPx, y),
+                    end = Offset(size.width, y),
+                    color = halfHourLineColor,
+                    strokeWidth = lineStrokeWidthPx
+                )
+            }
+
+            if (is12HoursFormat) {
+                hourLabels.forEachIndexed { index, hour ->
+                    val parts = hour.split(" ")
+                    parts.forEachIndexed { partIndex, part ->
+                        val layoutResult = textMeasurer.measure(
+                            text = AnnotatedString(part), style = TextStyle(
+                                color = hoursTextColor,
+                                fontSize = hoursTextSize,
+                                textAlign = TextAlign.Center
+                            )
+                        )
+                        val baseY = gridCellHeightPx * (index + 1)
+                        val y =
+                            baseY + (partIndex * layoutResult.size.height) - layoutResult.size.height
+                        drawText(
+                            textLayoutResult = layoutResult,
+                            topLeft = Offset(hourTextXPosition - layoutResult.size.width / 2f, y)
+                        )
+                    }
+                }
+            } else {
+                hourLabels.forEachIndexed { index, hour ->
+                    val layoutResult = textMeasurer.measure(
+                        text = AnnotatedString(hour), style = TextStyle(
+                            color = hoursTextColor,
+                            fontSize = hoursTextSize,
+                            textAlign = TextAlign.Center
+                        )
+                    )
+                    val y = (gridCellHeightPx * (index + 1)) - (layoutResult.size.height / 2)
+                    drawText(
+                        textLayoutResult = layoutResult,
+                        topLeft = Offset(hourTextXPosition - layoutResult.size.width / 2f, y)
+                    )
+                }
+            }
+        }
+
+        schedules.groupByDayOfWeek().forEach { (dayOfWeek, schedulesForOneDayOfWeek) ->
+            if ((dayOfWeek != DayOfWeek.SUNDAY || showSunday) && (dayOfWeek != DayOfWeek.SATURDAY || showSaturday)) {
+                val scheduleCrossing = schedulesForOneDayOfWeek.getCrossSchedules()
+                val uniqueSchedules = schedulesForOneDayOfWeek.getUniqueSchedules()
+
+                scheduleCrossing.forEach { crossSchedules ->
+                    crossSchedules.forEachIndexed { index, schedule ->
+                        val crossedSchedulesCount = crossSchedules.size
+                        val width = when (crossedSchedulesCount) {
+                            1 -> calculateSingleScheduleViewWidth(cellWidth, scheduleEndPadding)
+                            else -> calculateCrossScheduleViewWidth(
+                                cellWidth, crossedSchedulesCount, scheduleEndPadding
+                            )
+                        }
+                        val height = calculateScheduleViewHeight(
+                            schedule.startTime,
+                            schedule.endTime,
+                            gridCellHeight,
+                            scheduleBottomPadding
+                        )
+
+                        val ySchedule =
+                            calculateTopMarginScheduleView(schedule.startTime, gridCellHeight)
+
+                        val xSchedule = when (crossedSchedulesCount) {
+                            1 -> calculateStartMarginSingleScheduleView(
+                                hoursCellWidth,
+                                cellWidth,
+                                schedule.dayOfWeek,
+                                isMondayFirstDayOfWeek,
+                                showSaturday,
+                                showSunday
+                            )
+
+                            else -> calculateStartMarginCrossScheduleView(
+                                hoursCellWidth,
+                                cellWidth,
+                                schedule.dayOfWeek,
+                                isMondayFirstDayOfWeek,
+                                showSaturday,
+                                showSunday,
+                                crossedSchedulesCount,
+                                index
+                            )
+                        }
+                        HorarioTimetableGrid(
+                            nombreCurso = schedule.courseName,
+                            lugar = schedule.classPlace,
+                            altura = height,
+                            anchura = width,
+                            modifier = Modifier.absoluteOffset(x = xSchedule, y = ySchedule),
+                            backgroundColor = schedule.color,
+                            onClick = { onScheduleClick(schedule.id) })
+                    }
+                }
+
+                uniqueSchedules.forEach { uniqueSchedule ->
+                    val width = calculateSingleScheduleViewWidth(cellWidth, scheduleEndPadding)
+
+                    val height = calculateScheduleViewHeight(
+                        uniqueSchedule.startTime,
+                        uniqueSchedule.endTime,
+                        gridCellHeight,
+                        scheduleBottomPadding
+                    )
+
+                    val ySchedule =
+                        calculateTopMarginScheduleView(uniqueSchedule.startTime, gridCellHeight)
+
+                    val xSchedule = calculateStartMarginSingleScheduleView(
+                        hoursCellWidth,
+                        cellWidth,
+                        uniqueSchedule.dayOfWeek,
+                        isMondayFirstDayOfWeek,
+                        showSaturday,
+                        showSunday
+                    )
+
+                    HorarioTimetableGrid(
+                        nombreCurso = uniqueSchedule.courseName,
+                        lugar = uniqueSchedule.classPlace,
+                        altura = height,
+                        anchura = width,
+                        modifier = Modifier.absoluteOffset(x = xSchedule, y = ySchedule),
+                        backgroundColor = uniqueSchedule.color,
+                        onClick = { onScheduleClick(uniqueSchedule.id) })
+                }
+            }
+        }
+
+        val topCurrentHour = calculateSelectorTopMargin(gridCellHeightPx)
+
+        Box(
+            modifier = Modifier
+                .absoluteOffset(
+                    x = hoursCellWidth, y = with(density) { topCurrentHour.toDp() })
+                .size(width = maxWidth - hoursCellWidth, 1.dp)
+                .background(MaterialTheme.colorScheme.background)
+        )
+
+        Box(
+            modifier = Modifier
+                .absoluteOffset(
+                    x = hoursCellWidth, y = with(density) { topCurrentHour.toDp() - 3.dp })
+                .size(8.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.background)
+        )
+
+        targetOffsetY = topCurrentHour.toInt() - (gridCellHeightPx * 4).toInt()
     }
 }
 
@@ -331,49 +631,6 @@ fun HorarioListItem(
                         color = textColor
                     )
                 }
-            }
-        }
-    }
-}
-
-@Composable
-fun CabezeraHorario(
-    dias: Map<String, LocalDate>,
-    currentDate: LocalDate,
-    isTimetableModeGrid: Boolean,
-    onDayClick: (LocalDate) -> Unit
-) {
-    BoxWithConstraints(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                color = MaterialTheme.colorScheme.primary
-            )
-            .padding(bottom = 10.dp)
-    ) {
-        val hoursCellWidth = dimensionResource(R.dimen.timetable_hours_cell_width)
-
-        val anchoDiaSemana = if (isTimetableModeGrid) {
-            val anchoDisponibleDp = maxWidth - hoursCellWidth
-            anchoDisponibleDp / dias.size
-        } else {
-            maxWidth / dias.size
-        }
-
-        Row(
-            modifier = Modifier.padding(start = if (isTimetableModeGrid) hoursCellWidth else 0.dp)
-        ) {
-            for (dia in dias) {
-                DiaSemana(
-                    dia.key,
-                    dia.value.dayOfMonth,
-                    anchoDiaSemana,
-                    if (isTimetableModeGrid) dia.value == LocalDate.now()
-                    else dia.value == currentDate,
-                    if (isTimetableModeGrid && dia.value == LocalDate.now()) true
-                    else if (!isTimetableModeGrid) dia.value == LocalDate.now()
-                    else false,
-                    onClick = { onDayClick(dia.value) })
             }
         }
     }
@@ -442,12 +699,12 @@ fun TimetableList(/*prefs: TimetableUserPreferences,
         val range = (0 - daysBefore)..daysAfter
 
         range.map { today.plusDays(it.toLong()) }.filter { date ->
-                when (date.dayOfWeek) {
-                    DayOfWeek.SATURDAY -> prefs.showSaturday
-                    DayOfWeek.SUNDAY -> prefs.showSunday
-                    else -> true
-                }
+            when (date.dayOfWeek) {
+                DayOfWeek.SATURDAY -> prefs.showSaturday
+                DayOfWeek.SUNDAY -> prefs.showSunday
+                else -> true
             }
+        }
     }
 
     val initialPage = remember(visibleDates) {
@@ -481,22 +738,22 @@ fun TimetableList(/*prefs: TimetableUserPreferences,
 
         LaunchedEffect(pagerState) {
             snapshotFlow { pagerState.settledPage }.collect { page ->
-                    val dateContent = visibleDates[page]
-                    val curentDateCabezera =
-                        visibleDates[initialPage].plusWeeks((pagerCabezeraState.currentPage - initialPage).toLong())
-                    val rangeDate = props.getDaysOfMonthOfWeek(
-                        prefs.isMondayFirstDayOfWeek,
-                        prefs.showSaturday,
-                        prefs.showSunday,
-                        curentDateCabezera
-                    )
-                    props.updateCurrentMonth(dateContent)
-                    if (!rangeDate.contains(dateContent)) {
-                        val navigatePageCabezeraPager =
-                            if (dateContent < rangeDate.first()) pagerCabezeraState.currentPage - 1 else pagerCabezeraState.currentPage + 1
-                        pagerCabezeraState.animateScrollToPage(navigatePageCabezeraPager)
-                    }
+                val dateContent = visibleDates[page]
+                val curentDateCabezera =
+                    visibleDates[initialPage].plusWeeks((pagerCabezeraState.currentPage - initialPage).toLong())
+                val rangeDate = props.getDaysOfMonthOfWeek(
+                    prefs.isMondayFirstDayOfWeek,
+                    prefs.showSaturday,
+                    prefs.showSunday,
+                    curentDateCabezera
+                )
+                props.updateCurrentMonth(dateContent)
+                if (!rangeDate.contains(dateContent)) {
+                    val navigatePageCabezeraPager =
+                        if (dateContent < rangeDate.first()) pagerCabezeraState.currentPage - 1 else pagerCabezeraState.currentPage + 1
+                    pagerCabezeraState.animateScrollToPage(navigatePageCabezeraPager)
                 }
+            }
         }
 
         LaunchedEffect(props.selectNowDay) {
@@ -618,247 +875,6 @@ fun WrapContentHorizontalPager(
             .height(with(LocalDensity.current) { pageHeight.toDp() })
     ) { pageIndex ->
         content(pageIndex)
-    }
-}
-
-@Composable
-fun SchedulesGrid(
-    modifier: Modifier = Modifier,
-    showSaturday: Boolean,
-    showSunday: Boolean,
-    is12HoursFormat: Boolean,
-    isMondayFirstDayOfWeek: Boolean,
-    schedules: List<ScheduleView>,
-    onClickSchedule: (String) -> Unit
-) {
-    val density = LocalDensity.current
-    val textMeasurer = rememberTextMeasurer()
-    val hoursCellWidth = dimensionResource(R.dimen.timetable_hours_cell_width)
-    val hoursCellWidthPx = with(density) { hoursCellWidth.toPx() }
-    val columnsNumber = getColumnsNumber(showSaturday, showSunday)
-    val gridCellHeight = dimensionResource(R.dimen.timetable_grid_cell_height)
-    val gridCellHeightPx = with(density) { gridCellHeight.toPx() }
-    val canvasHeight = gridCellHeight * 24
-    val lineWidth = dimensionResource(R.dimen.timetable_grid_lines_stroke_width)
-    val lineWidthPx = with(density) { lineWidth.toPx() }
-    val numVerticalGridLines = getNumVerticalGridLines(showSaturday, showSunday)
-    val numHorizontalGridLines = 24
-    val gridStrokeColor = colorResource(R.color.timetable_default_grid_stroke_color)
-    val halfHourGridStrokeColor =
-        colorResource(R.color.timetable_default_half_hour_grid_stroke_color)
-    val hoursTextSize = dimensionResource(R.dimen.timetable_hours_text_size).value.sp
-    val hoursTextColor = colorResource(R.color.timetable_default_hours_text_color)
-    val hoursText =
-        stringArrayResource(if (is12HoursFormat) R.array.hours_in_12_hour_format else R.array.hours_in_24_hour_format).toList()
-    val xDrawText = hoursCellWidthPx / 2
-    val scheduleEndPadding = dimensionResource(R.dimen.timetable_schedule_end_margin)
-    //val scheduleEndPaddingPx = with(density) { scheduleEndPadding.toPx() }
-    val scheduleBottomPadding = dimensionResource(R.dimen.timetable_schedule_bottom_margin)
-    //val scheduleBottomPaddingPx = with(density) { scheduleBottomPadding.toPx() }
-    val scrollState = rememberScrollState()
-    var targetOffsetY by remember { mutableStateOf(0) }
-
-    LaunchedEffect(targetOffsetY) {
-        scrollState.scrollTo(targetOffsetY)
-    }
-
-    BoxWithConstraints(
-        modifier = modifier
-            .verticalScroll(scrollState)
-            .heightIn(min = canvasHeight)
-    ) {
-        val totalWidthPx = with(density) { maxWidth.toPx() }
-        val gridCellWidthPx = calculateGridCellWidth(
-            rootViewWidthPx = totalWidthPx,
-            hoursCellWidthPx = hoursCellWidthPx,
-            columnsNumber = columnsNumber
-        )
-
-        val gridCellWidth = with(density) { gridCellWidthPx.toDp() }
-
-        Canvas(
-            modifier = modifier
-                .fillMaxWidth()
-                .height(canvasHeight)
-        ) {
-            for (i in 1..numVerticalGridLines) {
-                val x = hoursCellWidthPx + i * gridCellWidthPx
-                drawLine(
-                    start = Offset(x, 0f),
-                    end = Offset(x, size.height),
-                    color = gridStrokeColor,
-                    strokeWidth = lineWidthPx
-                )
-            }
-
-            for (i in 1..numHorizontalGridLines) {
-                val y = i * gridCellHeightPx
-                drawLine(
-                    start = Offset(hoursCellWidthPx, y),
-                    end = Offset(size.width, y),
-                    color = gridStrokeColor,
-                    strokeWidth = lineWidthPx
-                )
-            }
-
-            for (i in 1..numHorizontalGridLines) {
-                val y = ((i - 1) * gridCellHeightPx) + (gridCellHeightPx / 2)
-                drawLine(
-                    start = Offset(hoursCellWidthPx, y),
-                    end = Offset(size.width, y),
-                    color = halfHourGridStrokeColor,
-                    strokeWidth = lineWidthPx
-                )
-            }
-
-            if (is12HoursFormat) {
-                hoursText.forEachIndexed { index, hour ->
-                    val parts = hour.split(" ")
-                    parts.forEachIndexed { partIndex, part ->
-                        val layoutResult = textMeasurer.measure(
-                            text = AnnotatedString(part), style = TextStyle(
-                                color = hoursTextColor,
-                                fontSize = hoursTextSize,
-                                textAlign = TextAlign.Center
-                            )
-                        )
-                        val baseY = gridCellHeightPx * (index + 1)
-                        val y =
-                            baseY + (partIndex * layoutResult.size.height) - layoutResult.size.height
-                        drawText(
-                            textLayoutResult = layoutResult,
-                            topLeft = Offset(xDrawText - layoutResult.size.width / 2f, y)
-                        )
-                    }
-                }
-            } else {
-                hoursText.forEachIndexed { index, hour ->
-                    val layoutResult = textMeasurer.measure(
-                        text = AnnotatedString(hour), style = TextStyle(
-                            color = hoursTextColor,
-                            fontSize = hoursTextSize,
-                            textAlign = TextAlign.Center
-                        )
-                    )
-                    val y = (gridCellHeightPx * (index + 1)) - (layoutResult.size.height / 2)
-                    drawText(
-                        textLayoutResult = layoutResult,
-                        topLeft = Offset(xDrawText - layoutResult.size.width / 2f, y)
-                    )
-                }
-            }
-        }
-
-        schedules.groupByDayOfWeek().forEach { (dayOfWeek, schedulesForOneDayOfWeek) ->
-            if ((dayOfWeek != DayOfWeek.SUNDAY || showSunday) && (dayOfWeek != DayOfWeek.SATURDAY || showSaturday)) {
-                val scheduleCrossing = schedulesForOneDayOfWeek.getCrossSchedules()
-                val uniqueSchedules = schedulesForOneDayOfWeek.getUniqueSchedules()
-
-                scheduleCrossing.forEach { crossSchedules ->
-                    crossSchedules.forEachIndexed { index, schedule ->
-                        val crossedSchedulesCount = crossSchedules.size
-                        val width = when (crossedSchedulesCount) {
-                            1 -> calculateSingleScheduleViewWidth(gridCellWidth, scheduleEndPadding)
-                            else -> calculateCrossScheduleViewWidth(
-                                gridCellWidth, crossedSchedulesCount, scheduleEndPadding
-                            )
-                        }
-                        val height = calculateScheduleViewHeight(
-                            schedule.startTime,
-                            schedule.endTime,
-                            gridCellHeight,
-                            scheduleBottomPadding
-                        )
-
-                        val ySchedule =
-                            calculateTopMarginScheduleView(schedule.startTime, gridCellHeight)
-
-                        val xSchedule = when (crossedSchedulesCount) {
-                            1 -> calculateStartMarginSingleScheduleView(
-                                hoursCellWidth,
-                                gridCellWidth,
-                                schedule.dayOfWeek,
-                                isMondayFirstDayOfWeek,
-                                showSaturday,
-                                showSunday
-                            )
-
-                            else -> calculateStartMarginCrossScheduleView(
-                                hoursCellWidth,
-                                gridCellWidth,
-                                schedule.dayOfWeek,
-                                isMondayFirstDayOfWeek,
-                                showSaturday,
-                                showSunday,
-                                crossedSchedulesCount,
-                                index
-                            )
-                        }
-                        HorarioTimetableGrid(
-                            nombreCurso = schedule.courseName,
-                            lugar = schedule.classPlace,
-                            altura = height,
-                            anchura = width,
-                            modifier = Modifier.absoluteOffset(x = xSchedule, y = ySchedule),
-                            backgroundColor = schedule.color,
-                            onClick = { onClickSchedule(schedule.id) })
-                    }
-                }
-
-                uniqueSchedules.forEach { uniqueSchedule ->
-                    val width = calculateSingleScheduleViewWidth(gridCellWidth, scheduleEndPadding)
-
-                    val height = calculateScheduleViewHeight(
-                        uniqueSchedule.startTime,
-                        uniqueSchedule.endTime,
-                        gridCellHeight,
-                        scheduleBottomPadding
-                    )
-
-                    val ySchedule =
-                        calculateTopMarginScheduleView(uniqueSchedule.startTime, gridCellHeight)
-
-                    val xSchedule = calculateStartMarginSingleScheduleView(
-                        hoursCellWidth,
-                        gridCellWidth,
-                        uniqueSchedule.dayOfWeek,
-                        isMondayFirstDayOfWeek,
-                        showSaturday,
-                        showSunday
-                    )
-
-                    HorarioTimetableGrid(
-                        nombreCurso = uniqueSchedule.courseName,
-                        lugar = uniqueSchedule.classPlace,
-                        altura = height,
-                        anchura = width,
-                        modifier = Modifier.absoluteOffset(x = xSchedule, y = ySchedule),
-                        backgroundColor = uniqueSchedule.color,
-                        onClick = { onClickSchedule(uniqueSchedule.id) })
-                }
-            }
-        }
-
-        val topCurrentHour = calculateSelectorTopMargin(gridCellHeightPx)
-
-        Box(
-            modifier = Modifier
-                .absoluteOffset(
-                    x = hoursCellWidth, y = with(density) { topCurrentHour.toDp() })
-                .size(width = maxWidth - hoursCellWidth, 1.dp)
-                .background(MaterialTheme.colorScheme.background)
-        )
-
-        Box(
-            modifier = Modifier
-                .absoluteOffset(
-                    x = hoursCellWidth, y = with(density) { topCurrentHour.toDp() - 3.dp })
-                .size(8.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.background)
-        )
-
-        targetOffsetY = topCurrentHour.toInt() - (gridCellHeightPx * 4).toInt()
     }
 }
 
