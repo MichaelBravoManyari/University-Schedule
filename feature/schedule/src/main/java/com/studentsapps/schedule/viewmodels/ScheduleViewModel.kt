@@ -102,26 +102,6 @@ class ScheduleViewModel @Inject constructor(
 
     fun loadScheduleForDate(date: LocalDate) {
         viewModelScope.launch {
-            /*_uiState.update { currentState ->
-                if (currentState is ScheduleUiState.Success &&
-                    !currentState.scheduleByDate.containsKey(date)
-                ) {
-                    val prefs = currentState.timetableUserPreferences
-                    val scheduleList = if (prefs.showAsGrid) {
-                        val startDate = getStartDate(prefs, date)
-                        val endDate = getEndDate(prefs, date)
-                        scheduleRepository.getSchedulesForTimetableInGridMode(
-                            prefs.showSaturday, prefs.showSunday, startDate, endDate, userId
-                        )
-                    } else {
-                        scheduleRepository.getSchedulesForTimetableInListMode(date, userId)
-                    }
-
-                    currentState.copy(
-                        scheduleByDate = currentState.scheduleByDate + (date to scheduleList)
-                    )
-                } else currentState
-            }*/
             val currentState = _uiState.value
             if (currentState is ScheduleUiState.Success && !currentState.scheduleByDate.containsKey(date)) {
                 val prefs = currentState.timetableUserPreferences
