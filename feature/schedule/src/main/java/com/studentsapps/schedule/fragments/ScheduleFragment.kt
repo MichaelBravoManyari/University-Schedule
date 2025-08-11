@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
@@ -18,6 +19,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.findNavController
+import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupWithNavController
 import com.google.firebase.auth.FirebaseAuth
@@ -40,6 +42,11 @@ class ScheduleFragment : Fragment() {
     private var _binding: FragmentScheduleBinding? = null
     private val binding get() = _binding!!
     private val viewModel: ScheduleViewModel by viewModels()
+
+    private val destinationChangedListener =
+        NavController.OnDestinationChangedListener { _, _, _ ->
+            binding.toolbar.navigationIcon = null
+        }
 
     @Inject
     lateinit var auth: FirebaseAuth
@@ -64,7 +71,8 @@ class ScheduleFragment : Fragment() {
             )
 
             setContent {
-                UniversityScheduleTheme {
+                val isDark = isSystemInDarkTheme()
+                UniversityScheduleTheme(darkTheme = isDark) {
                     TimetableCompose(viewModel) { scheduleId ->
                         navController.navigate(
                             ScheduleFragmentDirections.actionScheduleFragmentToModalBottomSheetSchedule(
@@ -90,6 +98,7 @@ class ScheduleFragment : Fragment() {
             })
 
         navController = view.findNavController()
+        val appBarConfiguration = AppBarConfiguration(setOf(R.id.scheduleFragment))
 
         observeCurrentMonth()
 
@@ -108,7 +117,9 @@ class ScheduleFragment : Fragment() {
             }
         }
 
-        binding.toolbar.setupWithNavController(navController)
+        binding.toolbar.setupWithNavController(navController, appBarConfiguration)
+        navController.addOnDestinationChangedListener(destinationChangedListener)
+
         configureMenuOptionsInAppBar()
     }
 
@@ -197,6 +208,7 @@ class ScheduleFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        navController.removeOnDestinationChangedListener(destinationChangedListener)
         _binding = null
     }
 }

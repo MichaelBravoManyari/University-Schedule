@@ -30,6 +30,11 @@ class CourseFragment : Fragment() {
     private lateinit var navController: NavController
     private val viewModel: CourseViewModel by viewModels()
 
+    private val destinationChangedListener =
+        NavController.OnDestinationChangedListener { _, _, _ ->
+            binding.toolbar.navigationIcon = null
+        }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -72,6 +77,7 @@ class CourseFragment : Fragment() {
         }
 
         binding.toolbar.setupWithNavController(navController, appBarConfiguration)
+        navController.addOnDestinationChangedListener(destinationChangedListener)
     }
 
     fun navigateToCourseRegistrationFragment() {
@@ -80,6 +86,7 @@ class CourseFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        navController.removeOnDestinationChangedListener(destinationChangedListener)
         _binding = null
     }
 }

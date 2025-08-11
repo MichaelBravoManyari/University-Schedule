@@ -5,6 +5,7 @@ import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -51,9 +52,41 @@ class MainActivity : AppCompatActivity() {
         navController = navHostFragment.navController
     }
 
-    private fun setupBottomNavAndRail() {
+    /*private fun setupBottomNavAndRail() {
         binding.bottomNavView?.setupWithNavController(navController)
         binding.navigationRail?.setupWithNavController(navController)
+    }*/
+
+    private fun setupBottomNavAndRail() {
+        binding.bottomNavView?.apply {
+            setupWithNavController(navController)
+            setOnItemSelectedListener { item ->
+                navigateWithFade(item.itemId)
+                true
+            }
+        }
+
+        binding.navigationRail?.apply {
+            setupWithNavController(navController)
+            setOnItemSelectedListener { item ->
+                navigateWithFade(item.itemId)
+                true
+            }
+        }
+    }
+
+    private fun navigateWithFade(destinationId: Int) {
+        val options = NavOptions.Builder()
+            .setLaunchSingleTop(true)
+            .setEnterAnim(R.anim.fade_in)
+            .setExitAnim(R.anim.fade_out)
+            .setPopEnterAnim(R.anim.fade_in)
+            .setPopExitAnim(R.anim.fade_out)
+            .build()
+
+        if (navController.currentDestination?.id != destinationId) {
+            navController.navigate(destinationId, null, options)
+        }
     }
 
     private fun observeDestinationChanges() {

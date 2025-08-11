@@ -57,4 +57,6 @@
     <string name="sign_out">Sign out</string>
     <string name="mail">Mail</string>
     <string name="no_user">No user</string>
+    <string name="no_schedules_this_day">No schedules for this day</string>
+    <string name="loading_preferences">Loading preferences</string>
 </resources>

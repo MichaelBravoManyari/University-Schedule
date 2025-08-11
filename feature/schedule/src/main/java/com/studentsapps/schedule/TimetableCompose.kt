@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -81,14 +80,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.core.graphics.ColorUtils
 import com.studentsapps.model.ScheduleDetails
 import com.studentsapps.model.TimetableUserPreferences
@@ -145,7 +142,21 @@ fun TimetableCompose(viewModel: ScheduleViewModel, onClickSchedule: (String) -> 
 
         else -> {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Cargando preferencias...")
+                val regularFont = FontFamily(
+                    Font(
+                        com.studentsapps.designsystem.R.font.roboto_regular,
+                        FontWeight.Normal
+                    )
+                )
+
+                Text(
+                    text = stringResource(com.studentsapps.schedule.R.string.loading_preferences),
+                    modifier = Modifier.align(Alignment.Center),
+                    textAlign = TextAlign.Center,
+                    fontFamily = regularFont,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontSize = 16.sp
+                )
             }
         }
     }
@@ -349,22 +360,42 @@ fun TimetableList(props: TimetableProps) {
                 val scheduleList =
                     if (prefs.showAsGrid) emptyList() else props.scheduleByDate[date].orEmpty()
 
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(scheduleList.map { it.asScheduleView() }) { schedule ->
-                        val startTime =
-                            if (prefs.is12HoursFormat) formatLocalTime(schedule.startTime) else schedule.startTime.toString()
-                        val endTime =
-                            if (prefs.is12HoursFormat) formatLocalTime(schedule.endTime) else schedule.endTime.toString()
-                        ScheduleListItem(
-                            courseName = schedule.courseName,
-                            timeRange = "$startTime-$endTime",
-                            classroom = schedule.classPlace,
-                            backgroundColor = schedule.color,
-                            onClick = { props.onClickSchedule(schedule.id) }
+                Box(modifier = Modifier.fillMaxSize()) {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(scheduleList.map { it.asScheduleView() }) { schedule ->
+                            val startTime =
+                                if (prefs.is12HoursFormat) formatLocalTime(schedule.startTime) else schedule.startTime.toString()
+                            val endTime =
+                                if (prefs.is12HoursFormat) formatLocalTime(schedule.endTime) else schedule.endTime.toString()
+                            ScheduleListItem(
+                                courseName = schedule.courseName,
+                                timeRange = "$startTime-$endTime",
+                                classroom = schedule.classPlace,
+                                backgroundColor = schedule.color,
+                                onClick = { props.onClickSchedule(schedule.id) }
+                            )
+                        }
+                    }
+
+                    if (!prefs.showAsGrid && scheduleList.isEmpty()) {
+                        val regularFont = FontFamily(
+                            Font(
+                                com.studentsapps.designsystem.R.font.roboto_regular,
+                                FontWeight.Normal
+                            )
+                        )
+
+                        Text(
+                            text = stringResource(com.studentsapps.schedule.R.string.no_schedules_this_day),
+                            modifier = Modifier.align(Alignment.Center),
+                            textAlign = TextAlign.Center,
+                            fontFamily = regularFont,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            fontSize = 16.sp
                         )
                     }
                 }
@@ -760,10 +791,11 @@ fun TimetableScheduleItem(
     Column(
         modifier = modifier
             .size(width, height)
+            .clickable { onClick() }
             .clip(RoundedCornerShape(5.dp))
             .background(Color(backgroundColor))
             .padding(5.dp)
-            .clickable { onClick() }) {
+    ) {
         Text(
             text = courseName,
             fontFamily = fontFamilyMedium,
@@ -835,43 +867,6 @@ fun ScheduleListItem(
                 }
             }
         }
-    }
-}
-
-@Composable
-fun AutoHeightHorizontalPager(
-    pagerState: PagerState,
-    modifier: Modifier = Modifier,
-    key: ((index: Int) -> Any)? = null,
-    isScrollEnabled: Boolean = true,
-    extraPagesToPreload: Int = 0,
-    pageContent: @Composable (page: Int) -> Unit
-) {
-    var currentPageHeight by remember { mutableIntStateOf(0) }
-
-    SubcomposeLayout(modifier = modifier) { constraints ->
-        val placeables = subcompose("measure") {
-            Box(Modifier.fillMaxWidth()) {
-                pageContent(pagerState.currentPage)
-            }
-        }.map { it.measure(constraints) }
-
-        val maxHeight = placeables.maxOfOrNull { it.height } ?: constraints.minHeight
-        currentPageHeight = maxHeight
-
-        layout(0, 0) {}
-    }
-
-    HorizontalPager(
-        state = pagerState,
-        key = key,
-        userScrollEnabled = isScrollEnabled,
-        beyondViewportPageCount = extraPagesToPreload,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(with(LocalDensity.current) { currentPageHeight.toDp() })
-    ) { pageIndex ->
-        pageContent(pageIndex)
     }
 }
 
