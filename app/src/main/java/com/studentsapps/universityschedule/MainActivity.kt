@@ -52,11 +52,6 @@ class MainActivity : AppCompatActivity() {
         navController = navHostFragment.navController
     }
 
-    /*private fun setupBottomNavAndRail() {
-        binding.bottomNavView?.setupWithNavController(navController)
-        binding.navigationRail?.setupWithNavController(navController)
-    }*/
-
     private fun setupBottomNavAndRail() {
         binding.bottomNavView?.apply {
             setupWithNavController(navController)

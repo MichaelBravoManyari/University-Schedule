@@ -1,6 +1,7 @@
 package com.studentsapps.course.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +18,12 @@ import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.FullScreenContentCallback
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.studentsapps.course.R
@@ -36,6 +43,7 @@ class RegisterCourseFragment : Fragment() {
     private val viewModel: RegisterCourseViewModel by viewModels()
     private var courseId = ""
     private var navigatedFromTimeLoggingDestination = false
+    private var interstitialAd: InterstitialAd? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -65,6 +73,8 @@ class RegisterCourseFragment : Fragment() {
             binding.btnDeleteCourse.visibility = View.VISIBLE
         }
 
+        loadInterstitialAd()
+
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { uiState ->
@@ -80,7 +90,7 @@ class RegisterCourseFragment : Fragment() {
     private fun handleUiState(uiState: RegisterCourseUiState) {
         if (uiState.isCourseRecorded) {
             if (!navigatedFromTimeLoggingDestination)
-                navigateToCourseFragment()
+                showAdThenNavigate() //navigateToCourseFragment()
             else
                 navigateToScheduleRegisterScheduleFragment()
         }
@@ -169,8 +179,53 @@ class RegisterCourseFragment : Fragment() {
             }.show()
     }
 
+    private fun loadInterstitialAd() {
+        val adRequest = AdRequest.Builder().build()
+        InterstitialAd.load(
+            requireContext(),
+            "ca-app-pub-3940256099942544/1033173712", // Reemplaza con tu ID real antes de publicar
+            adRequest,
+            object : InterstitialAdLoadCallback() {
+                override fun onAdLoaded(ad: InterstitialAd) {
+                    interstitialAd = ad
+                    Log.d("Ads", "Interstitial ad loaded.")
+                }
+
+                override fun onAdFailedToLoad(adError: LoadAdError) {
+                    interstitialAd = null
+                    Log.d("Ads", "Failed to load ad: ${adError.message}")
+                }
+            }
+        )
+    }
+
+    private fun showAdThenNavigate() {
+        if (interstitialAd != null) {
+            interstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
+                override fun onAdDismissedFullScreenContent() {
+                    interstitialAd = null
+                    loadInterstitialAd() // Carga otro para la próxima vez
+                    navigateToCourseFragment()
+                }
+
+                override fun onAdFailedToShowFullScreenContent(adError: AdError) {
+                    interstitialAd = null
+                    navigateToCourseFragment()
+                }
+
+                override fun onAdShowedFullScreenContent() {
+                    interstitialAd = null
+                }
+            }
+            interstitialAd?.show(requireActivity())
+        } else {
+            navigateToCourseFragment()
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
+        interstitialAd = null
         _binding = null
     }
 }

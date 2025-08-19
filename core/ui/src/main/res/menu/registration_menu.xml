@@ -6,4 +6,5 @@
         android:title="@string/add"
         app:showAsAction="always"
         app:actionLayout="@layout/custom_action_button"/>
-</menu>
+
+   </menu>

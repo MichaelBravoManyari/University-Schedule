@@ -25,7 +25,7 @@ dependencies {
     testImplementation(project(":core:testing"))
     testImplementation(project(":core:data-test"))
 
-    kapt("androidx.hilt:hilt-compiler:1.2.0")
+    kapt(libs.androidx.hilt.compiler)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -53,4 +53,7 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.navigation.dynamic.features.fragment)
+
+    // Google AdMob
+    implementation(libs.play.services.ads)
 }

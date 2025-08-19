@@ -6,4 +6,5 @@
     <color name="text_color">#EAEAEA</color>
     <color name="secondary_text_color">#EAEAEA</color>
     <color name="background_registration_option">#222328</color>
+    <color name="delete_red">#CF6679</color>
 </resources>

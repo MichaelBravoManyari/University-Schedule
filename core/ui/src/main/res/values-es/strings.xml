@@ -13,4 +13,5 @@
     <string name="update">Actualizar</string>
     <string name="select_color">Selecciona un color</string>
     <string name="accept">Aceptar</string>
+    <string name="delete_course">Eliminar</string>
 </resources>

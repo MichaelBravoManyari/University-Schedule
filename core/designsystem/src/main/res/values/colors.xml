@@ -13,4 +13,5 @@
     <color name="text_color_black">#EAEAEA</color>
     <color name="secondary_text_color_black">#EAEAEA</color>
     <color name="background_registration_option_black">#222328</color>
+    <color name="delete_red">#B3261E</color>
 </resources>

@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
@@ -18,6 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavDeepLinkRequest
+import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.onNavDestinationSelected
@@ -71,8 +71,7 @@ class ScheduleFragment : Fragment() {
             )
 
             setContent {
-                val isDark = isSystemInDarkTheme()
-                UniversityScheduleTheme(darkTheme = isDark) {
+                UniversityScheduleTheme {
                     TimetableCompose(viewModel) { scheduleId ->
                         navController.navigate(
                             ScheduleFragmentDirections.actionScheduleFragmentToModalBottomSheetSchedule(
@@ -158,7 +157,14 @@ class ScheduleFragment : Fragment() {
                         val request =
                             NavDeepLinkRequest.Builder.fromUri("android-app://studentsapps.app/authFragment".toUri())
                                 .build()
-                        navController.navigate(request)
+                        val options = NavOptions.Builder()
+                            .setLaunchSingleTop(true)
+                            .setEnterAnim(android.R.anim.fade_in)
+                            .setExitAnim(android.R.anim.fade_out)
+                            .setPopEnterAnim(android.R.anim.fade_in)
+                            .setPopExitAnim(android.R.anim.fade_out)
+                            .build()
+                        navController.navigate(request, options)
                         true
                     }
 

@@ -12,10 +12,18 @@
         tools:layout="@layout/fragment_auth" >
         <action
             android:id="@+id/action_authFragment_to_emailSignUpFragment"
-            app:destination="@id/emailSignUpFragment" />
+            app:destination="@id/emailSignUpFragment"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out" />
         <action
             android:id="@+id/action_authFragment_to_emailLoginFragment"
-            app:destination="@id/emailLoginFragment" />
+            app:destination="@id/emailLoginFragment"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out" />
         <deepLink app:uri="android-app://studentsapps.app/authFragment" />
     </fragment>
     <fragment
@@ -24,7 +32,11 @@
         android:label="EmailSignUpFragment" >
         <action
             android:id="@+id/action_emailSignUpFragment_to_authFragment"
-            app:destination="@id/authFragment" />
+            app:destination="@id/authFragment"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out" />
     </fragment>
     <fragment
         android:id="@+id/emailLoginFragment"
@@ -32,6 +44,10 @@
         android:label="EmailLoginFragment" >
         <action
             android:id="@+id/action_emailLoginFragment_to_authFragment"
-            app:destination="@id/authFragment" />
+            app:destination="@id/authFragment"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out" />
     </fragment>
 </navigation>
