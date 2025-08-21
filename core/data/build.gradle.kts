@@ -22,7 +22,7 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.hilt.work)
     implementation(libs.firebase.auth.ktx)
-    kapt("androidx.hilt:hilt-compiler:1.2.0")
+    kapt(libs.androidx.hilt.compiler)
 
     androidTestImplementation(libs.junit)
     androidTestImplementation(libs.kotlinx.coroutines.test)

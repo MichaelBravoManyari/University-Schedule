@@ -17,7 +17,7 @@ dependencies {
     implementation(project(":core:database"))
     implementation(project(":core:network"))
 
-    kapt("androidx.hilt:hilt-compiler:1.2.0")
+    kapt(libs.androidx.hilt.compiler)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.work.runtime.ktx)

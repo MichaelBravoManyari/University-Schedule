@@ -28,11 +28,11 @@ class MyApplication : Application(), Configuration.Provider {
                 .build()
         )
 
-        CoroutineScope(Dispatchers.IO).launch {
+        /*CoroutineScope(Dispatchers.IO).launch {
             MobileAds.initialize(this@MyApplication) {
                 Log.d("AdMob", "SDK initialized Application")
             }
-        }
+        }*/
     }
 
     override val workManagerConfiguration: Configuration

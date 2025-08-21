@@ -26,12 +26,15 @@ import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.studentsapps.admodule.AdManager
 import com.studentsapps.course.R
 import com.studentsapps.course.databinding.FragmentRegisterCourseBinding
 import com.studentsapps.course.viewmodels.RegisterCourseUiState
 import com.studentsapps.course.viewmodels.RegisterCourseViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class RegisterCourseFragment : Fragment() {
@@ -44,6 +47,13 @@ class RegisterCourseFragment : Fragment() {
     private var courseId = ""
     private var navigatedFromTimeLoggingDestination = false
     private var interstitialAd: InterstitialAd? = null
+
+    @Inject lateinit var adManager: AdManager
+
+    override fun onResume() {
+        super.onResume()
+        adManager.preload(requireContext())
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -73,7 +83,7 @@ class RegisterCourseFragment : Fragment() {
             binding.btnDeleteCourse.visibility = View.VISIBLE
         }
 
-        loadInterstitialAd()
+        //loadInterstitialAd()
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -90,7 +100,12 @@ class RegisterCourseFragment : Fragment() {
     private fun handleUiState(uiState: RegisterCourseUiState) {
         if (uiState.isCourseRecorded) {
             if (!navigatedFromTimeLoggingDestination)
-                showAdThenNavigate() //navigateToCourseFragment()
+                adManager.showInterstitial(requireActivity()) {
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        delay(250)
+                        navigateToScheduleRegisterScheduleFragment()
+                    }
+                }
             else
                 navigateToScheduleRegisterScheduleFragment()
         }
@@ -205,7 +220,10 @@ class RegisterCourseFragment : Fragment() {
                 override fun onAdDismissedFullScreenContent() {
                     interstitialAd = null
                     loadInterstitialAd() // Carga otro para la próxima vez
-                    navigateToCourseFragment()
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        delay(250) // prueba con 200–300 ms
+                        navigateToCourseFragment()
+                    }
                 }
 
                 override fun onAdFailedToShowFullScreenContent(adError: AdError) {

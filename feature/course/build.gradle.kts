@@ -22,6 +22,7 @@ dependencies {
     implementation(project(":core:data"))
     implementation(project(":core:network"))
     implementation(project(":sync"))
+    implementation(project(":admodule"))
     testImplementation(project(":core:testing"))
     testImplementation(project(":core:data-test"))
 
