@@ -7,13 +7,6 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonDeserializationContext
-import com.google.gson.JsonDeserializer
-import com.google.gson.JsonElement
-import com.google.gson.JsonPrimitive
-import com.google.gson.JsonSerializationContext
-import com.google.gson.JsonSerializer
 import com.studentsapps.data.broadcasts.asScheduleDetails
 import com.studentsapps.data.broadcasts.cancelAlarm
 import com.studentsapps.data.broadcasts.scheduleAlarm
@@ -32,14 +25,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import java.lang.reflect.Type
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.LocalTime
 import java.time.ZoneOffset
-import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import com.studentsapps.common.serialization.JsonConfig.appJson
+import kotlinx.serialization.encodeToString
 
 class ScheduleRepositoryImp @Inject constructor(
     private val scheduleLocalDataSource: ScheduleLocalDataSource,
@@ -54,36 +46,6 @@ class ScheduleRepositoryImp @Inject constructor(
         endDate: LocalDate,
         userId: String
     ): Flow<List<ScheduleDetails>> {
-        /*val schedules = scheduleLocalDataSource.getSchedulesForTimetableInGridMode(
-            showSaturday, showSunday, startDate, endDate, userId
-        ).map(ScheduleDetailsView::asExternalModel)
-
-        if (schedules.isNotEmpty()) {
-            val pendingOperation = PendingOperationEntity(
-                operationType = "READ_LIST",
-                entityType = "SCHEDULE",
-                payload = serializeSchedules(schedules.map { scheduleDetails ->
-                    with(scheduleDetails) {
-                        Schedule(
-                            id = scheduleId,
-                            startTime,
-                            endTime,
-                            classPlace,
-                            dayOfWeek,
-                            specificDate,
-                            courseId
-                        )
-                    }
-                }),
-                status = "PENDING",
-                timestamp = LocalDateTime.now(ZoneOffset.UTC),
-                userId = userId
-            )
-            pendingOperationLocalDataSource.insert(pendingOperation)
-            scheduleSyncWorker()
-        }
-
-        return schedules*/
         return scheduleLocalDataSource.getSchedulesForTimetableInGridMode(
             showSaturday,
             showSunday,
@@ -122,36 +84,6 @@ class ScheduleRepositoryImp @Inject constructor(
     override fun getSchedulesForTimetableInListMode(
         date: LocalDate, userId: String
     ): Flow<List<ScheduleDetails>> {
-        /*val schedules =
-            scheduleLocalDataSource.getSchedulesForTimetableInListMode(date.dayOfWeek, date, userId)
-                .map(ScheduleDetailsView::asExternalModel)
-
-        if (schedules.isNotEmpty()) {
-            val pendingOperation = PendingOperationEntity(
-                operationType = "READ_LIST",
-                entityType = "SCHEDULE",
-                payload = serializeSchedules(schedules.map { scheduleDetails ->
-                    with(scheduleDetails) {
-                        Schedule(
-                            id = scheduleId,
-                            startTime,
-                            endTime,
-                            classPlace,
-                            dayOfWeek,
-                            specificDate,
-                            courseId
-                        )
-                    }
-                }),
-                status = "PENDING",
-                timestamp = LocalDateTime.now(ZoneOffset.UTC),
-                userId = userId
-            )
-            pendingOperationLocalDataSource.insert(pendingOperation)
-            scheduleSyncWorker()
-        }
-
-        return schedules*/
         return scheduleLocalDataSource.getSchedulesForTimetableInListMode(
             date.dayOfWeek,
             date,
@@ -417,15 +349,11 @@ class ScheduleRepositoryImp @Inject constructor(
     }
 
     private fun serializeSchedule(schedule: Schedule): String {
-        val gson = GsonBuilder().registerTypeAdapter(LocalTime::class.java, LocalTimeAdapter())
-            .registerTypeAdapter(LocalDate::class.java, LocalDateAdapter()).create()
-        return gson.toJson(schedule)
+        return appJson.encodeToString(schedule)
     }
 
     private fun serializeSchedules(schedules: List<Schedule>): String {
-        val gson = GsonBuilder().registerTypeAdapter(LocalTime::class.java, LocalTimeAdapter())
-            .registerTypeAdapter(LocalDate::class.java, LocalDateAdapter()).create()
-        return gson.toJson(schedules)
+        return appJson.encodeToString(schedules)
     }
 
     private fun scheduleSyncWorker() {
@@ -437,23 +365,5 @@ class ScheduleRepositoryImp @Inject constructor(
 
         WorkManager.getInstance(context)
             .enqueueUniqueWork("SyncPendingOperations", ExistingWorkPolicy.APPEND, syncRequest)
-    }
-}
-
-class LocalDateAdapter : JsonSerializer<LocalDate>, JsonDeserializer<LocalDate> {
-    private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-
-    override fun serialize(
-        src: LocalDate?, typeOfSrc: Type?, context: JsonSerializationContext?
-    ): JsonElement {
-        return JsonPrimitive(src?.format(formatter))
-    }
-
-    override fun deserialize(
-        json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?
-    ): LocalDate {
-        return LocalDate.parse(
-            json?.asString, formatter
-        )
     }
 }

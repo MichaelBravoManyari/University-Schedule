@@ -7,14 +7,6 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonDeserializationContext
-import com.google.gson.JsonDeserializer
-import com.google.gson.JsonElement
-import com.google.gson.JsonPrimitive
-import com.google.gson.JsonSerializationContext
-import com.google.gson.JsonSerializer
 import com.studentsapps.data.workers.SyncPendingOperationsWorker
 import com.studentsapps.database.datasources.CourseLocalDataSource
 import com.studentsapps.database.datasources.PendingOperationLocalDataSource
@@ -29,13 +21,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import java.lang.reflect.Type
-import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.LocalTime
 import java.time.ZoneOffset
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import com.studentsapps.common.serialization.JsonConfig.appJson
+import kotlinx.serialization.encodeToString
 
 class CourseRepositoryImp @Inject constructor(
     private val courseLocalDataSource: CourseLocalDataSource,
@@ -139,55 +130,51 @@ class CourseRepositoryImp @Inject constructor(
     override suspend fun deleteCourse(courseId: String) {
         val courseEntity = courseLocalDataSource.getCourse(courseId).first()
 
-        if (courseEntity != null) {
-            val schedules = scheduleLocalDataSource.getSchedulesByCourseId(courseId)
+        val schedules = scheduleLocalDataSource.getSchedulesByCourseId(courseId)
 
-            for (schedule in schedules) {
-                scheduleLocalDataSource.deleteSchedule(schedule)
+        for (schedule in schedules) {
+            scheduleLocalDataSource.deleteSchedule(schedule)
 
-                val pendingOperationSchedule = PendingOperationEntity(
-                    operationType = "DELETE",
-                    entityType = "SCHEDULE",
-                    payload = serializeSchedule(schedule.asExternalModel()),
-                    status = "PENDING",
-                    timestamp = LocalDateTime.now(ZoneOffset.UTC),
-                    userId = schedule.userId
-                )
-
-                pendingOperationLocalDataSource.insert(pendingOperationSchedule)
-
-                scheduleSyncWorker()
-            }
-
-            courseLocalDataSource.deleteCourse(courseEntity)
-
-            val pendingOperationCourse = PendingOperationEntity(
+            val pendingOperationSchedule = PendingOperationEntity(
                 operationType = "DELETE",
-                entityType = "COURSE",
-                payload = serializeCourse(courseEntity.asExternalModel()),
+                entityType = "SCHEDULE",
+                payload = serializeSchedule(schedule.asExternalModel()),
                 status = "PENDING",
-                timestamp = LocalDateTime.now(),
-                userId = courseEntity.userId
+                timestamp = LocalDateTime.now(ZoneOffset.UTC),
+                userId = schedule.userId
             )
 
-            pendingOperationLocalDataSource.insert(pendingOperationCourse)
+            pendingOperationLocalDataSource.insert(pendingOperationSchedule)
 
             scheduleSyncWorker()
         }
+
+        courseLocalDataSource.deleteCourse(courseEntity)
+
+        val pendingOperationCourse = PendingOperationEntity(
+            operationType = "DELETE",
+            entityType = "COURSE",
+            payload = serializeCourse(courseEntity.asExternalModel()),
+            status = "PENDING",
+            timestamp = LocalDateTime.now(),
+            userId = courseEntity.userId
+        )
+
+        pendingOperationLocalDataSource.insert(pendingOperationCourse)
+
+        scheduleSyncWorker()
     }
 
     override suspend fun deleteCourseEntity(courseId: String) {
         val courseEntity = courseLocalDataSource.getCourse(courseId).first()
 
-        if (courseEntity != null) {
-            val schedules = scheduleLocalDataSource.getSchedulesByCourseId(courseId)
+        val schedules = scheduleLocalDataSource.getSchedulesByCourseId(courseId)
 
-            for (schedule in schedules) {
-                scheduleRepository.deleteScheduleEntity(schedule.id, schedule.userId)
-            }
-
-            courseLocalDataSource.deleteCourse(courseEntity)
+        for (schedule in schedules) {
+            scheduleRepository.deleteScheduleEntity(schedule.id, schedule.userId)
         }
+
+        courseLocalDataSource.deleteCourse(courseEntity)
     }
 
     override fun getCoursesByIds(courseIds: List<String>): Flow<List<Course>> =
@@ -200,19 +187,15 @@ class CourseRepositoryImp @Inject constructor(
     }
 
     private fun serializeCourse(course: Course): String {
-        return Gson().toJson(course)
+        return appJson.encodeToString(course)
     }
 
     private fun serializeCourses(courses: List<Course>): String {
-        return Gson().toJson(courses)
+        return appJson.encodeToString(courses)
     }
 
     private fun serializeSchedule(schedule: Schedule): String {
-        val gson = GsonBuilder()
-            .registerTypeAdapter(LocalTime::class.java, LocalTimeAdapter())
-            .registerTypeAdapter(LocalDate::class.java, LocalDateAdapter())
-            .create()
-        return gson.toJson(schedule)
+        return appJson.encodeToString(schedule)
     }
 
     private fun scheduleSyncWorker() {
@@ -231,23 +214,5 @@ class CourseRepositoryImp @Inject constructor(
 
         WorkManager.getInstance(context)
             .enqueueUniqueWork("SyncPendingOperations", ExistingWorkPolicy.APPEND, syncRequest)
-    }
-}
-
-class LocalTimeAdapter : JsonSerializer<LocalTime>, JsonDeserializer<LocalTime> {
-    override fun serialize(
-        src: LocalTime?,
-        typeOfSrc: Type?,
-        context: JsonSerializationContext?
-    ): JsonElement {
-        return JsonPrimitive(src?.toString())
-    }
-
-    override fun deserialize(
-        json: JsonElement?,
-        typeOfT: Type?,
-        context: JsonDeserializationContext?
-    ): LocalTime {
-        return LocalTime.parse(json?.asString)
     }
 }

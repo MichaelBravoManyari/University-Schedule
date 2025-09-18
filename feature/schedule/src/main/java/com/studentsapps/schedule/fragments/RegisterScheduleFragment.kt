@@ -38,6 +38,7 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
+import com.studentsapps.admodule.AdManager
 import com.studentsapps.schedule.R
 import com.studentsapps.schedule.databinding.FragmentRegisterScheduleBinding
 import com.studentsapps.schedule.viewmodels.RecurrenceOption
@@ -48,6 +49,7 @@ import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalTime
 import java.time.ZoneId
+import javax.inject.Inject
 
 private const val TAG = "RegisterSchedule"
 
@@ -64,11 +66,18 @@ class RegisterScheduleFragment : Fragment() {
     private lateinit var notificationPermissionLauncher: ActivityResultLauncher<String>
     private lateinit var exactAlarmPermissionLauncher: ActivityResultLauncher<Intent>
 
+    @Inject
+    lateinit var adManager: AdManager
 
     val onExistingCoursesCheckedChangeListener =
         CompoundButton.OnCheckedChangeListener { _, isChecked ->
             viewModel.existingCourseChecked(isChecked)
         }
+
+    override fun onResume() {
+        super.onResume()
+        adManager.preload(requireContext())
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -120,9 +129,11 @@ class RegisterScheduleFragment : Fragment() {
                     }
 
                     if (uiState.isScheduleRecorded) {
-                        navController.navigate(
-                            RegisterScheduleFragmentDirections.actionRegisterScheduleFragmentToScheduleFragment()
-                        )
+                        adManager.showInterstitial(requireActivity()) {
+                            navController.navigate(
+                                RegisterScheduleFragmentDirections.actionRegisterScheduleFragmentToScheduleFragment()
+                            )
+                        }
                     }
                 }
             }

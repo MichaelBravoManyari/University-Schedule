@@ -20,7 +20,6 @@ object AdsModule {
     @Provides
     @Singleton
     fun provideAdManager(app: Application): AdManager {
-        // Inicializamos MobileAds al instanciar
         CoroutineScope(Dispatchers.IO).launch {
             MobileAds.initialize(app) {}
         }

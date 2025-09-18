@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Horario Universitario</string>
+    <string name="app_name">Mi Horario Universitario</string>
     <string name="schedule">Horario</string>
     <string name="courses">Cursos</string>
+    <string name="title_update_required_dialog">Actualización requerida</string>
+    <string name="message_update_required_dialog">Hay una nueva versión de la aplicación disponible. Para continuar usándola, por favor actualízala desde Google Play Store.</string>
+    <string name="update">Actualizar</string>
 </resources>

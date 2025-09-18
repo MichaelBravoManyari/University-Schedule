@@ -5,8 +5,13 @@ plugins {
 
 android {
     namespace = "com.studentsapps.common"
+
+    defaultConfig {
+        consumerProguardFiles("consumer-rules.pro")
+    }
 }
 
 dependencies {
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.firebase.auth.ktx)
 }

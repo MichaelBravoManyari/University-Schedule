@@ -16,7 +16,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.UniversitySchedule"
+        android:theme="@style/Theme.UniversitySchedule.Splash"
         tools:targetApi="31">
         <activity
             android:name=".MainActivity"
@@ -31,7 +31,6 @@
         <receiver
             android:name="com.studentsapps.data.broadcasts.ScheduleAlarmReceiver"
             android:exported="false" />
-
         <receiver
             android:name="com.studentsapps.data.broadcasts.AlarmPermissionReceiver"
             android:enabled="true"
@@ -51,7 +50,7 @@
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-7236696914770073~9403479548"/>
+            android:value="${ADMOB_APP_ID}" />
     </application>
 
 </manifest>

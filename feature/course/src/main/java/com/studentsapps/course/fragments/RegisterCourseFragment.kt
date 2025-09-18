@@ -1,7 +1,6 @@
 package com.studentsapps.course.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,12 +17,6 @@ import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.setupWithNavController
-import com.google.android.gms.ads.AdError
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.FullScreenContentCallback
-import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.interstitial.InterstitialAd
-import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.studentsapps.admodule.AdManager
@@ -32,7 +25,6 @@ import com.studentsapps.course.databinding.FragmentRegisterCourseBinding
 import com.studentsapps.course.viewmodels.RegisterCourseUiState
 import com.studentsapps.course.viewmodels.RegisterCourseViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -46,7 +38,6 @@ class RegisterCourseFragment : Fragment() {
     private val viewModel: RegisterCourseViewModel by viewModels()
     private var courseId = ""
     private var navigatedFromTimeLoggingDestination = false
-    private var interstitialAd: InterstitialAd? = null
 
     @Inject lateinit var adManager: AdManager
 
@@ -83,8 +74,6 @@ class RegisterCourseFragment : Fragment() {
             binding.btnDeleteCourse.visibility = View.VISIBLE
         }
 
-        //loadInterstitialAd()
-
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { uiState ->
@@ -101,13 +90,12 @@ class RegisterCourseFragment : Fragment() {
         if (uiState.isCourseRecorded) {
             if (!navigatedFromTimeLoggingDestination)
                 adManager.showInterstitial(requireActivity()) {
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        delay(250)
-                        navigateToScheduleRegisterScheduleFragment()
-                    }
+                    navigateToCourseFragment()
                 }
             else
-                navigateToScheduleRegisterScheduleFragment()
+                adManager.showInterstitial(requireActivity()) {
+                    navigateToScheduleRegisterScheduleFragment()
+                }
         }
 
         if (uiState.name.isNotEmpty()) {
@@ -119,7 +107,9 @@ class RegisterCourseFragment : Fragment() {
         }
 
         if (uiState.isCourseDeleted) {
-            navigateToCourseFragment()
+            adManager.showInterstitial(requireActivity()) {
+                navigateToCourseFragment()
+            }
         }
     }
 
@@ -194,56 +184,8 @@ class RegisterCourseFragment : Fragment() {
             }.show()
     }
 
-    private fun loadInterstitialAd() {
-        val adRequest = AdRequest.Builder().build()
-        InterstitialAd.load(
-            requireContext(),
-            "ca-app-pub-3940256099942544/1033173712", // Reemplaza con tu ID real antes de publicar
-            adRequest,
-            object : InterstitialAdLoadCallback() {
-                override fun onAdLoaded(ad: InterstitialAd) {
-                    interstitialAd = ad
-                    Log.d("Ads", "Interstitial ad loaded.")
-                }
-
-                override fun onAdFailedToLoad(adError: LoadAdError) {
-                    interstitialAd = null
-                    Log.d("Ads", "Failed to load ad: ${adError.message}")
-                }
-            }
-        )
-    }
-
-    private fun showAdThenNavigate() {
-        if (interstitialAd != null) {
-            interstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
-                override fun onAdDismissedFullScreenContent() {
-                    interstitialAd = null
-                    loadInterstitialAd() // Carga otro para la próxima vez
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        delay(250) // prueba con 200–300 ms
-                        navigateToCourseFragment()
-                    }
-                }
-
-                override fun onAdFailedToShowFullScreenContent(adError: AdError) {
-                    interstitialAd = null
-                    navigateToCourseFragment()
-                }
-
-                override fun onAdShowedFullScreenContent() {
-                    interstitialAd = null
-                }
-            }
-            interstitialAd?.show(requireActivity())
-        } else {
-            navigateToCourseFragment()
-        }
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
-        interstitialAd = null
         _binding = null
     }
 }

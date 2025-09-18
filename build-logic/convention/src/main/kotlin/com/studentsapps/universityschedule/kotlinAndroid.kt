@@ -6,13 +6,20 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 internal fun Project.configureKotlinAndroid(
     commonExtension: CommonExtension<*, *, *, *, *, *>,
 ) {
+    val javaVersion = providers
+        .gradleProperty("JAVA_VERSION")
+        .orElse("17")
+        .get()
+        .toInt()
+
     commonExtension.apply {
-        compileSdk = 34
+        compileSdk = 35
 
         defaultConfig {
             minSdk = 24
@@ -20,8 +27,8 @@ internal fun Project.configureKotlinAndroid(
         }
 
         compileOptions {
-            sourceCompatibility = JavaVersion.VERSION_1_8
-            targetCompatibility = JavaVersion.VERSION_1_8
+            sourceCompatibility = JavaVersion.toVersion(javaVersion)
+            targetCompatibility = JavaVersion.toVersion(javaVersion)
             isCoreLibraryDesugaringEnabled = true
         }
 
@@ -32,18 +39,18 @@ internal fun Project.configureKotlinAndroid(
         }
     }
 
-    configureKotlin()
+    configureKotlin(javaVersion)
 
     dependencies {
         add("coreLibraryDesugaring", libs.findLibrary("desugar.jdk.libs").get())
     }
 }
 
-private fun Project.configureKotlin() {
+private fun Project.configureKotlin(javaVersion: Int) {
     tasks.withType<KotlinCompile>().configureEach {
-        kotlinOptions {
-            jvmTarget = JavaVersion.VERSION_1_8.toString()
-            languageVersion = "1.9"
+        compilerOptions {
+            jvmTarget.set(JvmTarget.fromTarget(javaVersion.toString()))
+            languageVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9)
         }
     }
     tasks.withType<Test> {

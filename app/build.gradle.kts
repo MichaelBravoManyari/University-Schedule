@@ -1,15 +1,39 @@
+import java.util.Properties
+
+val apikeysPropertiesFile = rootProject.file("apikeys.properties")
+val apikeysProperties = Properties().apply {
+    load(apikeysPropertiesFile.inputStream())
+}
+
 plugins {
     id("universityschedule.android.application")
     id("universityschedule.android.hilt")
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
+    alias(libs.plugins.org.jetbrains.kotlin.android)
 }
 
 android {
     namespace = "com.studentsapps.universityschedule"
 
+    buildTypes {
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+
     defaultConfig {
         applicationId = "com.studentsapps.universityschedule"
         versionCode = 1
         versionName = "1.0"
+
+        // App ID (para el manifest)
+        manifestPlaceholders["ADMOB_APP_ID"] = apikeysProperties["ADMOB_APP_ID"] ?: ""
     }
 
     buildFeatures {
@@ -36,10 +60,15 @@ dependencies {
     implementation(libs.material)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
+    implementation(libs.firebase.crashlytics.ndk)
     implementation(libs.androidx.hilt.work)
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.firestore.ktx)
+    implementation(libs.firebase.config.ktx)
+    implementation(libs.kotlinx.coroutines.play.services)
+    implementation(libs.androidx.activity)
+    implementation(libs.androidx.core.splashscreen)
 
     kapt(libs.androidx.hilt.compiler)
 

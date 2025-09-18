@@ -1,11 +1,15 @@
 plugins {
     id("universityschedule.android.library")
     id("universityschedule.android.hilt")
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.10"
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
     namespace = "com.studentsapps.network"
+
+    defaultConfig {
+        consumerProguardFiles("consumer-rules.pro")
+    }
 }
 
 dependencies {

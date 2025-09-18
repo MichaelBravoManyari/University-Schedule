@@ -5,6 +5,10 @@ plugins {
 
 android {
     namespace = "com.studentsapps.data"
+
+    defaultConfig {
+        consumerProguardFiles("consumer-rules.pro")
+    }
 }
 
 dependencies {
@@ -16,7 +20,6 @@ dependencies {
     implementation(project(":core:database-test"))
     androidTestImplementation(project(":core:datastore-test"))
 
-    implementation(libs.gson)
     implementation(libs.androidx.core.ktx)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.work.runtime.ktx)

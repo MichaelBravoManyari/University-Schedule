@@ -18,12 +18,12 @@ class InterstitialAdCache @Inject constructor() {
     private var lastShownTime: Long = 0L
     private var isLoading = false
 
-    private val AD_EXPIRATION = 60 * 60 * 1000 // 1 hora
-    private val AD_COOLDOWN = 2 * 60 * 1000    // 2 minutos
+    private val adExpiration = 60 * 60 * 1000
+    private val adCooldown = 2 * 60 * 1000
 
     fun loadAd(context: Context, adUnitId: String) {
         if (isLoading) return
-        if (System.currentTimeMillis() - lastLoadedTime < AD_EXPIRATION && interstitialAd.get() != null) return
+        if (System.currentTimeMillis() - lastLoadedTime < adExpiration && interstitialAd.get() != null) return
 
         isLoading = true
         val adRequest = AdRequest.Builder().build()
@@ -66,6 +66,6 @@ class InterstitialAdCache @Inject constructor() {
     }
 
     private fun canShowAd(): Boolean {
-        return System.currentTimeMillis() - lastShownTime >= AD_COOLDOWN
+        return System.currentTimeMillis() - lastShownTime >= adCooldown
     }
 }

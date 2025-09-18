@@ -20,8 +20,8 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.serialization.json.Json
 import java.time.LocalDateTime
+import com.studentsapps.common.serialization.JsonConfig.appJson
 
 @HiltWorker
 class SyncPendingOperationsWorker @AssistedInject constructor(
@@ -242,7 +242,7 @@ private fun deserializeCourse(
     lastModified: LocalDateTime,
     userId: String
 ): NetworkCourse {
-    val course = Json.decodeFromString<NetworkCourse>(payload)
+    val course = appJson.decodeFromString<NetworkCourse>(payload)
     return course.copy(lastModified = lastModified, userId = userId)
 }
 
@@ -251,7 +251,7 @@ private fun deserializeCourses(
     lastModified: LocalDateTime,
     userId: String
 ): List<NetworkCourse> {
-    val courses = Json.decodeFromString<List<NetworkCourse>>(payload)
+    val courses = appJson.decodeFromString<List<NetworkCourse>>(payload)
     return courses.map { it.copy(lastModified = lastModified, userId = userId) }
 }
 
@@ -260,7 +260,7 @@ private fun deserializeSchedule(
     lastModified: LocalDateTime,
     userId: String
 ): NetworkSchedule {
-    val schedule = Json.decodeFromString<NetworkSchedule>(payload)
+    val schedule = appJson.decodeFromString<NetworkSchedule>(payload)
     return schedule.copy(lastModified = lastModified, userId = userId)
 }
 
@@ -269,6 +269,6 @@ private fun deserializeSchedules(
     lastModified: LocalDateTime,
     userId: String
 ): List<NetworkSchedule> {
-    val schedules = Json.decodeFromString<List<NetworkSchedule>>(payload)
+    val schedules = appJson.decodeFromString<List<NetworkSchedule>>(payload)
     return schedules.map { it.copy(lastModified = lastModified, userId = userId) }
 }

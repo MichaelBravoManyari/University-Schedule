@@ -1,5 +1,6 @@
 package com.studentsapps.course.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.studentsapps.common.UserManager
@@ -26,6 +27,7 @@ class CourseViewModel @Inject constructor(
         .filterNotNull()
         .distinctUntilChanged()
         .flatMapLatest { userId ->
+            Log.d("CourseViewModel", "UserId recibido: $userId")
             courseRepository.getAllCourse(userId = userId)
         }
         .map(CourseUiState::Success)

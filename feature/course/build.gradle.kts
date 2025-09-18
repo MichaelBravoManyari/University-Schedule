@@ -11,6 +11,10 @@ android {
         dataBinding = true
         viewBinding = true
     }
+
+    defaultConfig {
+        consumerProguardFiles("consumer-rules.pro")
+    }
 }
 
 dependencies {
@@ -54,7 +58,4 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.navigation.dynamic.features.fragment)
-
-    // Google AdMob
-    implementation(libs.play.services.ads)
 }

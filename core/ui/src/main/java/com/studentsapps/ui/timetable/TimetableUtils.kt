@@ -34,7 +34,7 @@ class TimetableUtils @Inject constructor() {
         if (!showSaturday) removeSaturdayFromDaysOfWeek(isMondayFirstDayOfWeek, daysOfMonthOfWeek)
 
         if (!showSunday) {
-            if (isMondayFirstDayOfWeek) daysOfMonthOfWeek.removeLast() else daysOfMonthOfWeek.removeFirst()
+            if (isMondayFirstDayOfWeek) daysOfMonthOfWeek.removeAt(daysOfMonthOfWeek.lastIndex) else daysOfMonthOfWeek.removeAt(0)
         }
 
         return daysOfMonthOfWeek

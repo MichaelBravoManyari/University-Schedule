@@ -1,9 +1,12 @@
 package com.studentsapps.universityschedule
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
@@ -12,21 +15,33 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.studentsapps.sync.SynchronizationManager
 import com.studentsapps.universityschedule.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
+import androidx.core.net.toUri
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
+    private val viewModel: SplashViewModel by viewModels()
 
     @Inject
     lateinit var synchronizationManager: SynchronizationManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
+
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        splashScreen.setKeepOnScreenCondition {
+            viewModel.isReady.value == false && viewModel.forceUpdateRequired.value == false
+        }
+
+        observeViewModel()
 
         setupNavController()
         setupBottomNavAndRail()
@@ -36,6 +51,38 @@ class MainActivity : AppCompatActivity() {
             val dialog = createLoadingDialog()
             synchronizationManager.startSyncIfNeeded(dialog)
         }
+    }
+
+    private fun observeViewModel() {
+        viewModel.forceUpdateRequired.observe(this) { required ->
+            if (required) {
+                showForceUpdateDialog()
+            }
+        }
+    }
+
+    private fun showForceUpdateDialog() {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(getString(R.string.title_update_required_dialog))
+            .setMessage(getString(R.string.message_update_required_dialog))
+            .setCancelable(false)
+            .setPositiveButton(getString(R.string.update)) { _, _ ->
+                val appPackageName = packageName
+                try {
+                    startActivity(
+                        Intent(Intent.ACTION_VIEW, "market://details?id=$appPackageName".toUri())
+                    )
+                } catch (e: Exception) {
+                    startActivity(
+                        Intent(
+                            Intent.ACTION_VIEW,
+                            "https://play.google.com/store/apps/details?id=$appPackageName".toUri()
+                        )
+                    )
+                }
+                finish()
+            }
+            .show()
     }
 
     private fun createLoadingDialog(): AlertDialog {

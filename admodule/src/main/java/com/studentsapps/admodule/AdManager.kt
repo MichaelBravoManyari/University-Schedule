@@ -9,7 +9,7 @@ import javax.inject.Singleton
 class AdManager @Inject constructor(
     private val cache: InterstitialAdCache
 ) {
-    private val interstitialId = "ca-app-pub-3940256099942544/1033173712"
+    private val interstitialId = BuildConfig.ADMOB_INTERSTITIAL_ID
 
     fun preload(context: Context) {
         cache.loadAd(context, interstitialId)

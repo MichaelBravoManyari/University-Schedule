@@ -1,8 +1,12 @@
 package com.studentsapps.model
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Course(
-    val id: String,
-    val name: String,
-    val nameProfessor: String?,
-    val color: Int
+    @SerialName("id") val id: String,
+    @SerialName("name") val name: String,
+    @SerialName("nameProfessor") val nameProfessor: String?,
+    @SerialName("color") val color: Int
 )

@@ -6,6 +6,10 @@ plugins {
 
 android {
     namespace = "com.studentsapps.database"
+
+    defaultConfig {
+        consumerProguardFiles("consumer-rules.pro")
+    }
 }
 
 dependencies {

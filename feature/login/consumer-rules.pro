@@ -1,0 +1,1 @@
+-keep class com.studentsapps.login.** extends androidx.fragment.app.Fragment { *; }

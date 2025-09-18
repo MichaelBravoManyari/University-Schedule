@@ -26,6 +26,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import com.studentsapps.common.UserManager
+import com.studentsapps.login.BuildConfig
 import com.studentsapps.login.R
 import com.studentsapps.login.databinding.FragmentAuthBinding
 import com.studentsapps.sync.SynchronizationManager
@@ -87,7 +88,7 @@ class AuthFragment : Fragment() {
         showLoading(true)
 
         val googleIdOption =
-            GetSignInWithGoogleOption.Builder(getString(R.string.web_client_id))
+            GetSignInWithGoogleOption.Builder(BuildConfig.GOOGLE_WEB_CLIENT_ID)
                 .build()
         val request = GetCredentialRequest.Builder().addCredentialOption(googleIdOption).build()
         lifecycleScope.launch {

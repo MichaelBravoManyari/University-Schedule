@@ -5,6 +5,10 @@ plugins {
 
 android {
     namespace = "com.studentsapps.datastore"
+
+    defaultConfig {
+        consumerProguardFiles("consumer-rules.pro")
+    }
 }
 
 dependencies {

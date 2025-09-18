@@ -52,7 +52,12 @@ class RegisterScheduleViewModel @Inject constructor(
         viewModelScope.launch {
             val course = courseRepository.getCourse(courseId).first()
             _uiState.update { currentState ->
-                currentState.copy(selectedCourse = course, noSelectCourse = false)
+                currentState.copy(
+                    selectedCourse = course.copy(
+                        name = truncateCourseName(course.name) ?: course.name
+                    ),
+                    noSelectCourse = false
+                )
             }
         }
     }
@@ -91,7 +96,10 @@ class RegisterScheduleViewModel @Inject constructor(
 
     fun setCourseName(courseName: String?) {
         _uiState.update { currentState ->
-            currentState.copy(courseName = courseName, noSelectCourse = false)
+            currentState.copy(
+                courseName = courseName,
+                noSelectCourse = false
+            )
         }
     }
 
@@ -135,7 +143,9 @@ class RegisterScheduleViewModel @Inject constructor(
                         day = dayOfWeek,
                         startTime = startTime,
                         endTime = endTime,
-                        selectedCourse = course,
+                        selectedCourse = course.copy(
+                            name = truncateCourseName(course.name) ?: course.name
+                        ),
                         repetition = if (specificDate != null) RecurrenceOption.SPECIFIC_DATE else RecurrenceOption.EVERY_WEEK,
                         specificDate = specificDate,
                         classroom = classPlace
@@ -293,6 +303,15 @@ class RegisterScheduleViewModel @Inject constructor(
 
     private fun startTimeIsLessThanEndTime(): Boolean =
         uiState.value.startTime < uiState.value.endTime
+
+    private fun truncateCourseName(name: String?, maxLength: Int = 25): String? {
+        if (name.isNullOrBlank()) return name
+        return if (name.length > maxLength) {
+            name.substring(0, maxLength).trimEnd() + "..."
+        } else {
+            name
+        }
+    }
 }
 
 data class RegisterScheduleUiState(

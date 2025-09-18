@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "1056896212396-s1ptvqak4d62a4el84sdmsgn94mienbp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.studentsapps.universityschedule",
+            "certificate_hash": "1ddd14daafc87f87eb787264081062eb4a853021"
+          }
+        },
+        {
           "client_id": "1056896212396-jqkd4ba6qvch3352mgtumbt79ssbq59u.apps.googleusercontent.com",
           "client_type": 3
         }

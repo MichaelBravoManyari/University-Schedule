@@ -14,6 +14,7 @@ import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.findNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.studentsapps.common.UserManager
 import com.studentsapps.login.R
 import com.studentsapps.login.databinding.FragmentEmailSignUpBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,6 +29,9 @@ class EmailSignUpFragment : Fragment() {
 
     @Inject
     lateinit var auth: FirebaseAuth
+
+    @Inject
+    lateinit var userManager: UserManager
 
     private lateinit var backPressCallback: OnBackPressedCallback
 
@@ -115,9 +119,9 @@ class EmailSignUpFragment : Fragment() {
         showLoading(true)
         auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                val userId = auth.currentUser?.uid
-                if (userId != null) {
-                    saveUserToFirestore(userId)
+                userManager.updateUserId()
+                if (userManager.userId.value != null) {
+                    saveUserToFirestore(userManager.userId.value!!)
                 }
             } else {
                 showLoading(false)

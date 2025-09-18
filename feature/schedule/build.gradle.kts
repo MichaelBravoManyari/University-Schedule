@@ -25,6 +25,7 @@ dependencies {
     implementation(project(":core:model"))
     implementation(project(":core:common"))
     implementation(project(":sync"))
+    implementation(project(":admodule"))
     testImplementation(project(":core:testing"))
     testImplementation(project(":core:data-test"))
 
@@ -43,13 +44,13 @@ dependencies {
     androidTestImplementation(composeBom)
 
     // Compose core
-    implementation("androidx.compose.runtime:runtime")
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.foundation:foundation")
-    implementation("androidx.compose.foundation:foundation-layout")
-    implementation("androidx.compose.material3:material3")
-    implementation("androidx.compose.runtime:runtime-livedata")
-    implementation("androidx.compose.ui:ui-tooling")
+    implementation(libs.androidx.runtime)
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.foundation)
+    implementation(libs.androidx.foundation.layout)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.ui.tooling)
 
     // Local test
     testImplementation(libs.junit)

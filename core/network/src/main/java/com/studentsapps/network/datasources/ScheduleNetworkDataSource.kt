@@ -26,7 +26,7 @@ class ScheduleNetworkDataSource @Inject constructor() {
                 "endTime" to schedule.endTime,
                 "classPlace" to schedule.classPlace,
                 "dayOfWeek" to schedule.dayOfWeek,
-                "specificDate" to schedule.specificDate,
+                "specificDate" to schedule.specificDate?.toString(),
                 "courseId" to schedule.courseId,
                 "lastModified" to Timestamp(
                     schedule.lastModified.toInstant(ZoneOffset.UTC).toEpochMilli() / 1000, 0
@@ -117,7 +117,10 @@ class ScheduleNetworkDataSource @Inject constructor() {
         }
     }
 
-    suspend fun getSchedulesByIds(userId: String, schedulesIds: List<String>): List<NetworkSchedule> {
+    suspend fun getSchedulesByIds(
+        userId: String,
+        schedulesIds: List<String>
+    ): List<NetworkSchedule> {
         if (schedulesIds.isEmpty()) return emptyList()
 
         return try {
@@ -210,7 +213,7 @@ class ScheduleNetworkDataSource @Inject constructor() {
                     DayOfWeek.valueOf(it!!.uppercase())
                 }
                 val specificDate = documentSnapshot.getString("specificDate")
-                    ?.let { LocalDate.parse(it, DateTimeFormatter.ofPattern("yyyy-MM-dd")) }
+                    ?.let { LocalDate.parse(it) }
                 val courseId = documentSnapshot.getString("courseId") ?: " "
                 val timestamp = documentSnapshot.getTimestamp("lastModified")?.toDate()
                 val lastModified = timestamp?.toInstant()?.atZone(ZoneOffset.UTC)?.toLocalDateTime()

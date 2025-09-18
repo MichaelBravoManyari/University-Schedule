@@ -54,15 +54,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                app:endIconMode="custom"
                 android:hint="@string/course_name"
                 app:endIconDrawable="@{viewModel.uiState.courseNameError ? @drawable/ic_error : null}"
+                app:endIconMode="custom"
                 app:hintTextColor="@color/text_color">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/edit_text_course_name"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:inputType="textCapSentences"
+                    android:maxLines="1" />
             </com.google.android.material.textfield.TextInputLayout>
         </RelativeLayout>
 
@@ -136,7 +138,9 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/edit_text_teacher_course"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:inputType="textCapSentences"
+                    android:maxLines="1" />
             </com.google.android.material.textfield.TextInputLayout>
         </RelativeLayout>
 
@@ -144,16 +148,16 @@
             android:id="@+id/btn_delete_course"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/relative_layout_teacher"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
-            android:layout_marginStart="10dp"
+            android:backgroundTint="@color/delete_red"
+            android:onClick="@{()->registerCourseFragment.deleteCourse()}"
             android:text="@string/delete_course"
             android:textColor="@color/secondary_color"
-            android:onClick="@{()->registerCourseFragment.deleteCourse()}"
-            android:backgroundTint="@color/delete_red"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/relative_layout_teacher" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

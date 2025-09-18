@@ -7,7 +7,9 @@ import android.content.Intent
 import android.os.Build
 import com.studentsapps.model.Schedule
 import com.studentsapps.model.ScheduleDetails
+import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import kotlin.math.absoluteValue
@@ -36,7 +38,12 @@ fun scheduleAlarm(context: Context, scheduleDetails: ScheduleDetails) {
     }
 
     if (scheduleDetails.specificDate != null) {
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerTimeMillis, pendingIntent)
+        val triggerDateTime = Instant.ofEpochMilli(triggerTimeMillis)
+            .atZone(ZoneId.systemDefault())
+            .toLocalDateTime().plusMinutes(10)
+
+        if (triggerDateTime >= LocalDateTime.now())
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerTimeMillis, pendingIntent)
     } else {
         alarmManager.setRepeating(
             AlarmManager.RTC_WAKEUP,

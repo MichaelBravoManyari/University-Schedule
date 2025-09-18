@@ -7,11 +7,12 @@ import android.graphics.Typeface
 import androidx.annotation.ColorInt
 import androidx.annotation.Dimension
 import javax.inject.Inject
+import androidx.core.graphics.createBitmap
 
 class TimetableCanvasRender @Inject constructor() {
 
     fun createTimetableBitmap(bitmapWith: Int, bitmapHeight: Int): Bitmap {
-        return Bitmap.createBitmap(bitmapWith, bitmapHeight, Bitmap.Config.ARGB_8888)
+        return createBitmap(bitmapWith, bitmapHeight)
     }
 
     fun drawGrid(
@@ -61,7 +62,7 @@ class TimetableCanvasRender @Inject constructor() {
     }
 
     fun getCurrentMonthDayBackground(viewWidth: Int, viewHeight: Int, @ColorInt circleColor: Int): Bitmap {
-        val bitmap = Bitmap.createBitmap(viewWidth, viewHeight, Bitmap.Config.ARGB_8888)
+        val bitmap = createBitmap(viewWidth, viewHeight)
         val canvas = Canvas(bitmap)
         val xAxis = viewWidth / 2f
         val yAxis = viewHeight / 2f

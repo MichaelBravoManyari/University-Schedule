@@ -1,3 +1,10 @@
+import java.util.Properties
+
+val apikeysPropertiesFile = rootProject.file("apikeys.properties")
+val apikeysProperties = Properties().apply {
+    load(apikeysPropertiesFile.inputStream())
+}
+
 plugins {
     id("universityschedule.android.ui")
     alias(libs.plugins.org.jetbrains.kotlin.android)
@@ -9,6 +16,23 @@ android {
     buildFeatures {
         dataBinding = true
         viewBinding = true
+        buildConfig = true
+    }
+
+    afterEvaluate {
+        extensions.configure<com.android.build.gradle.LibraryExtension>("android") {
+            buildFeatures.buildConfig = true
+        }
+    }
+
+    defaultConfig {
+        buildConfigField(
+            "String",
+            "GOOGLE_WEB_CLIENT_ID",
+            "\"${apikeysProperties["GOOGLE_WEB_CLIENT_ID"]}\""
+        )
+
+        consumerProguardFiles("consumer-rules.pro")
     }
 }
 

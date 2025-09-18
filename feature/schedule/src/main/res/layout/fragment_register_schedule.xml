@@ -224,6 +224,8 @@
                             android:id="@+id/edit_text_course"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:inputType="textCapSentences"
+                            android:maxLines="1"
                             tools:ignore="DuplicateSpeakableTextCheck" />
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -257,6 +259,8 @@
                             android:layout_centerVertical="true"
                             android:layout_marginEnd="16dp"
                             android:drawableEnd="@drawable/ic_baseline_keyboard_arrow_right"
+                            android:ellipsize="end"
+                            android:maxLines="1"
                             android:text="@{viewModel.uiState.selectedCourse.name}"
                             android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
                             android:textColor="@color/text_color"
@@ -380,6 +384,8 @@
                             android:id="@+id/edit_text_classroom"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:inputType="textCapSentences"
+                            android:maxLines="1"
                             android:text="@{viewModel.uiState.classroom}" />
                     </com.google.android.material.textfield.TextInputLayout>
                 </RelativeLayout>

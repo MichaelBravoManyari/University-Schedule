@@ -12,13 +12,14 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.studentsapps.admodule.AdManager
 import com.studentsapps.schedule.R
 import com.studentsapps.schedule.databinding.ModalBottomSheetScheduleBinding
 import com.studentsapps.schedule.viewmodels.BottomSheetScheduleViewModel
 import com.studentsapps.ui.dialogs.BaseBottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ModalBottomSheetSchedule : BaseBottomSheetDialogFragment() {
@@ -28,6 +29,14 @@ class ModalBottomSheetSchedule : BaseBottomSheetDialogFragment() {
     private val binding get() = _binding!!
     private val args: ModalBottomSheetScheduleArgs by navArgs()
     private val viewModel: BottomSheetScheduleViewModel by viewModels()
+
+    @Inject
+    lateinit var adManager: AdManager
+
+    override fun onResume() {
+        super.onResume()
+        adManager.preload(requireContext())
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -59,10 +68,12 @@ class ModalBottomSheetSchedule : BaseBottomSheetDialogFragment() {
                 .setMessage(R.string.delete_schedule)
                 .setPositiveButton(R.string.accept_dialog) { _, _ ->
                     viewModel.deleteSchedule(args.scheduleId)
-                    navController.previousBackStackEntry?.savedStateHandle?.set(
-                        "updateScheduleList",
-                        true
-                    )
+                    adManager.showInterstitial(requireActivity()) {
+                        navController.previousBackStackEntry?.savedStateHandle?.set(
+                            "updateScheduleList",
+                            true
+                        )
+                    }
                 }
                 .setNegativeButton(R.string.cancel) { dialog, _ ->
                     dialog.dismiss()
