@@ -78,32 +78,36 @@ La app ofrece una interfaz moderna y personalizable:
 
 *Visualización de horarios*
 
-<img src="screenshots/horarios-university-schedule-español.png" width="600" alt="Visualización de horarios">
+<img src="screenshots/horarios-university-schedule-español.png" width="400" alt="Visualización de horarios">
 
 *Detalle de los horarios*
 
-![Detalle de los horarios](screenshots/detalles-horarios-university-schedule-español.png)
+<img src="screenshots/detalles-horarios-university-schedule-español.png" width="400" alt="Detalle de los horarios">
+
+*Visualización de horarios*
+
+<img src="screenshots/horarios-university-schedule-español.png" width="400" alt="Visualización de horarios">
 
 *Agregar horario*
 
-![Agregar horario](screenshots/nuevo-horario-university-schedule-español.png)
+<img src="screenshots/nuevo-horario-university-schedule-español.png" width="400" alt="Agregar horario">
 
 *Personalización de los horarios*
 
-![Personalización de los horarios](screenshots/personalizacion-horario-university-schedule-español.png)
+<img src="screenshots/personalizacion-horario-university-schedule-español.png" width="400" alt="Personalización de los horarios">
 
 *Recordatorio de los horarios*
 
-![Recordatorio de los horarios](screenshots/recordatorios-horios-university-schedule.png)
+<img src="screenshots/recordatorios-horios-university-schedule.png" width="400" alt="Recordatorio de los horarios">
 
 *Visualización de cursos*
 
-![Visualización de cursos](screenshots/cursos-university-schedule-español.png)
+<img src="screenshots/cursos-university-schedule-español.png" width="400" alt="Visualización de cursos">
 
 *Agregar Cursos*
 
-![Agregar Cursos](screenshots/add_course.jpg)
+<img src="screenshots/add_course.jpg" width="400" alt="Agregar Cursos">
 
 *Configuración del horario*
 
-![Configuración del horario](screenshots/configuracion-horario-university-schedule-español.png)
+<img src="screenshots/configuracion-horario-university-schedule-español.png" width="400" alt="Configuración del horario">
