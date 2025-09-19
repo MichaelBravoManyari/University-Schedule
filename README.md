@@ -84,10 +84,6 @@ La app ofrece una interfaz moderna y personalizable:
 
 <img src="screenshots/detalles-horarios-university-schedule-español.png" width="400" alt="Detalle de los horarios">
 
-*Visualización de horarios*
-
-<img src="screenshots/horarios-university-schedule-español.png" width="400" alt="Visualización de horarios">
-
 *Agregar horario*
 
 <img src="screenshots/nuevo-horario-university-schedule-español.png" width="400" alt="Agregar horario">
