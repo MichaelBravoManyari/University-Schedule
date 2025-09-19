@@ -1,90 +1,109 @@
-# University Schedule
+# Mi Horario Universitario (University Schedule)
 
-## About the App
+## Acerca de la aplicación
 
-**University Schedule** is an Android application designed to help students organize their academic lives. The app allows students to register their class schedules, manage the courses they are enrolled in, and keep track of their professors. It is a comprehensive tool aimed at enhancing the student experience by providing a centralized platform for academic scheduling.
+**Mi Horario Universitario** es una aplicación Android diseñada para ayudar a los estudiantes a organizar su vida académica.
+La app permite registrar horarios de clases, gestionar cursos, mantener información de los profesores y recibir notificaciones de los próximos eventos académicos.
 
-## Features
+La aplicación está construida bajo un enfoque offline-first, lo que significa que toda la información de cursos y horarios se guarda primero en una base de datos local en el dispositivo y luego se sincroniza automáticamente con la nube cuando hay conexión a Internet.
+Gracias a esto, los usuarios pueden acceder a su información desde cualquier dispositivo Android iniciando sesión con su cuenta de Google o con usuario y contraseña.
 
-- **Class Schedule Management**: Easily add and view class schedules.
-- **Course Management**: Keep track of courses with detailed information.
-- **Professor Directory**: Store and manage information about professors.
-- **User-Friendly Interface**: Intuitive design for a seamless user experience.
-- **Notifications**: Receive reminders for upcoming classes and events.
+## Características principales
+
+- **Gestión de horarios**: agrega, visualiza y organiza tus horarios de clase.
+- **Gestión de cursos**: administra cursos con detalles completos.
+- **Directorio de profesores**: guarda y consulta información de docentes.
+- **Sincronización en la nube**: accede a tus cursos y horarios desde cualquier dispositivo mediante tu cuenta.
+- **Modo offline-first**: los datos se almacenan localmente y se sincronizan cuando hay conexión.
+- **Notificaciones**: recordatorios automáticos antes del inicio de cada clase.
+- **Personalización**: configura el formato de hora (12h/24h), día de inicio de semana, vistas en cuadrícula o lista, entre otras.
+- **Inicio de sesión**: autenticación con Google o con correo/contraseña gracias a Firebase Authentication.
+- **Anuncios**: integración de Google AdMob.
+- **Monitoreo de fallos**: integración de Firebase Crashlytics para la gestión de errores en producción.
+- **Control de versiones**: uso de Firebase Remote Config para el forzado de actualizaciones.
+- **UI moderna**: migración progresiva de la interfaz a Jetpack Compose con Material 3.
+
+## Arquitectura
+
+La app sigue las [guías oficiales de arquitectura de Android](https://developer.android.com/topic/architecture), asegurando separación de responsabilidades y facilitando mantenibilidad y pruebas.
+- **MVVM (Model-View-ViewModel)**: separación de lógica de negocio y UI.
+- **ViewModel + Flows + LiveData**: manejo de datos reactivos y observables.
+- **Patrón Repository**: acceso limpio y desacoplado a datos locales y remotos.
+- **Room Database**: almacenamiento local persistente.
+- **WorkManager**: sincronización en segundo plano de operaciones pendientes.
+
+## Modularización
+
+El proyecto está estructurado en múltiples módulos para mejorar escalabilidad y mantenibilidad, siguiendo las [guías oficiales de modularización de Android](https://developer.android.com/topic/modularization).
+
+- **App Module**: punto de entrada de la aplicación, incluye Splash, RemoteConfigHelper y lógica de forzado de versiones.
+- **Core Modules**:
+  - **Common**: utilidades compartidas y manejo de sesiones con Firebase Auth.
+  - **Data**: sincronización de datos locales y en la nube mediante workers.
+  - **Database**: operaciones locales con Room.
+  - **Datastore**: almacenamiento de preferencias.
+  - **DesignSystem**: componentes de UI reutilizables.
+  - **Model**: modelos de datos con soporte para offline-first.
+  - **Network**: acceso a servicios en la nube de Firebase (Firestore).
+  - **UI**: temas y componentes visuales (incluyendo soporte Compose).
+- **Feature Modules**:
+  - **Course**: gestión de cursos.
+  - **Schedule**: gestión y visualización de horarios (incluye vistas en Compose).
+  - **Login**: autenticación con Google y correo/contraseña.
+- **Sync Module**: sincronización de datos entre nube y base local.
+- **Build-Logic**: configuraciones centralizadas de Gradle.
+- **Testing Modules**: utilidades para pruebas unitarias, de integración y de UI.
+
+## Tecnologías principales
+
+- **Kotlin**
+- **Jetpack Compose + Views (migración progresiva)**
+- **Firebase (Auth, Firestore, Crashlytics, Remote Config, Analytics)**
+- **Google AdMob**
+- **Room Database**
+- **WorkManager**
+- **Coroutines + Flows**
+- **Hilt (Inyección de dependencias)**
+- **JUnit, Robolectric, Espresso, MockK**
+
+## Interfaz de usuario
+
+La app ofrece una interfaz moderna y personalizable:
+- **Material 3** con soporte para tema claro y oscuro.
+- Vistas en **lista y cuadrícula** para horarios.
+- Pantallas de configuración personalizables.
+- Migración progresiva a **Compose** para una experiencia más fluida.
 
 ### Screenshots
 
-*Home Screen*
+*Visualización de horarios*
 
-![Home Screen](screenshots/schedule_timetable.jpg)
-![](screenshots/schedule_timetable_night.jpg)
-![](screenshots/schedule_list.jpg)
-![](screenshots/schedule_list_night.jpg)
+![Visualización de horarios](screenshots/horarios-university-schedule-español.png)
 
-*Add Course*
+*Detalle de los horarios*
 
-![Add Course](screenshots/add_course.jpg)
-![](screenshots/add_course_night.jpg)
+![Detalle de los horarios](screenshots/detalles-horarios-university-schedule-español.png)
 
-*Add Schedule*
+*Agregar horario*
 
-![Add schedule](screenshots/add_schedule.jpg)
-![](screenshots/add_schedule_night.jpg)
+![Agregar horario](screenshots/nuevo-horario-university-schedule-español.png)
 
-*Courses*
+*Personalización de los horarios*
 
-![Courses](screenshots/courses.jpg)
-![](screenshots/courses_night.jpg)
+![Personalización de los horarios](screenshots/personalizacion-horario-university-schedule-español.png)
 
-*Schedule Configuration*
+*Recordatorio de los horarios*
 
-![Schedule Configuration](screenshots/schedule_configuration.jpg)
-![](screenshots/schedule_configuration_night.jpeg)
+![Recordatorio de los horarios](screenshots/recordatorios-horios-university-schedule.png)
 
-## Architecture
+*Visualización de cursos*
 
-The **University Schedule** app follows the [official architecture guidance](https://developer.android.com/topic/architecture), ensuring a clear separation of concerns and facilitating maintainability and testability. The architecture leverages:
-- **Model-View-ViewModel (MVVM)**: Ensures a clear separation of the UI logic from the business logic, making the app more modular and easier to test.
-- **ViewModel**: Manages UI-related data in a lifecycle-conscious way.
-- **Kotlin Flows**: For asynchronous data streams, ensuring efficient and reactive handling of data updates.
-- **LiveData**: Provides observable data holder classes.
-- **Repository Pattern**: Manages data operations and provides a clean API to the ViewModel.
-- **Room Database**: For local data storage.
+![Visualización de cursos](screenshots/cursos-university-schedule-español.png)
 
-## Modularization
+*Agregar Cursos*
 
-University Schedule is structured into several modules to enhance scalability and maintainability, following the [official modularization guide](https://developer.android.com/topic/modularization) from the Android Developer website. The modules are:
+![Agregar Cursos](screenshots/add_course.jpg)
 
-- **App Module**: The main entry point of the application.
-- **Build-Logic Module**: Contains the convention module for build configurations.
-- **Core Module**: Encapsulates the following sub-modules:
-  - **Common**: Shared utilities and constants.
-  - **Data-Test**: Testing utilities for the data layer.
-  - **Data**: Manages data sources.
-  - **Database-Test**: Testing utilities for database interactions.
-  - **Database**: Manages local database operations.
-  - **Datastore-Test**: Testing utilities for data storage.
-  - **Datastore**: Manages data storage operations.
-  - **DesignSystem**: Custom UI components and design system elements.
-  - **Model**: Defines data models.
-  - **Testing**: Shared testing utilities and configurations.
-  - **UI**: User interface components.
-- **Feature Module**: Encapsulates feature-specific logic with the following sub-modules:
-  - **Course**: Manages course-related features.
-  - **Schedule**: Manages scheduling features.
-- **UI-Test-Hilt-Manifest Module**: Configuration for UI tests using Hilt.
+*Configuración del horario*
 
-## Testing
-
-The app employs a comprehensive testing strategy utilizing several libraries to ensure robust and reliable code:
-- **JUnit**: For unit testing.
-- **Robolectric**: For running Android tests on the JVM.
-- **Espresso**: For UI testing.
-- **MockK**: For mocking dependencies.
-- **Hilt**: For dependency injection in tests.
-
-## UI
-
-The user interface of University Schedule is built using Material 3 components and Views, ensuring a modern and consistent design. Key UI elements include:
-- **Material 3 Components**: For a cohesive and responsive design.
-- **Custom Views**: Tailored to the specific needs of the app for a unique user experience.
+![Configuración del horario](screenshots/configuracion-horario-university-schedule-español.png)
