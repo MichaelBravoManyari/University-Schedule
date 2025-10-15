@@ -15,11 +15,12 @@ object LocalTimeSerializer : KSerializer<LocalTime> {
     override val descriptor: SerialDescriptor
         get() = PrimitiveSerialDescriptor("LocalTime", PrimitiveKind.STRING)
 
-    override fun deserialize(decoder: Decoder): LocalTime {
-        return LocalTime.parse(decoder.decodeString(), formatter)
-    }
+    override fun deserialize(decoder: Decoder): LocalTime = LocalTime.parse(decoder.decodeString(), formatter)
 
-    override fun serialize(encoder: Encoder, value: LocalTime) {
+    override fun serialize(
+        encoder: Encoder,
+        value: LocalTime,
+    ) {
         encoder.encodeString(value.format(formatter))
     }
 }

@@ -24,5 +24,5 @@ data class NetworkSchedule(
     @Contextual
     @SerialName("lastModified") val lastModified: LocalDateTime = LocalDateTime.now(),
     @SerialName("courseId") val courseId: String,
-    @SerialName("userId") val userId: String = ""
+    @SerialName("userId") val userId: String = "",
 )

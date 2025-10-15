@@ -9,12 +9,12 @@ import com.studentsapps.model.Course
 import com.studentsapps.ui.databinding.ItemCourseBinding
 import com.studentsapps.ui.timetable.animateOpacity
 
-class CourseAdapter(private val onItemClicked: (Course) -> Unit) :
-    ListAdapter<Course, CourseAdapter.CourseViewHolder>(DiffCallback) {
-
-    class CourseViewHolder(private var binding: ItemCourseBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-
+class CourseAdapter(
+    private val onItemClicked: (Course) -> Unit,
+) : ListAdapter<Course, CourseAdapter.CourseViewHolder>(DiffCallback) {
+    class CourseViewHolder(
+        private var binding: ItemCourseBinding,
+    ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(course: Course) {
             binding.course = course
             binding.executePendingBindings()
@@ -22,25 +22,32 @@ class CourseAdapter(private val onItemClicked: (Course) -> Unit) :
     }
 
     companion object {
-        private val DiffCallback = object : DiffUtil.ItemCallback<Course>() {
-            override fun areItemsTheSame(oldItem: Course, newItem: Course): Boolean {
-                return oldItem.id == newItem.id
-            }
+        private val DiffCallback =
+            object : DiffUtil.ItemCallback<Course>() {
+                override fun areItemsTheSame(
+                    oldItem: Course,
+                    newItem: Course,
+                ): Boolean = oldItem.id == newItem.id
 
-            override fun areContentsTheSame(oldItem: Course, newItem: Course): Boolean {
-                return oldItem == newItem
+                override fun areContentsTheSame(
+                    oldItem: Course,
+                    newItem: Course,
+                ): Boolean = oldItem == newItem
             }
-        }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CourseViewHolder {
-        val viewHolder = CourseViewHolder(
-            ItemCourseBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): CourseViewHolder {
+        val viewHolder =
+            CourseViewHolder(
+                ItemCourseBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                ),
             )
-        )
         viewHolder.itemView.setOnClickListener {
             animateOpacity(it, 0.5f) {
                 animateOpacity(it, 1.0f) {
@@ -52,7 +59,10 @@ class CourseAdapter(private val onItemClicked: (Course) -> Unit) :
         return viewHolder
     }
 
-    override fun onBindViewHolder(holder: CourseViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: CourseViewHolder,
+        position: Int,
+    ) {
         holder.bind(getItem(position))
     }
 }

@@ -9,8 +9,9 @@ import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
 @HiltAndroidApp
-class MyApplication : Application(), Configuration.Provider {
-
+class MyApplication :
+    Application(),
+    Configuration.Provider {
     @Inject lateinit var workerFactory: HiltWorkerFactory
 
     override fun onCreate() {
@@ -18,15 +19,18 @@ class MyApplication : Application(), Configuration.Provider {
 
         WorkManager.initialize(
             this,
-            Configuration.Builder()
+            Configuration
+                .Builder()
                 .setWorkerFactory(workerFactory)
                 .setMinimumLoggingLevel(Log.DEBUG)
-                .build()
+                .build(),
         )
     }
 
     override val workManagerConfiguration: Configuration
-        get() = Configuration.Builder()
-            .setWorkerFactory(workerFactory)
-            .build()
+        get() =
+            Configuration
+                .Builder()
+                .setWorkerFactory(workerFactory)
+                .build()
 }

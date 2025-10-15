@@ -2,6 +2,7 @@ plugins {
     id("universityschedule.android.ui")
     alias(libs.plugins.org.jetbrains.kotlin.android)
     alias(libs.plugins.compose.compiler)
+    id("universityschedule.android.lint")
 }
 
 android {
@@ -66,5 +67,4 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.navigation.dynamic.features.fragment)
-
 }

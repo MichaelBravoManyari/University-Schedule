@@ -21,5 +21,5 @@ data class Schedule(
     @SerialName("dayOfWeek") val dayOfWeek: DayOfWeek,
     @Serializable(with = LocalDateSerializer::class)
     @SerialName("specificDate") val specificDate: LocalDate?,
-    @SerialName("courseId") val courseId: String
+    @SerialName("courseId") val courseId: String,
 )

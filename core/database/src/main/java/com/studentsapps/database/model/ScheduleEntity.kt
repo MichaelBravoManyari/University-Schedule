@@ -17,9 +17,9 @@ import java.util.UUID
         ForeignKey(
             entity = CourseEntity::class,
             parentColumns = ["id"],
-            childColumns = ["course_id"]
-        )
-    ]
+            childColumns = ["course_id"],
+        ),
+    ],
 )
 data class ScheduleEntity(
     @PrimaryKey
@@ -39,15 +39,16 @@ data class ScheduleEntity(
     @ColumnInfo(name = "user_id")
     val userId: String,
     @ColumnInfo(name = "course_id")
-    val courseId: String
+    val courseId: String,
 )
 
-fun ScheduleEntity.asExternalModel() = Schedule(
-    id = id,
-    startTime = startTime,
-    endTime = endTime,
-    classPlace = classPlace,
-    dayOfWeek = dayOfWeek,
-    specificDate = specificDate,
-    courseId = courseId
-)
+fun ScheduleEntity.asExternalModel() =
+    Schedule(
+        id = id,
+        startTime = startTime,
+        endTime = endTime,
+        classPlace = classPlace,
+        dayOfWeek = dayOfWeek,
+        specificDate = specificDate,
+        courseId = courseId,
+    )

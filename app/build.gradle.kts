@@ -1,12 +1,14 @@
 import java.util.Properties
 
 val apikeysPropertiesFile = rootProject.file("apikeys.properties")
-val apikeysProperties = Properties().apply {
-    load(apikeysPropertiesFile.inputStream())
-}
+val apikeysProperties =
+    Properties().apply {
+        load(apikeysPropertiesFile.inputStream())
+    }
 
 plugins {
     id("universityschedule.android.application")
+    id("universityschedule.android.lint")
     id("universityschedule.android.hilt")
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
@@ -22,14 +24,21 @@ android {
             isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
+        }
+
+        create("profile") {
+            initWith(getByName("release"))
+            isDebuggable = true
+            matchingFallbacks += listOf("release")
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 
     defaultConfig {
         applicationId = "com.studentsapps.universityschedule"
-        versionCode = 1
+        versionCode = 2
         versionName = "1.0"
 
         // App ID (para el manifest)

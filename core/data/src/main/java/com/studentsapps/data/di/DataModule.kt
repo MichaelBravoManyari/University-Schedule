@@ -17,11 +17,10 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 interface DataModule {
-
     @Binds
     @Singleton
     fun bindTimetableUserPreferencesRepository(
-        timetableUserPreferencesRepository: TimetableUserPreferencesRepositoryImp
+        timetableUserPreferencesRepository: TimetableUserPreferencesRepositoryImp,
     ): TimetableUserPreferencesRepository
 
     @Binds

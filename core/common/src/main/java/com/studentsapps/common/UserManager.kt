@@ -7,13 +7,15 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-    class UserManager @Inject constructor(
-    private val auth: FirebaseAuth
-) {
-    private val _userId = MutableStateFlow(auth.currentUser?.uid)
-    val userId: StateFlow<String?> = _userId
+class UserManager
+    @Inject
+    constructor(
+        private val auth: FirebaseAuth,
+    ) {
+        private val _userId = MutableStateFlow(auth.currentUser?.uid)
+        val userId: StateFlow<String?> = _userId
 
-    fun updateUserId() {
-        _userId.value = auth.currentUser?.uid
+        fun updateUserId() {
+            _userId.value = auth.currentUser?.uid
+        }
     }
-}

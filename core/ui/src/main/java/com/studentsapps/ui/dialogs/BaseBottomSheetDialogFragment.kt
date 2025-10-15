@@ -5,7 +5,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
-
     override fun onStart() {
         super.onStart()
         val bottomSheet = dialog?.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)

@@ -24,7 +24,6 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class CourseFragment : Fragment() {
-
     private var _binding: FragmentCourseBinding? = null
     private val binding get() = _binding!!
     private lateinit var navController: NavController
@@ -36,8 +35,9 @@ class CourseFragment : Fragment() {
         }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentCourseBinding.inflate(inflater, container, false)
         binding.apply {
@@ -47,19 +47,23 @@ class CourseFragment : Fragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         navController = view.findNavController()
         val appBarConfiguration = AppBarConfiguration(setOf(R.id.courseFragment))
 
-        val courseAdapter = CourseListAdapter { course ->
-            navController.navigate(
-                CourseFragmentDirections.actionCourseFragmentToRegisterCourseFragment(
-                    title = R.string.update_course,
-                    courseId = course.id
+        val courseAdapter =
+            CourseListAdapter { course ->
+                navController.navigate(
+                    CourseFragmentDirections.actionCourseFragmentToRegisterCourseFragment(
+                        title = R.string.update_course,
+                        courseId = course.id,
+                    ),
                 )
-            )
-        }
+            }
         val space = resources.getDimensionPixelSize(com.studentsapps.ui.R.dimen.item_spacing)
         binding.recyclerViewCourse.adapter = courseAdapter
         binding.recyclerViewCourse.addItemDecoration(SpacesItemDecoration(space))

@@ -16,7 +16,6 @@ import java.time.LocalTime
 
 @ExperimentalCoroutinesApi
 class ScheduleLocalDataSourceTest {
-
     private val testDispatcher = UnconfinedTestDispatcher()
     private lateinit var subject: ScheduleLocalDataSource
     private lateinit var scheduleDao: ScheduleDao
@@ -28,54 +27,70 @@ class ScheduleLocalDataSourceTest {
     }
 
     @Test
-    fun getSchedulesForTimetableInGridMode_returnScheduleDetailsView() = runTest(testDispatcher) {
-        assertThat(
-            subject.getSchedulesForTimetableInGridMode(
-                showSaturday = true,
-                showSunday = true,
-                startDate = LocalDate.of(2023, 11, 20),
-                endDate = LocalDate.of(2023, 11, 26)
-            ), `is`(
-                scheduleDao.getSchedulesForTimetableInGridMode(
+    fun getSchedulesForTimetableInGridMode_returnScheduleDetailsView() =
+        runTest(testDispatcher) {
+            assertThat(
+                subject.getSchedulesForTimetableInGridMode(
                     showSaturday = true,
                     showSunday = true,
                     startDate = LocalDate.of(2023, 11, 20),
-                    endDate = LocalDate.of(2023, 11, 26)
-                )
+                    endDate = LocalDate.of(2023, 11, 26),
+                ),
+                `is`(
+                    scheduleDao.getSchedulesForTimetableInGridMode(
+                        showSaturday = true,
+                        showSunday = true,
+                        startDate = LocalDate.of(2023, 11, 20),
+                        endDate = LocalDate.of(2023, 11, 26),
+                    ),
+                ),
             )
-        )
-    }
+        }
 
     @Test
-    fun getSchedulesForTimetableInListMode_returnScheduleDetailsView() = runTest(testDispatcher) {
-        val date = LocalDate.of(2023, 11, 20)
-        assertThat(
-            subject.getSchedulesForTimetableInListMode(
-                date = date, dayOfWeek = date.dayOfWeek
-            ), `is`(
-                scheduleDao.getSchedulesForTimetableInListMode(
-                    specificDate = date, dayOfWeek = date.dayOfWeek
-                )
+    fun getSchedulesForTimetableInListMode_returnScheduleDetailsView() =
+        runTest(testDispatcher) {
+            val date = LocalDate.of(2023, 11, 20)
+            assertThat(
+                subject.getSchedulesForTimetableInListMode(
+                    date = date,
+                    dayOfWeek = date.dayOfWeek,
+                ),
+                `is`(
+                    scheduleDao.getSchedulesForTimetableInListMode(
+                        specificDate = date,
+                        dayOfWeek = date.dayOfWeek,
+                    ),
+                ),
             )
-        )
-    }
+        }
 
     @Test
-    fun insert_scheduleEntity() = runTest(testDispatcher) {
-        val scheduleEntity = ScheduleEntity(
-            id = 10, LocalTime.of(12, 0), LocalTime.of(13, 0), null, DayOfWeek.MONDAY, null, 1
-        )
-        assertThat(
-            subject.insert(scheduleEntity), `is`(scheduleDao.insert(scheduleEntity))
-        )
-    }
+    fun insert_scheduleEntity() =
+        runTest(testDispatcher) {
+            val scheduleEntity =
+                ScheduleEntity(
+                    id = 10,
+                    LocalTime.of(12, 0),
+                    LocalTime.of(13, 0),
+                    null,
+                    DayOfWeek.MONDAY,
+                    null,
+                    1,
+                )
+            assertThat(
+                subject.insert(scheduleEntity),
+                `is`(scheduleDao.insert(scheduleEntity)),
+            )
+        }
 
     @Test
-    fun get_scheduleDetailsView_by_scheduleId_returnsScheduleDetails() = runTest(testDispatcher) {
-        val scheduleId = 1
-        assertThat(
-            subject.getScheduleDetailsView(scheduleId),
-            `is`(scheduleDao.getScheduleDetailsById(scheduleId))
-        )
-    }
+    fun get_scheduleDetailsView_by_scheduleId_returnsScheduleDetails() =
+        runTest(testDispatcher) {
+            val scheduleId = 1
+            assertThat(
+                subject.getScheduleDetailsView(scheduleId),
+                `is`(scheduleDao.getScheduleDetailsById(scheduleId)),
+            )
+        }
 }

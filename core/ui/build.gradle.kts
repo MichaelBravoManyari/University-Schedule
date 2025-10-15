@@ -1,6 +1,7 @@
 plugins {
     id("universityschedule.android.ui")
     alias(libs.plugins.compose.compiler)
+    id("universityschedule.android.lint")
 }
 
 android {
@@ -53,5 +54,4 @@ dependencies {
     testImplementation(libs.mockk)
     testImplementation(libs.androidx.arch.core.testing)
     testImplementation(libs.espresso.core)
-
 }

@@ -18,31 +18,32 @@ import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
-class CourseViewModel @Inject constructor(
-    private val courseRepository: CourseRepository,
-    userManager: UserManager,
-) : ViewModel() {
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val uiState: StateFlow<CourseUiState> = userManager.userId
-        .filterNotNull()
-        .distinctUntilChanged()
-        .flatMapLatest { userId ->
-            Log.d("CourseViewModel", "UserId recibido: $userId")
-            courseRepository.getAllCourse(userId = userId)
-        }
-        .map(CourseUiState::Success)
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = CourseUiState.Loading
-        )
-}
+class CourseViewModel
+    @Inject
+    constructor(
+        private val courseRepository: CourseRepository,
+        userManager: UserManager,
+    ) : ViewModel() {
+        @OptIn(ExperimentalCoroutinesApi::class)
+        val uiState: StateFlow<CourseUiState> =
+            userManager.userId
+                .filterNotNull()
+                .distinctUntilChanged()
+                .flatMapLatest { userId ->
+                    Log.d("CourseViewModel", "UserId recibido: $userId")
+                    courseRepository.getAllCourse(userId = userId)
+                }.map(CourseUiState::Success)
+                .stateIn(
+                    scope = viewModelScope,
+                    started = SharingStarted.WhileSubscribed(5000),
+                    initialValue = CourseUiState.Loading,
+                )
+    }
 
 sealed interface CourseUiState {
-
     data object Loading : CourseUiState
 
     data class Success(
-        val courseList: List<Course>
+        val courseList: List<Course>,
     ) : CourseUiState
 }

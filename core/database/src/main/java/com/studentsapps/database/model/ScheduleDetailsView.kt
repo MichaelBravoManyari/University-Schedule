@@ -14,7 +14,7 @@ import java.time.LocalTime
         FROM schedules s INNER JOIN courses c 
         ON s.course_id = c.id
     """,
-    viewName = "schedule_details"
+    viewName = "schedule_details",
 )
 data class ScheduleDetailsView(
     @ColumnInfo(name = "schedule_id")
@@ -36,17 +36,18 @@ data class ScheduleDetailsView(
     @ColumnInfo(name = "course_color")
     val courseColor: Int,
     @ColumnInfo(name = "user_id")
-    val userId: String
+    val userId: String,
 )
 
-fun ScheduleDetailsView.asExternalModel() = ScheduleDetails(
-    scheduleId = scheduleId,
-    startTime = startTime,
-    endTime = endTime,
-    classPlace = classPlace,
-    dayOfWeek = dayOfWeek,
-    specificDate = specificDate,
-    courseId = courseId,
-    courseName = courseName,
-    courseColor = courseColor,
-)
+fun ScheduleDetailsView.asExternalModel() =
+    ScheduleDetails(
+        scheduleId = scheduleId,
+        startTime = startTime,
+        endTime = endTime,
+        classPlace = classPlace,
+        dayOfWeek = dayOfWeek,
+        specificDate = specificDate,
+        courseId = courseId,
+        courseName = courseName,
+        courseColor = courseColor,
+    )

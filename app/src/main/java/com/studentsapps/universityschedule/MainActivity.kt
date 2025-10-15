@@ -6,29 +6,24 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.studentsapps.sync.SynchronizationManager
 import com.studentsapps.universityschedule.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import androidx.core.net.toUri
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
     private val viewModel: SplashViewModel by viewModels()
-
-    @Inject
-    lateinit var synchronizationManager: SynchronizationManager
+    private var dialog: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
@@ -42,14 +37,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         observeViewModel()
-
         setupNavController()
         setupBottomNavAndRail()
         observeDestinationChanges()
+        observeViewModelSync()
 
         if (savedInstanceState == null) {
-            val dialog = createLoadingDialog()
-            synchronizationManager.startSyncIfNeeded(dialog)
+            viewModel.startSyncIfNeeded()
         }
     }
 
@@ -57,6 +51,20 @@ class MainActivity : AppCompatActivity() {
         viewModel.forceUpdateRequired.observe(this) { required ->
             if (required) {
                 showForceUpdateDialog()
+            }
+        }
+    }
+
+    private fun observeViewModelSync() {
+        lifecycleScope.launch {
+            viewModel.isSyncing.collect { isSyncing ->
+                if (isSyncing) {
+                    if (dialog == null) dialog = createLoadingDialog()
+                    dialog?.show()
+                } else {
+                    dialog?.dismiss()
+                    dialog = null
+                }
             }
         }
     }
@@ -70,28 +78,26 @@ class MainActivity : AppCompatActivity() {
                 val appPackageName = packageName
                 try {
                     startActivity(
-                        Intent(Intent.ACTION_VIEW, "market://details?id=$appPackageName".toUri())
+                        Intent(Intent.ACTION_VIEW, "market://details?id=$appPackageName".toUri()),
                     )
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     startActivity(
                         Intent(
                             Intent.ACTION_VIEW,
-                            "https://play.google.com/store/apps/details?id=$appPackageName".toUri()
-                        )
+                            "https://play.google.com/store/apps/details?id=$appPackageName".toUri(),
+                        ),
                     )
                 }
                 finish()
-            }
-            .show()
+            }.show()
     }
 
-    private fun createLoadingDialog(): AlertDialog {
-        return MaterialAlertDialogBuilder(this)
+    private fun createLoadingDialog(): AlertDialog =
+        MaterialAlertDialogBuilder(this)
             .setView(com.studentsapps.common.R.layout.dialog_progress)
             .setTitle(this.getText(com.studentsapps.common.R.string.synchronizing))
             .setCancelable(false)
             .create()
-    }
 
     private fun setupNavController() {
         val navHostFragment =
@@ -118,13 +124,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun navigateWithFade(destinationId: Int) {
-        val options = NavOptions.Builder()
-            .setLaunchSingleTop(true)
-            .setEnterAnim(R.anim.fade_in)
-            .setExitAnim(R.anim.fade_out)
-            .setPopEnterAnim(R.anim.fade_in)
-            .setPopExitAnim(R.anim.fade_out)
-            .build()
+        val options =
+            NavOptions
+                .Builder()
+                .setLaunchSingleTop(true)
+                .setEnterAnim(R.anim.fade_in)
+                .setExitAnim(R.anim.fade_out)
+                .setPopEnterAnim(R.anim.fade_in)
+                .setPopExitAnim(R.anim.fade_out)
+                .build()
 
         if (navController.currentDestination?.id != destinationId) {
             navController.navigate(destinationId, null, options)
@@ -136,7 +144,8 @@ class MainActivity : AppCompatActivity() {
             when (destination.id) {
                 com.studentsapps.login.R.id.authFragment,
                 com.studentsapps.login.R.id.emailSignUpFragment,
-                com.studentsapps.login.R.id.emailLoginFragment -> hideNavigation()
+                com.studentsapps.login.R.id.emailLoginFragment,
+                -> hideNavigation()
 
                 else -> showNavigation()
             }

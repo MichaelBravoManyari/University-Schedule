@@ -16,7 +16,6 @@ import java.time.LocalDate
 
 @ExperimentalCoroutinesApi
 class ScheduleRepositoryImpTest {
-
     private val testDispatcher = UnconfinedTestDispatcher()
     private lateinit var subject: ScheduleRepositoryImp
     private lateinit var scheduleLocalDataSource: ScheduleLocalDataSource
@@ -28,44 +27,50 @@ class ScheduleRepositoryImpTest {
     }
 
     @Test
-    fun getSchedulesForTimetableInGridMode_returnsScheduleDetails() = runTest(testDispatcher) {
-        assertThat(
-            subject.getSchedulesForTimetableInGridMode(
-                showSaturday = true,
-                showSunday = true,
-                startDate = LocalDate.of(2023, 11, 20),
-                endDate = LocalDate.of(2023, 11, 26)
-            ), `is`(
-                scheduleLocalDataSource.getSchedulesForTimetableInGridMode(
+    fun getSchedulesForTimetableInGridMode_returnsScheduleDetails() =
+        runTest(testDispatcher) {
+            assertThat(
+                subject.getSchedulesForTimetableInGridMode(
                     showSaturday = true,
                     showSunday = true,
                     startDate = LocalDate.of(2023, 11, 20),
-                    endDate = LocalDate.of(2023, 11, 26)
-                ).map(ScheduleDetailsView::asExternalModel)
+                    endDate = LocalDate.of(2023, 11, 26),
+                ),
+                `is`(
+                    scheduleLocalDataSource
+                        .getSchedulesForTimetableInGridMode(
+                            showSaturday = true,
+                            showSunday = true,
+                            startDate = LocalDate.of(2023, 11, 20),
+                            endDate = LocalDate.of(2023, 11, 26),
+                        ).map(ScheduleDetailsView::asExternalModel),
+                ),
             )
-        )
-    }
+        }
 
     @Test
-    fun getSchedulesForTimetableInListMode_returnsScheduleDetails() = runTest(testDispatcher) {
-        val date = LocalDate.of(2023, 11, 20)
-        assertThat(
-            subject.getSchedulesForTimetableInListMode(date),
-            `is`(
-                scheduleLocalDataSource.getSchedulesForTimetableInListMode(
-                    dayOfWeek = DayOfWeek.MONDAY,
-                    date = date
-                ).map(ScheduleDetailsView::asExternalModel)
+    fun getSchedulesForTimetableInListMode_returnsScheduleDetails() =
+        runTest(testDispatcher) {
+            val date = LocalDate.of(2023, 11, 20)
+            assertThat(
+                subject.getSchedulesForTimetableInListMode(date),
+                `is`(
+                    scheduleLocalDataSource
+                        .getSchedulesForTimetableInListMode(
+                            dayOfWeek = DayOfWeek.MONDAY,
+                            date = date,
+                        ).map(ScheduleDetailsView::asExternalModel),
+                ),
             )
-        )
-    }
+        }
 
     @Test
-    fun getScheduleDetailsById_returnsScheduleDetails() = runTest(testDispatcher) {
-        val scheduleId = 1
-        assertThat(
-            subject.getScheduleDetailsById(scheduleId),
-            `is`(scheduleLocalDataSource.getScheduleDetailsView(scheduleId).asExternalModel())
-        )
-    }
+    fun getScheduleDetailsById_returnsScheduleDetails() =
+        runTest(testDispatcher) {
+            val scheduleId = 1
+            assertThat(
+                subject.getScheduleDetailsById(scheduleId),
+                `is`(scheduleLocalDataSource.getScheduleDetailsView(scheduleId).asExternalModel()),
+            )
+        }
 }

@@ -1,10 +1,8 @@
 package com.studentsapps.sync
 
-import android.app.Dialog
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import androidx.appcompat.app.AlertDialog
 import com.google.firebase.auth.FirebaseAuth
 import com.studentsapps.data.repository.CourseRepository
 import com.studentsapps.data.repository.PendingOperationRepository
@@ -16,52 +14,36 @@ import com.studentsapps.network.datasources.ScheduleNetworkDataSource
 import com.studentsapps.network.model.NetworkCourse
 import com.studentsapps.network.model.NetworkSchedule
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.takeWhile
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class SynchronizationManager @Inject constructor(
-    @ApplicationContext private val context: Context,
-    private val auth: FirebaseAuth,
-    private val pendingOperations: PendingOperationRepository,
-    private val courseNetworkDataSource: CourseNetworkDataSource,
-    private val scheduleNetworkDataSource: ScheduleNetworkDataSource,
-    private val courseRepository: CourseRepository,
-    private val scheduleRepository: ScheduleRepository
-) {
-    private val coroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+class SynchronizationManager
+    @Inject
+    constructor(
+        @ApplicationContext private val context: Context,
+        private val auth: FirebaseAuth,
+        private val pendingOperations: PendingOperationRepository,
+        private val courseNetworkDataSource: CourseNetworkDataSource,
+        private val scheduleNetworkDataSource: ScheduleNetworkDataSource,
+        private val courseRepository: CourseRepository,
+        private val scheduleRepository: ScheduleRepository,
+    ) {
+        suspend fun startSyncIfNeeded() {
+            val userId = auth.currentUser?.uid ?: return
+            if (!isInternetAvailable()) return
 
-    fun startSyncIfNeeded(dialog: AlertDialog) {
-        val userId = auth.currentUser?.uid ?: return
+            pendingOperations
+                .getPendingOperations("PENDING", userId)
+                .map { it.isEmpty() && isInternetAvailable() }
+                .filter { it }
+                .first()
 
-        if (!isInternetAvailable()) return
-
-        coroutineScope.launch {
-            dialog.show()
-            var hasSynced = false
-
-            pendingOperations.getPendingOperations("PENDING", userId)
-                .takeWhile { !hasSynced }
-                .collect { pendingOperations ->
-                    if (isInternetAvailable()) {
-                        if (pendingOperations.isEmpty() && !hasSynced) {
-                            hasSynced = true
-                            startSynchronization(dialog, userId)
-                        }
-                    } else {
-                        hasSynced = true
-                        dialog.dismiss()
-                    }
-                }
+            startSynchronization(userId)
         }
-    }
 
-    private suspend fun startSynchronization(dialog: Dialog, userId: String) {
-        try {
+        suspend fun startSynchronization(userId: String) {
             val coursesFirebase = courseNetworkDataSource.getAllCourses(userId)
             val scheduleFirebase = scheduleNetworkDataSource.getAllSchedules(userId)
             val coursesLocal = courseRepository.getAllCourseEntity(userId).first()
@@ -102,33 +84,30 @@ class SynchronizationManager @Inject constructor(
             }
 
             scheduleRepository.scheduleAllUserAlarms(userId)
-        } finally {
-            dialog.dismiss()
         }
-    }
 
-    private fun isInternetAvailable(): Boolean {
-        val connectivityManager =
-            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val network = connectivityManager.activeNetwork ?: return false
-        val capabilities =
-            connectivityManager.getNetworkCapabilities(network) ?: return false
-        return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
+        private fun isInternetAvailable(): Boolean {
+            val connectivityManager =
+                context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val network = connectivityManager.activeNetwork ?: return false
+            val capabilities =
+                connectivityManager.getNetworkCapabilities(network) ?: return false
+            return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
                 capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+        }
+
+        private fun NetworkCourse.toCourseEntity() = CourseEntity(id, name, nameProfessor, color, lastModified, userId)
+
+        private fun NetworkSchedule.toScheduleEntity() =
+            ScheduleEntity(
+                id,
+                startTime,
+                endTime,
+                classPlace,
+                dayOfWeek,
+                specificDate,
+                lastModified,
+                userId,
+                courseId,
+            )
     }
-
-    private fun NetworkCourse.toCourseEntity() =
-        CourseEntity(id, name, nameProfessor, color, lastModified, userId)
-
-    private fun NetworkSchedule.toScheduleEntity() = ScheduleEntity(
-        id,
-        startTime,
-        endTime,
-        classPlace,
-        dayOfWeek,
-        specificDate,
-        lastModified,
-        userId,
-        courseId
-    )
-}

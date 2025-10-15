@@ -17,17 +17,23 @@ import com.studentsapps.model.Course
 import com.studentsapps.ui.R
 import com.studentsapps.ui.timetable.animateOpacity
 
-class CourseListAdapter(private val onItemClicked: (Course) -> Unit) :
-    ListAdapter<Course, CourseListAdapter.CourseListViewHolder>(
-        DiffCallback
+class CourseListAdapter(
+    private val onItemClicked: (Course) -> Unit,
+) : ListAdapter<Course, CourseListAdapter.CourseListViewHolder>(
+        DiffCallback,
     ) {
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CourseListViewHolder {
-        val viewHolder = CourseListViewHolder(
-            CourseListItemBinding.inflate(
-                LayoutInflater.from(parent.context), parent, false
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): CourseListViewHolder {
+        val viewHolder =
+            CourseListViewHolder(
+                CourseListItemBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                ),
             )
-        )
 
         viewHolder.itemView.setOnClickListener {
             animateOpacity(it, 0.5f) {
@@ -40,14 +46,16 @@ class CourseListAdapter(private val onItemClicked: (Course) -> Unit) :
         return viewHolder
     }
 
-    override fun onBindViewHolder(holder: CourseListViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: CourseListViewHolder,
+        position: Int,
+    ) {
         holder.bind(getItem(position))
     }
 
     class CourseListViewHolder(
-        private val binding: CourseListItemBinding
+        private val binding: CourseListItemBinding,
     ) : RecyclerView.ViewHolder(binding.root) {
-
         fun bind(course: Course) {
             with(binding) {
                 courseListItemName.text = course.name
@@ -60,8 +68,8 @@ class CourseListAdapter(private val onItemClicked: (Course) -> Unit) :
                             text = course.nameProfessor
                             setTextColor(
                                 getTextColorBasedOnCourseColor(
-                                    course.color
-                                )
+                                    course.color,
+                                ),
                             )
                             val drawableStart = compoundDrawablesRelative[0]
                             if (drawableStart != null) {
@@ -69,11 +77,13 @@ class CourseListAdapter(private val onItemClicked: (Course) -> Unit) :
                                 drawableStart.colorFilter =
                                     PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN)
                                 setCompoundDrawablesRelativeWithIntrinsicBounds(
-                                    drawableStart, null, null, null
+                                    drawableStart,
+                                    null,
+                                    null,
+                                    null,
                                 )
                             }
                         }
-
                     }
                 }
                 courseListItemContainer.backgroundTintList =
@@ -82,25 +92,34 @@ class CourseListAdapter(private val onItemClicked: (Course) -> Unit) :
             }
         }
 
-        private fun getTextColorBasedOnCourseColor(@ColorInt courseColor: Int): Int {
-            return if (ColorUtils.calculateLuminance(courseColor) < 0.5) ContextCompat.getColor(
-                binding.root.context, R.color.timetable_schedule_view_light_text_color
-            )
-            else ContextCompat.getColor(
-                binding.root.context, R.color.timetable_schedule_view_dark_text_color
-            )
-        }
+        private fun getTextColorBasedOnCourseColor(
+            @ColorInt courseColor: Int,
+        ): Int =
+            if (ColorUtils.calculateLuminance(courseColor) < 0.5) {
+                ContextCompat.getColor(
+                    binding.root.context,
+                    R.color.timetable_schedule_view_light_text_color,
+                )
+            } else {
+                ContextCompat.getColor(
+                    binding.root.context,
+                    R.color.timetable_schedule_view_dark_text_color,
+                )
+            }
     }
 
     companion object {
-        private val DiffCallback = object : DiffUtil.ItemCallback<Course>() {
-            override fun areItemsTheSame(oldItem: Course, newItem: Course): Boolean {
-                return oldItem.id == newItem.id
-            }
+        private val DiffCallback =
+            object : DiffUtil.ItemCallback<Course>() {
+                override fun areItemsTheSame(
+                    oldItem: Course,
+                    newItem: Course,
+                ): Boolean = oldItem.id == newItem.id
 
-            override fun areContentsTheSame(oldItem: Course, newItem: Course): Boolean {
-                return oldItem == newItem
+                override fun areContentsTheSame(
+                    oldItem: Course,
+                    newItem: Course,
+                ): Boolean = oldItem == newItem
             }
-        }
     }
 }

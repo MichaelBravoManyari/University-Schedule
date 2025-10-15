@@ -30,7 +30,6 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class RegisterCourseFragment : Fragment() {
-
     private var _binding: FragmentRegisterCourseBinding? = null
     private val binding get() = _binding!!
     private val args: RegisterCourseFragmentArgs by navArgs()
@@ -47,7 +46,9 @@ class RegisterCourseFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentRegisterCourseBinding.inflate(inflater, container, false)
         binding.apply {
@@ -58,7 +59,10 @@ class RegisterCourseFragment : Fragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         navController = view.findNavController()
 
@@ -88,14 +92,15 @@ class RegisterCourseFragment : Fragment() {
 
     private fun handleUiState(uiState: RegisterCourseUiState) {
         if (uiState.isCourseRecorded) {
-            if (!navigatedFromTimeLoggingDestination)
+            if (!navigatedFromTimeLoggingDestination) {
                 adManager.showInterstitial(requireActivity()) {
                     navigateToCourseFragment()
                 }
-            else
+            } else {
                 adManager.showInterstitial(requireActivity()) {
                     navigateToScheduleRegisterScheduleFragment()
                 }
+            }
         }
 
         if (uiState.name.isNotEmpty()) {
@@ -119,31 +124,35 @@ class RegisterCourseFragment : Fragment() {
 
     private fun navigateToCourseFragment() {
         navController.navigate(
-            RegisterCourseFragmentDirections.actionRegisterCourseFragmentToCourseFragment()
+            RegisterCourseFragmentDirections.actionRegisterCourseFragmentToCourseFragment(),
         )
     }
 
     fun goToBottomSheetColor(colorCourse: Int) {
         val request =
-            NavDeepLinkRequest.Builder.fromUri("android-app://studentsapps.app/modalBottomSheetColor/$colorCourse".toUri())
+            NavDeepLinkRequest.Builder
+                .fromUri("android-app://studentsapps.app/modalBottomSheetColor/$colorCourse".toUri())
                 .build()
         navController.navigate(request)
     }
 
     private fun setupNavigationObservers() {
         val navBackStackEntry = navController.getBackStackEntry(R.id.registerCourseFragment)
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                handleSavedState(navBackStackEntry.savedStateHandle)
+        val observer =
+            LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_RESUME) {
+                    handleSavedState(navBackStackEntry.savedStateHandle)
+                }
             }
-        }
 
         navBackStackEntry.lifecycle.addObserver(observer)
-        viewLifecycleOwner.lifecycle.addObserver(LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_DESTROY) {
-                navBackStackEntry.lifecycle.removeObserver(observer)
-            }
-        })
+        viewLifecycleOwner.lifecycle.addObserver(
+            LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_DESTROY) {
+                    navBackStackEntry.lifecycle.removeObserver(observer)
+                }
+            },
+        )
     }
 
     private fun handleSavedState(savedStateHandle: SavedStateHandle) {
@@ -162,7 +171,8 @@ class RegisterCourseFragment : Fragment() {
                     getString(com.studentsapps.ui.R.string.update)
             }
 
-            menuAdd.actionView?.findViewById<MaterialButton>(com.studentsapps.ui.R.id.custom_action_button)
+            menuAdd.actionView
+                ?.findViewById<MaterialButton>(com.studentsapps.ui.R.id.custom_action_button)
                 ?.setOnClickListener {
                     viewModel.run {
                         setCourseName(binding.editTextCourseName.text.toString())
@@ -174,12 +184,12 @@ class RegisterCourseFragment : Fragment() {
     }
 
     fun deleteCourse() {
-        MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.delete_course)
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.delete_course)
             .setMessage(R.string.message_delete_course)
             .setPositiveButton(R.string.accept_dialog) { _, _ ->
                 viewModel.deleteCourse()
-            }
-            .setNegativeButton(R.string.cancel) { dialog, _ ->
+            }.setNegativeButton(R.string.cancel) { dialog, _ ->
                 dialog.dismiss()
             }.show()
     }

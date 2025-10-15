@@ -12,13 +12,12 @@ import io.mockk.verify
 import io.mockk.verifySequence
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Assert.assertThrows
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.Assert.assertThrows
 
 @RunWith(AndroidJUnit4::class)
 class TimetableCanvasRenderTest {
-
     private val canvasRender = TimetableCanvasRender()
 
     @Test
@@ -26,10 +25,11 @@ class TimetableCanvasRenderTest {
         val bitmapHeight = 900
         val bitmapWith = 500
         val bitmapConfig = Bitmap.Config.ARGB_8888
-        val realTimetableBitmap = canvasRender.createTimetableBitmap(
-            bitmapWith,
-            bitmapHeight
-        )
+        val realTimetableBitmap =
+            canvasRender.createTimetableBitmap(
+                bitmapWith,
+                bitmapHeight,
+            )
         assertThat(realTimetableBitmap.width, `is`(bitmapWith))
         assertThat(realTimetableBitmap.height, `is`(bitmapHeight))
         assertThat(realTimetableBitmap.config, `is`(bitmapConfig))
@@ -56,7 +56,7 @@ class TimetableCanvasRenderTest {
             paintHalfHourLine,
             verticalLinesCoordinates,
             horizontalHourLinesCoordinates,
-            halfHourHorizontalLinesCoordinates
+            halfHourHorizontalLinesCoordinates,
         )
         verifySequence {
             canvas.drawLines(verticalLinesCoordinates, gridPaint)
@@ -71,9 +71,10 @@ class TimetableCanvasRenderTest {
         val hoursText = listOf("1:00", "2:00", "3:00", "4:00", "5:00", "6:00", "7:00", "8:00")
         val xAxis = 20f
         val gridCellHeight = 50
-        val paint = Paint().apply {
-            textSize = 10f
-        }
+        val paint =
+            Paint().apply {
+                textSize = 10f
+            }
         val hourTextHeight = paint.descent() - paint.ascent()
         canvasRender.drawHoursText24HourFormat(canvas, hoursText, gridCellHeight, paint, xAxis)
         hoursText.forEachIndexed { index, hourText ->
@@ -88,9 +89,10 @@ class TimetableCanvasRenderTest {
         val hoursText = listOf("11 am", "12 pm", "1 pm", "2 pm", "3 pm", "4 pm", "5 pm", "6 pm")
         val gridCellHeight = 50
         val xAxis = 20f
-        val paint = Paint().apply {
-            textSize = 10f
-        }
+        val paint =
+            Paint().apply {
+                textSize = 10f
+            }
         val hourTextHeight = paint.descent() - paint.ascent()
         canvasRender.drawHoursText12HourFormat(canvas, hoursText, gridCellHeight, paint, xAxis)
         hoursText.forEachIndexed { hourPosition, hourText ->
@@ -116,10 +118,11 @@ class TimetableCanvasRenderTest {
     fun getPaintForHoursText_black10fRobotoRegular() {
         val textColor = Color.BLACK
         val textSize = 10f
-        val typeface = ResourcesCompat.getFont(
-            ApplicationProvider.getApplicationContext(),
-            com.studentsapps.designsystem.R.font.roboto_regular
-        )!!
+        val typeface =
+            ResourcesCompat.getFont(
+                ApplicationProvider.getApplicationContext(),
+                com.studentsapps.designsystem.R.font.roboto_regular,
+            )!!
         val realPaint = canvasRender.getPaintForHoursText(textColor, textSize, typeface)
         assertThat(realPaint.color, `is`(textColor))
         assertThat(realPaint.textAlign, `is`(Paint.Align.CENTER))
@@ -132,10 +135,11 @@ class TimetableCanvasRenderTest {
         val expectedBitmap = Bitmap.createBitmap(50, 50, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(expectedBitmap)
         val circleColor = Color.BLUE
-        val paint = Paint().apply {
-            color = circleColor
-            style = Paint.Style.FILL
-        }
+        val paint =
+            Paint().apply {
+                color = circleColor
+                style = Paint.Style.FILL
+            }
         canvas.drawCircle(25f, 25f, 25f, paint)
         val realBitmap = canvasRender.getCurrentMonthDayBackground(50, 50, circleColor)
         assertThat("same bitmap", realBitmap.sameAs(expectedBitmap))

@@ -19,15 +19,18 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class AlarmPermissionReceiver : BroadcastReceiver() {
-
     @Inject
     lateinit var scheduleRepository: ScheduleRepository
+
     @Inject lateinit var auth: FirebaseAuth
 
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent,
+    ) {
         Log.d("AlarmPermissionReceiver", "onReceive triggered with action: ${intent.action}")
         val userId = auth.currentUser?.uid
-        if(userId != null) {
+        if (userId != null) {
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && alarmManager.canScheduleExactAlarms()) {
                 reRegisterAllAlarms(context, userId)
@@ -35,7 +38,10 @@ class AlarmPermissionReceiver : BroadcastReceiver() {
         }
     }
 
-    private fun reRegisterAllAlarms(context: Context, userId: String) {
+    private fun reRegisterAllAlarms(
+        context: Context,
+        userId: String,
+    ) {
         CoroutineScope(Dispatchers.IO).launch {
             val allSchedules = scheduleRepository.getAllScheduleDetails(userId)
 

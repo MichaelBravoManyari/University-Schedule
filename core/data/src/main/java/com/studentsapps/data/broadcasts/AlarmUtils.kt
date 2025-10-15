@@ -14,22 +14,27 @@ import java.time.LocalTime
 import java.time.ZoneId
 import kotlin.math.absoluteValue
 
-fun scheduleAlarm(context: Context, scheduleDetails: ScheduleDetails) {
+fun scheduleAlarm(
+    context: Context,
+    scheduleDetails: ScheduleDetails,
+) {
     val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-    val intent = Intent(context, ScheduleAlarmReceiver::class.java).apply {
-        putExtra("scheduleId", scheduleDetails.scheduleId)
-        putExtra("courseName", scheduleDetails.courseName)
-        putExtra("courseColor", scheduleDetails.courseColor)
-    }
+    val intent =
+        Intent(context, ScheduleAlarmReceiver::class.java).apply {
+            putExtra("scheduleId", scheduleDetails.scheduleId)
+            putExtra("courseName", scheduleDetails.courseName)
+            putExtra("courseColor", scheduleDetails.courseColor)
+        }
 
     val requestCode = generateRequestCode(scheduleDetails.scheduleId)
 
-    val pendingIntent = PendingIntent.getBroadcast(
-        context,
-        requestCode,
-        intent,
-        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-    )
+    val pendingIntent =
+        PendingIntent.getBroadcast(
+            context,
+            requestCode,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
 
     val triggerTimeMillis = calculateTriggerTimeMillis(scheduleDetails)
 
@@ -38,59 +43,68 @@ fun scheduleAlarm(context: Context, scheduleDetails: ScheduleDetails) {
     }
 
     if (scheduleDetails.specificDate != null) {
-        val triggerDateTime = Instant.ofEpochMilli(triggerTimeMillis)
-            .atZone(ZoneId.systemDefault())
-            .toLocalDateTime().plusMinutes(10)
+        val triggerDateTime =
+            Instant
+                .ofEpochMilli(triggerTimeMillis)
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime()
+                .plusMinutes(15)
 
-        if (triggerDateTime >= LocalDateTime.now())
+        if (triggerDateTime >= LocalDateTime.now()) {
             alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerTimeMillis, pendingIntent)
+        }
     } else {
-        alarmManager.setRepeating(
+        alarmManager.setInexactRepeating(
             AlarmManager.RTC_WAKEUP,
             triggerTimeMillis,
             AlarmManager.INTERVAL_DAY * 7,
-            pendingIntent
+            pendingIntent,
         )
     }
 }
 
-fun generateRequestCode(scheduleId: String): Int {
-    return scheduleId.hashCode().absoluteValue
-}
+fun generateRequestCode(scheduleId: String): Int = scheduleId.hashCode().absoluteValue
 
 private fun calculateTriggerTimeMillis(scheduleDetails: ScheduleDetails): Long {
     val specificDate = scheduleDetails.specificDate
-    val dateTime = if (specificDate != null) {
-        specificDate.atTime(scheduleDetails.startTime)
-    } else {
-        val today = LocalDate.now()
-        val daysUntilNextOccurrence =
-            (scheduleDetails.dayOfWeek.value - today.dayOfWeek.value + 7) % 7
-        val nextOccurrence = if (daysUntilNextOccurrence == 0 && scheduleDetails.startTime.isBefore(
-                LocalTime.now()
-            )
-        ) {
-            today.plusDays(7)
+    val dateTime =
+        if (specificDate != null) {
+            specificDate.atTime(scheduleDetails.startTime)
         } else {
-            today.plusDays(daysUntilNextOccurrence.toLong())
+            val today = LocalDate.now()
+            val daysUntilNextOccurrence =
+                (scheduleDetails.dayOfWeek.value - today.dayOfWeek.value + 7) % 7
+            val nextOccurrence =
+                if (daysUntilNextOccurrence == 0 &&
+                    scheduleDetails.startTime.isBefore(
+                        LocalTime.now(),
+                    )
+                ) {
+                    today.plusDays(7)
+                } else {
+                    today.plusDays(daysUntilNextOccurrence.toLong())
+                }
+            nextOccurrence.atTime(scheduleDetails.startTime)
         }
-        nextOccurrence.atTime(scheduleDetails.startTime)
-    }
 
-    val triggerTime = dateTime.minusMinutes(10)
+    val triggerTime = dateTime.minusMinutes(15)
     return triggerTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
 }
 
-fun cancelAlarm(context: Context, scheduleDetails: ScheduleDetails) {
+fun cancelAlarm(
+    context: Context,
+    scheduleDetails: ScheduleDetails,
+) {
     val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
     val intent = Intent(context, ScheduleAlarmReceiver::class.java)
     val requestCode = generateRequestCode(scheduleDetails.scheduleId)
-    val pendingIntent = PendingIntent.getBroadcast(
-        context,
-        requestCode,
-        intent,
-        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-    )
+    val pendingIntent =
+        PendingIntent.getBroadcast(
+            context,
+            requestCode,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
     alarmManager.cancel(pendingIntent)
 }
 
@@ -98,7 +112,7 @@ fun Schedule.asScheduleDetails(
     scheduleId: String,
     specificDate: LocalDate?,
     courseName: String,
-    courseColor: Int
+    courseColor: Int,
 ) = ScheduleDetails(
     scheduleId = scheduleId,
     startTime = startTime,
@@ -108,5 +122,5 @@ fun Schedule.asScheduleDetails(
     specificDate = specificDate,
     courseId = courseId,
     courseName = courseName,
-    courseColor = courseColor
+    courseColor = courseColor,
 )

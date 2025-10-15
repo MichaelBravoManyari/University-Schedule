@@ -1,3 +1,9 @@
+repositories {
+    google()
+    mavenCentral()
+    gradlePluginPortal()
+}
+
 plugins {
     `kotlin-dsl`
 }
@@ -18,6 +24,8 @@ dependencies {
     compileOnly(libs.android.gradlePlugin)
     compileOnly(libs.kotlin.gradlePlugin)
     compileOnly(libs.ksp.gradlePlugin)
+    implementation(libs.detekt.gradlePlugin)
+    implementation(libs.ktlint.gradlePlugin)
 }
 
 gradlePlugin {
@@ -41,6 +49,10 @@ gradlePlugin {
         register("androidApplication") {
             id = "universityschedule.android.application"
             implementationClass = "AndroidApplicationConventionPlugin"
+        }
+        register("androidLint") {
+            id = "universityschedule.android.lint"
+            implementationClass = "AndroidLintConventionPlugin"
         }
     }
 }

@@ -17,13 +17,13 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object DataStoreModule {
-
     @Provides
     @Singleton
-    fun providesUserPreferencesDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
-        return PreferenceDataStoreFactory.create(
+    fun providesUserPreferencesDataStore(
+        @ApplicationContext context: Context,
+    ): DataStore<Preferences> =
+        PreferenceDataStoreFactory.create(
             corruptionHandler = ReplaceFileCorruptionHandler(produceNewData = { emptyPreferences() }),
-            produceFile = {context.preferencesDataStoreFile("user_preferences.pb")}
+            produceFile = { context.preferencesDataStoreFile("user_preferences.pb") },
         )
-    }
 }

@@ -38,7 +38,6 @@ import kotlin.test.assertEquals
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class RegisterCourseFragmentTest {
-
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
 
@@ -112,18 +111,16 @@ class RegisterCourseFragmentTest {
             fragmentArgs = fragmentArgs,
             navigation = {
                 Navigation.setViewNavController(requireView(), navController)
-            })
+            },
+        )
     }
 
-    private fun isEndIconDrawableNotNull(): Matcher<View> {
-        return object : BoundedMatcher<View, TextInputLayout>(TextInputLayout::class.java) {
+    private fun isEndIconDrawableNotNull(): Matcher<View> =
+        object : BoundedMatcher<View, TextInputLayout>(TextInputLayout::class.java) {
             override fun describeTo(description: Description?) {
                 description?.appendText("with endIconDrawable is: ")
             }
 
-            override fun matchesSafely(item: TextInputLayout): Boolean {
-                return item.endIconDrawable != null
-            }
+            override fun matchesSafely(item: TextInputLayout): Boolean = item.endIconDrawable != null
         }
-    }
 }

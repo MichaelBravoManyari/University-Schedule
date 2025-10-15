@@ -53,8 +53,10 @@ import java.time.LocalTime
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(context, attrs) {
-
+class Timetable(
+    context: Context,
+    attrs: AttributeSet,
+) : ConstraintLayout(context, attrs) {
     private var gridStrokeColor = 0
     private var halfHourGridStrokeColor = 0
     private var hoursTextColor = 0
@@ -107,46 +109,54 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
     private fun getAttrs(attrs: AttributeSet) {
         context.obtainStyledAttributes(attrs, R.styleable.Timetable).apply {
             try {
-                gridStrokeColor = getColor(
-                    R.styleable.Timetable_grid_stroke_color,
-                    getColorById(R.color.timetable_default_grid_stroke_color)
-                )
+                gridStrokeColor =
+                    getColor(
+                        R.styleable.Timetable_grid_stroke_color,
+                        getColorById(R.color.timetable_default_grid_stroke_color),
+                    )
 
-                halfHourGridStrokeColor = getColor(
-                    R.styleable.Timetable_half_hour_grid_stroke_color,
-                    getColorById(R.color.timetable_default_half_hour_grid_stroke_color)
-                )
+                halfHourGridStrokeColor =
+                    getColor(
+                        R.styleable.Timetable_half_hour_grid_stroke_color,
+                        getColorById(R.color.timetable_default_half_hour_grid_stroke_color),
+                    )
 
-                hoursTextColor = getColor(
-                    R.styleable.Timetable_hours_text_color,
-                    getColorById(R.color.timetable_default_hours_text_color)
-                )
+                hoursTextColor =
+                    getColor(
+                        R.styleable.Timetable_hours_text_color,
+                        getColorById(R.color.timetable_default_hours_text_color),
+                    )
 
-                val daysOfWeekFontId = getResourceId(
-                    R.styleable.Timetable_days_of_week_font,
-                    com.studentsapps.designsystem.R.font.roboto_medium
-                )
+                val daysOfWeekFontId =
+                    getResourceId(
+                        R.styleable.Timetable_days_of_week_font,
+                        com.studentsapps.designsystem.R.font.roboto_medium,
+                    )
                 daysOfWeekFont = ResourcesCompat.getFont(context, daysOfWeekFontId)!!
 
-                val daysOfMonthFontId = getResourceId(
-                    R.styleable.Timetable_days_of_month_font,
-                    com.studentsapps.designsystem.R.font.roboto_regular
-                )
+                val daysOfMonthFontId =
+                    getResourceId(
+                        R.styleable.Timetable_days_of_month_font,
+                        com.studentsapps.designsystem.R.font.roboto_regular,
+                    )
                 daysOfMonthFont = ResourcesCompat.getFont(context, daysOfMonthFontId)!!
 
-                val scheduleFontId = getResourceId(
-                    R.styleable.Timetable_schedule_font,
-                    com.studentsapps.designsystem.R.font.roboto_medium
-                )
+                val scheduleFontId =
+                    getResourceId(
+                        R.styleable.Timetable_schedule_font,
+                        com.studentsapps.designsystem.R.font.roboto_medium,
+                    )
 
                 scheduleFont = ResourcesCompat.getFont(context, scheduleFontId)!!
 
                 is12HoursFormat =
                     getBoolean(R.styleable.Timetable_is_12_hours_format, is12HoursFormat)
 
-                isMondayFirstDayOfWeek = getBoolean(
-                    R.styleable.Timetable_is_monday_first_day_of_week, isMondayFirstDayOfWeek
-                )
+                isMondayFirstDayOfWeek =
+                    getBoolean(
+                        R.styleable.Timetable_is_monday_first_day_of_week,
+                        isMondayFirstDayOfWeek,
+                    )
 
                 showSaturday = getBoolean(R.styleable.Timetable_show_saturday, showSaturday)
 
@@ -169,23 +179,23 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
 
     fun displaySunday() = showSunday
 
-    fun getStartDate(): LocalDate {
-        return utils.getDaysOfMonthOfWeek(
-            isMondayFirstDayOfWeek,
-            showSaturday,
-            showSunday,
-            date.value
-        ).first()
-    }
+    fun getStartDate(): LocalDate =
+        utils
+            .getDaysOfMonthOfWeek(
+                isMondayFirstDayOfWeek,
+                showSaturday,
+                showSunday,
+                date.value,
+            ).first()
 
-    fun getEndDate(): LocalDate {
-        return utils.getDaysOfMonthOfWeek(
-            isMondayFirstDayOfWeek,
-            showSaturday,
-            showSunday,
-            date.value
-        ).last()
-    }
+    fun getEndDate(): LocalDate =
+        utils
+            .getDaysOfMonthOfWeek(
+                isMondayFirstDayOfWeek,
+                showSaturday,
+                showSunday,
+                date.value,
+            ).last()
 
     fun setTimetableUserPreferences(timetableUserPreferences: TimetableUserPreferences) {
         animateTransition(date.value) {
@@ -310,9 +320,13 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
     }
 
     private fun configureDaysOfMonthViews() {
-        val daysOfMonthCurrentWeek = utils.getDaysOfMonthOfWeek(
-            isMondayFirstDayOfWeek, showSaturday, showSunday, date.value
-        )
+        val daysOfMonthCurrentWeek =
+            utils.getDaysOfMonthOfWeek(
+                isMondayFirstDayOfWeek,
+                showSaturday,
+                showSunday,
+                date.value,
+            )
         val daysOfMonthTextSize = getDimensionById(R.dimen.timetable_days_of_month_text_size)
         val daysOfMonthViews = getDaysOfMonthViews()
         hideIneligibleDaysOfMonthViews()
@@ -343,9 +357,13 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
             when {
                 viewDate == currentDate && viewDate == date.value -> {
                     if (view.measuredWidth != 0 && view.measuredHeight != 0) {
-                        val backgroundDrawable = canvasRender.getCurrentMonthDayBackground(
-                            view.measuredWidth, view.measuredHeight, currentMonthDayBackgroundColor
-                        ).toDrawable(resources)
+                        val backgroundDrawable =
+                            canvasRender
+                                .getCurrentMonthDayBackground(
+                                    view.measuredWidth,
+                                    view.measuredHeight,
+                                    currentMonthDayBackgroundColor,
+                                ).toDrawable(resources)
                         applyViewStyle(view, currentMonthDayTextColor, backgroundDrawable)
                     }
                 }
@@ -356,9 +374,13 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
 
                 viewDate == date.value && viewDate != currentDate && !showAsGrid -> {
                     if (view.measuredWidth != 0 && view.measuredHeight != 0) {
-                        val backgroundDrawable = canvasRender.getCurrentMonthDayBackground(
-                            view.measuredWidth, view.measuredHeight, monthDayTextColor
-                        ).toDrawable(resources)
+                        val backgroundDrawable =
+                            canvasRender
+                                .getCurrentMonthDayBackground(
+                                    view.measuredWidth,
+                                    view.measuredHeight,
+                                    monthDayTextColor,
+                                ).toDrawable(resources)
                         applyViewStyle(view, currentMonthDayTextColor, backgroundDrawable)
                     }
                 }
@@ -370,60 +392,82 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
         }
     }
 
-    private fun applyViewStyle(view: TextView, textColor: Int, backgroundDrawable: Drawable?) {
+    private fun applyViewStyle(
+        view: TextView,
+        textColor: Int,
+        backgroundDrawable: Drawable?,
+    ) {
         view.apply {
             setTextColor(textColor)
             background = backgroundDrawable
         }
     }
 
-    private fun getDaysOfWeekOrder(): List<String> {
-        return utils.getDaysOfWeekOrder(isMondayFirstDayOfWeek, showSaturday, showSunday)
+    private fun getDaysOfWeekOrder(): List<String> =
+        utils
+            .getDaysOfWeekOrder(isMondayFirstDayOfWeek, showSaturday, showSunday)
             .map { resourceId ->
                 getStringById(resourceId)
             }
-    }
 
-    private fun getDaysOfWeekViews(): List<TextView> {
-        return with(binding) {
-            val daysOfWeekViews = mutableListOf(
-                startDayOfWeek, secondDayOfWeek, thirdDayOfWeek, fourthDayOfWeek, fifthDayOfWeek
-            )
-
-            if (showSaturday && showSunday) daysOfWeekViews.addAll(
-                listOf(
-                    binding.sixthDayOfWeek, binding.seventhDayOfWeek
+    private fun getDaysOfWeekViews(): List<TextView> =
+        with(binding) {
+            val daysOfWeekViews =
+                mutableListOf(
+                    startDayOfWeek,
+                    secondDayOfWeek,
+                    thirdDayOfWeek,
+                    fourthDayOfWeek,
+                    fifthDayOfWeek,
                 )
-            )
-            else if (showSaturday || showSunday) daysOfWeekViews.add(binding.sixthDayOfWeek)
+
+            if (showSaturday && showSunday) {
+                daysOfWeekViews.addAll(
+                    listOf(
+                        binding.sixthDayOfWeek,
+                        binding.seventhDayOfWeek,
+                    ),
+                )
+            } else if (showSaturday || showSunday) {
+                daysOfWeekViews.add(binding.sixthDayOfWeek)
+            }
 
             daysOfWeekViews
         }
-    }
 
-    private fun getDaysOfMonthViews(): List<TextView> {
-        return with(binding) {
-            val daysOfMonthViews = mutableListOf(
-                firstDay, secondDay, thirdDay, fourthDay, fifthDay
-            )
-
-            if (showSaturday && showSunday) daysOfMonthViews.addAll(
-                listOf(
-                    binding.sixthDay, binding.seventhDay
+    private fun getDaysOfMonthViews(): List<TextView> =
+        with(binding) {
+            val daysOfMonthViews =
+                mutableListOf(
+                    firstDay,
+                    secondDay,
+                    thirdDay,
+                    fourthDay,
+                    fifthDay,
                 )
-            )
-            else if (showSaturday || showSunday) daysOfMonthViews.add(binding.sixthDay)
+
+            if (showSaturday && showSunday) {
+                daysOfMonthViews.addAll(
+                    listOf(
+                        binding.sixthDay,
+                        binding.seventhDay,
+                    ),
+                )
+            } else if (showSaturday || showSunday) {
+                daysOfMonthViews.add(binding.sixthDay)
+            }
 
             daysOfMonthViews
         }
-    }
 
     private fun hideIneligibleDaysOfWeekViews() {
         with(binding) {
             if (!showSaturday && !showSunday) {
                 sixthDayOfWeek.visibility = GONE
                 seventhDayOfWeek.visibility = GONE
-            } else if (!showSaturday || !showSunday) seventhDayOfWeek.visibility = GONE
+            } else if (!showSaturday || !showSunday) {
+                seventhDayOfWeek.visibility = GONE
+            }
         }
     }
 
@@ -432,19 +476,26 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
             if (!showSaturday && !showSunday) {
                 sixthDay.visibility = GONE
                 seventhDay.visibility = GONE
-            } else if (!showSaturday || !showSunday) seventhDay.visibility = GONE
+            } else if (!showSaturday || !showSunday) {
+                seventhDay.visibility = GONE
+            }
         }
     }
 
-    private fun getStringById(@StringRes stringId: Int): String {
-        return resources.getString(stringId)
-    }
+    private fun getStringById(
+        @StringRes stringId: Int,
+    ): String = resources.getString(stringId)
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+    override fun onMeasure(
+        widthMeasureSpec: Int,
+        heightMeasureSpec: Int,
+    ) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         val realRootViewWidth = getRootViewWidth(widthMeasureSpec)
-        if (realRootViewWidth != 0 && realRootViewWidth != rootViewWidth) rootViewWidth =
-            realRootViewWidth
+        if (realRootViewWidth != 0 && realRootViewWidth != rootViewWidth) {
+            rootViewWidth =
+                realRootViewWidth
+        }
         if (drawView) {
             if (redrawGridsAndHours) {
                 drawGridsAndHours()
@@ -482,13 +533,20 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
         }
     }
 
-    private fun createBitmapGridAndHours(bitmapWidth: Int, hoursCellWidth: Int): Bitmap {
+    private fun createBitmapGridAndHours(
+        bitmapWidth: Int,
+        hoursCellWidth: Int,
+    ): Bitmap {
         val gridCellHeight = getDimensionPixelSizeById(R.dimen.timetable_grid_cell_height)
         val bitmapHeight = utils.calculateTimetableBitmapHeight(ROWS_NUMBER, gridCellHeight)
         val timetableBitmap = canvasRender.createTimetableBitmap(bitmapWidth, bitmapHeight)
         val canvas = Canvas(timetableBitmap)
         drawGrid(
-            canvas, hoursCellWidth, gridCellHeight, bitmapHeight.toFloat(), bitmapWidth.toFloat()
+            canvas,
+            hoursCellWidth,
+            gridCellHeight,
+            bitmapHeight.toFloat(),
+            bitmapWidth.toFloat(),
         )
 
         drawHoursText(canvas, gridCellHeight, hoursCellWidth)
@@ -500,37 +558,56 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
         hoursCellWidth: Int,
         gridCellHeight: Int,
         lineHeight: Float,
-        lineLength: Float
+        lineLength: Float,
     ) {
         val lineWidth = getDimensionById(R.dimen.timetable_grid_lines_stroke_width)
         val numHorizontalGridLines = utils.getNumHorizontalGridLines(showSaturday, showSunday)
         val paintGrid = canvasRender.getPaintForGridLines(gridStrokeColor, lineWidth)
         val paintHalfHourLine =
             canvasRender.getPaintForGridLines(halfHourGridStrokeColor, lineWidth)
-        val verticalLinesCoordinates = utils.getVerticalLinesCoordinates(
-            numHorizontalGridLines, hoursCellWidth, gridCellWidth, lineHeight
-        )
-        val horizontalHourLinesCoordinates = utils.getHorizontalHourLinesCoordinates(
-            NUM_HORIZONTAL_GRID_LINES, hoursCellWidth, gridCellHeight, lineLength
-        )
-        val halfHourHorizontalLinesCoordinates = utils.getHalfHourHorizontalLinesCoordinates(
-            NUM_HORIZONTAL_GRID_LINES, hoursCellWidth, gridCellHeight, lineLength
-        )
+        val verticalLinesCoordinates =
+            utils.getVerticalLinesCoordinates(
+                numHorizontalGridLines,
+                hoursCellWidth,
+                gridCellWidth,
+                lineHeight,
+            )
+        val horizontalHourLinesCoordinates =
+            utils.getHorizontalHourLinesCoordinates(
+                NUM_HORIZONTAL_GRID_LINES,
+                hoursCellWidth,
+                gridCellHeight,
+                lineLength,
+            )
+        val halfHourHorizontalLinesCoordinates =
+            utils.getHalfHourHorizontalLinesCoordinates(
+                NUM_HORIZONTAL_GRID_LINES,
+                hoursCellWidth,
+                gridCellHeight,
+                lineLength,
+            )
         canvasRender.drawGrid(
             canvas,
             paintGrid,
             paintHalfHourLine,
             verticalLinesCoordinates,
             horizontalHourLinesCoordinates,
-            halfHourHorizontalLinesCoordinates
+            halfHourHorizontalLinesCoordinates,
         )
     }
 
-    private fun calculateGridCellWidth(realRootViewWidth: Int, hoursCellWidth: Int) {
+    private fun calculateGridCellWidth(
+        realRootViewWidth: Int,
+        hoursCellWidth: Int,
+    ) {
         val columnsNumber = utils.getColumnsNumber(showSaturday, showSunday)
-        gridCellWidth = utils.calculateGridCellWidth(
-            realRootViewWidth, hoursCellWidth, columnsNumber, COLUMNS_HOURS_NUMBER
-        )
+        gridCellWidth =
+            utils.calculateGridCellWidth(
+                realRootViewWidth,
+                hoursCellWidth,
+                columnsNumber,
+                COLUMNS_HOURS_NUMBER,
+            )
     }
 
     private fun getRootViewWidth(widthMeasureSpec: Int): Int {
@@ -544,40 +621,62 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
         }
     }
 
-    private fun drawHoursText(canvas: Canvas, gridCellHeight: Int, hoursCellWidth: Int) {
+    private fun drawHoursText(
+        canvas: Canvas,
+        gridCellHeight: Int,
+        hoursCellWidth: Int,
+    ) {
         val hoursTextSize = getDimensionById(R.dimen.timetable_hours_text_size)
         val hourTextPaint =
             canvasRender.getPaintForHoursText(hoursTextColor, hoursTextSize, daysOfWeekFont)
         val xAxis = hoursCellWidth / 2f
         val hoursText =
-            if (is12HoursFormat) getStringArrayById(R.array.hours_in_12_hour_format).toList() else getStringArrayById(
-                R.array.hours_in_24_hour_format
-            ).toList()
-        if (is12HoursFormat) canvasRender.drawHoursText12HourFormat(
-            canvas, hoursText, gridCellHeight, hourTextPaint, xAxis
-        )
-        else canvasRender.drawHoursText24HourFormat(
-            canvas, hoursText, gridCellHeight, hourTextPaint, xAxis
-        )
+            if (is12HoursFormat) {
+                getStringArrayById(R.array.hours_in_12_hour_format).toList()
+            } else {
+                getStringArrayById(
+                    R.array.hours_in_24_hour_format,
+                ).toList()
+            }
+        if (is12HoursFormat) {
+            canvasRender.drawHoursText12HourFormat(
+                canvas,
+                hoursText,
+                gridCellHeight,
+                hourTextPaint,
+                xAxis,
+            )
+        } else {
+            canvasRender.drawHoursText24HourFormat(
+                canvas,
+                hoursText,
+                gridCellHeight,
+                hourTextPaint,
+                xAxis,
+            )
+        }
     }
 
-    private fun getColorById(@ColorRes colorId: Int): Int {
-        return ContextCompat.getColor(context, colorId)
-    }
+    private fun getColorById(
+        @ColorRes colorId: Int,
+    ): Int = ContextCompat.getColor(context, colorId)
 
-    private fun getStringArrayById(@ArrayRes arrayId: Int): Array<String> {
-        return resources.getStringArray(arrayId)
-    }
+    private fun getStringArrayById(
+        @ArrayRes arrayId: Int,
+    ): Array<String> = resources.getStringArray(arrayId)
 
-    private fun getDimensionPixelSizeById(@DimenRes dimenId: Int): Int {
-        return resources.getDimensionPixelSize(dimenId)
-    }
+    private fun getDimensionPixelSizeById(
+        @DimenRes dimenId: Int,
+    ): Int = resources.getDimensionPixelSize(dimenId)
 
-    private fun getDimensionById(@DimenRes dimenId: Int): Float {
-        return resources.getDimension(dimenId)
-    }
+    private fun getDimensionById(
+        @DimenRes dimenId: Int,
+    ): Float = resources.getDimension(dimenId)
 
-    fun showSchedules(schedules: List<ScheduleView>, onItemClicked: (String) -> Unit) {
+    fun showSchedules(
+        schedules: List<ScheduleView>,
+        onItemClicked: (String) -> Unit,
+    ) {
         if (showAsGrid) {
             post { binding.scheduleContainer.removeAllViews() }
             schedules.groupByDayOfWeek().forEach { (dayOfWeek, schedulesForOneDayOfWeek) ->
@@ -612,22 +711,23 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
         schedule: ScheduleView,
         crossedSchedulesCount: Int = 1,
         index: Int = 0,
-        onItemClicked: (String) -> Unit
+        onItemClicked: (String) -> Unit,
     ) {
         post {
             with(schedule) {
-                val scheduleView = createScheduleView(
-                    id,
-                    courseName,
-                    classPlace,
-                    startTime,
-                    endTime,
-                    dayOfWeek,
-                    color,
-                    crossedSchedulesCount,
-                    index,
-                    onItemClicked
-                )
+                val scheduleView =
+                    createScheduleView(
+                        id,
+                        courseName,
+                        classPlace,
+                        startTime,
+                        endTime,
+                        dayOfWeek,
+                        color,
+                        crossedSchedulesCount,
+                        index,
+                        onItemClicked,
+                    )
                 binding.scheduleContainer.addView(scheduleView)
             }
         }
@@ -643,34 +743,44 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
         color: Int,
         crossedSchedulesCount: Int = 1,
         crossScheduleIndex: Int = 0,
-        onItemClicked: (String) -> Unit
+        onItemClicked: (String) -> Unit,
     ): LinearLayout {
-        val layoutParams = getScheduleViewLayoutParams(
-            startTime, endTime, day, crossedSchedulesCount, crossScheduleIndex
-        )
+        val layoutParams =
+            getScheduleViewLayoutParams(
+                startTime,
+                endTime,
+                day,
+                crossedSchedulesCount,
+                crossScheduleIndex,
+            )
         val textSize = getDimensionById(R.dimen.timetable_schedule_text_size)
         val marginSchedule = getDimensionPixelSizeById(R.dimen.timetable_schedule_padding)
         val background = ContextCompat.getDrawable(context, R.drawable.background_schedule_view)
-        val layoutParams1 = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
-        ).apply {
-            setMargins(marginSchedule, marginSchedule, marginSchedule, 0)
-        }
-        val materialTextView1 = MaterialTextView(context).apply {
-            contentDescription = id
-            text = courseName
-            this.layoutParams = layoutParams1
-            setTypeface(scheduleFont, Typeface.BOLD)
-            this.textSize = textSize
-            setTextColor(getTextColorBasedOnCourseColor(color))
-        }
-        val materialTextView2 = MaterialTextView(context).apply {
-            text = classPlace
-            this.layoutParams = layoutParams1
-            typeface = scheduleFont
-            this.textSize = textSize
-            setTextColor(getTextColorBasedOnCourseColor(color))
-        }
+        val layoutParams1 =
+            LinearLayout
+                .LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                ).apply {
+                    setMargins(marginSchedule, marginSchedule, marginSchedule, 0)
+                }
+        val materialTextView1 =
+            MaterialTextView(context).apply {
+                contentDescription = id
+                text = courseName
+                this.layoutParams = layoutParams1
+                setTypeface(scheduleFont, Typeface.BOLD)
+                this.textSize = textSize
+                setTextColor(getTextColorBasedOnCourseColor(color))
+            }
+        val materialTextView2 =
+            MaterialTextView(context).apply {
+                text = classPlace
+                this.layoutParams = layoutParams1
+                typeface = scheduleFont
+                this.textSize = textSize
+                setTextColor(getTextColorBasedOnCourseColor(color))
+            }
         return LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
             this.layoutParams = layoutParams
@@ -693,7 +803,7 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
         endTime: LocalTime,
         day: DayOfWeek,
         crossedSchedulesCount: Int = 1,
-        crossScheduleIndex: Int = 0
+        crossScheduleIndex: Int = 0,
     ): RelativeLayout.LayoutParams {
         val scheduleEndMargin = getDimensionPixelSizeById(R.dimen.timetable_schedule_end_margin)
         val cellHeight = getDimensionPixelSizeById(R.dimen.timetable_grid_cell_height)
@@ -701,38 +811,51 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
         val scheduleBottomMargin =
             getDimensionPixelSizeById(R.dimen.timetable_schedule_bottom_margin)
 
-        val width = when (crossedSchedulesCount) {
-            1 -> utils.calculateSingleScheduleViewWidth(gridCellWidth, scheduleEndMargin)
-            else -> utils.calculateCrossScheduleViewWidth(
-                gridCellWidth, crossedSchedulesCount, scheduleEndMargin
-            )
-        }
+        val width =
+            when (crossedSchedulesCount) {
+                1 -> utils.calculateSingleScheduleViewWidth(gridCellWidth, scheduleEndMargin)
+                else ->
+                    utils.calculateCrossScheduleViewWidth(
+                        gridCellWidth,
+                        crossedSchedulesCount,
+                        scheduleEndMargin,
+                    )
+            }
 
         val height =
             utils.calculateScheduleViewHeight(startTime, endTime, cellHeight, scheduleBottomMargin)
         val topMargin = utils.calculateTopMarginScheduleView(startTime, cellHeight)
-        val startMargin = when (crossedSchedulesCount) {
-            1 -> utils.calculateStartMarginSingleScheduleView(
-                hoursCellWidth, gridCellWidth, day, isMondayFirstDayOfWeek, showSaturday, showSunday
-            )
+        val startMargin =
+            when (crossedSchedulesCount) {
+                1 ->
+                    utils.calculateStartMarginSingleScheduleView(
+                        hoursCellWidth,
+                        gridCellWidth,
+                        day,
+                        isMondayFirstDayOfWeek,
+                        showSaturday,
+                        showSunday,
+                    )
 
-            else -> utils.calculateStartMarginCrossScheduleView(
-                hoursCellWidth,
-                gridCellWidth,
-                day,
-                isMondayFirstDayOfWeek,
-                showSaturday,
-                showSunday,
-                crossedSchedulesCount,
-                crossScheduleIndex
-            )
-        }
+                else ->
+                    utils.calculateStartMarginCrossScheduleView(
+                        hoursCellWidth,
+                        gridCellWidth,
+                        day,
+                        isMondayFirstDayOfWeek,
+                        showSaturday,
+                        showSunday,
+                        crossedSchedulesCount,
+                        crossScheduleIndex,
+                    )
+            }
 
-        val layoutParams = RelativeLayout.LayoutParams(width, height).apply {
-            addRule(RelativeLayout.ALIGN_PARENT_START)
-            addRule(RelativeLayout.ALIGN_PARENT_TOP)
-            setMargins(startMargin, topMargin, 0, 0)
-        }
+        val layoutParams =
+            RelativeLayout.LayoutParams(width, height).apply {
+                addRule(RelativeLayout.ALIGN_PARENT_START)
+                addRule(RelativeLayout.ALIGN_PARENT_TOP)
+                setMargins(startMargin, topMargin, 0, 0)
+            }
 
         return layoutParams
     }
@@ -746,24 +869,28 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
             getDimensionPixelSizeById(R.dimen.timetable_selector_circle_radius)
         val gridCellHeight = getDimensionPixelSizeById(R.dimen.timetable_grid_cell_height)
 
-        val lineParams = RelativeLayout.LayoutParams(
-            RelativeLayout.LayoutParams.MATCH_PARENT,
-            getDimensionPixelSizeById(R.dimen.timetable_selector_line_width)
-        ).apply {
-            addRule(RelativeLayout.ALIGN_PARENT_START)
-            addRule(RelativeLayout.ALIGN_PARENT_TOP)
-            setMargins(marginLeft + (selectorCircleRadius / 2), selectorTopMargin, 0, 0)
-        }
+        val lineParams =
+            RelativeLayout
+                .LayoutParams(
+                    RelativeLayout.LayoutParams.MATCH_PARENT,
+                    getDimensionPixelSizeById(R.dimen.timetable_selector_line_width),
+                ).apply {
+                    addRule(RelativeLayout.ALIGN_PARENT_START)
+                    addRule(RelativeLayout.ALIGN_PARENT_TOP)
+                    setMargins(marginLeft + (selectorCircleRadius / 2), selectorTopMargin, 0, 0)
+                }
         lineSelector.layoutParams = lineParams
 
-        val circleParams = RelativeLayout.LayoutParams(
-            selectorCircleRadius,
-            selectorCircleRadius
-        ).apply {
-            addRule(RelativeLayout.ALIGN_PARENT_START)
-            addRule(RelativeLayout.ALIGN_PARENT_TOP)
-            setMargins(marginLeft, selectorTopMargin - (selectorCircleRadius / 2), 0, 0)
-        }
+        val circleParams =
+            RelativeLayout
+                .LayoutParams(
+                    selectorCircleRadius,
+                    selectorCircleRadius,
+                ).apply {
+                    addRule(RelativeLayout.ALIGN_PARENT_START)
+                    addRule(RelativeLayout.ALIGN_PARENT_TOP)
+                    setMargins(marginLeft, selectorTopMargin - (selectorCircleRadius / 2), 0, 0)
+                }
         circleSelector.layoutParams = circleParams
 
         post {
@@ -784,9 +911,10 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
     private fun createCircleSelectorView(): View {
         val circleSelector = View(context)
         circleSelector.background = AppCompatResources.getDrawable(context, R.drawable.color_circle)
-        circleSelector.backgroundTintList = ColorStateList.valueOf(
-            getColorById(R.color.timetable_current_month_day_background_color)
-        )
+        circleSelector.backgroundTintList =
+            ColorStateList.valueOf(
+                getColorById(R.color.timetable_current_month_day_background_color),
+            )
         return circleSelector
     }
 
@@ -797,13 +925,17 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
         return (gridCellHeight * currentHour) + (gridCellHeight * (currentMinute / 60f)).toInt()
     }
 
-    private fun getTextColorBasedOnCourseColor(@ColorInt courseColor: Int): Int {
-        return if (ColorUtils.calculateLuminance(courseColor) < 0.5) getColorById(R.color.timetable_schedule_view_light_text_color)
-        else getColorById(R.color.timetable_schedule_view_dark_text_color)
-    }
+    private fun getTextColorBasedOnCourseColor(
+        @ColorInt courseColor: Int,
+    ): Int =
+        if (ColorUtils.calculateLuminance(courseColor) < 0.5) {
+            getColorById(R.color.timetable_schedule_view_light_text_color)
+        } else {
+            getColorById(R.color.timetable_schedule_view_dark_text_color)
+        }
 
-    override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
-        return when (ev.actionMasked) {
+    override fun onInterceptTouchEvent(ev: MotionEvent): Boolean =
+        when (ev.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
                 mDownX = ev.x
                 false
@@ -816,22 +948,18 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
 
             else -> false
         }
-    }
 
     @SuppressLint("ClickableViewAccessibility")
-    override fun onTouchEvent(event: MotionEvent): Boolean {
-        return gestureDetector.onTouchEvent(event) || super.onTouchEvent(event)
-    }
+    override fun onTouchEvent(event: MotionEvent): Boolean = gestureDetector.onTouchEvent(event) || super.onTouchEvent(event)
 
-    override fun onSaveInstanceState(): Parcelable {
-        return SavedState(super.onSaveInstanceState()).apply {
+    override fun onSaveInstanceState(): Parcelable =
+        SavedState(super.onSaveInstanceState()).apply {
             date.value.let {
                 year = it.year
                 month = it.monthValue
                 day = it.dayOfMonth
             }
         }
-    }
 
     override fun onRestoreInstanceState(state: Parcelable?) {
         when (state) {
@@ -845,7 +973,6 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
     }
 
     private class SavedState : BaseSavedState {
-
         var year = 0
         var month = 0
         var day = 0
@@ -860,7 +987,10 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
             }
         }
 
-        override fun writeToParcel(out: Parcel, flags: Int) {
+        override fun writeToParcel(
+            out: Parcel,
+            flags: Int,
+        ) {
             super.writeToParcel(out, flags)
             with(out) {
                 writeInt(year)
@@ -871,22 +1001,21 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
 
         companion object {
             @JvmField
-            val CREATOR: Parcelable.Creator<SavedState> = object : Parcelable.Creator<SavedState> {
-                override fun createFromParcel(source: Parcel): SavedState {
-                    return SavedState(source)
-                }
+            val CREATOR: Parcelable.Creator<SavedState> =
+                object : Parcelable.Creator<SavedState> {
+                    override fun createFromParcel(source: Parcel): SavedState = SavedState(source)
 
-                override fun newArray(size: Int): Array<SavedState?> {
-                    return arrayOfNulls(size)
+                    override fun newArray(size: Int): Array<SavedState?> = arrayOfNulls(size)
                 }
-            }
         }
     }
 
     private inner class MyGestureListener : GestureDetector.SimpleOnGestureListener() {
-
         override fun onFling(
-            e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float
+            e1: MotionEvent?,
+            e2: MotionEvent,
+            velocityX: Float,
+            velocityY: Float,
         ): Boolean {
             val selectedDate = calculateSelectedDate(e2)
             animateTransition(selectedDate) {
@@ -898,27 +1027,34 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
             return true
         }
 
-        private fun calculateSelectedDate(e2: MotionEvent): LocalDate {
-            return if (showAsGrid) {
+        private fun calculateSelectedDate(e2: MotionEvent): LocalDate =
+            if (showAsGrid) {
                 if (isRightSwipe(e2)) date.value.minusWeeks(1) else date.value.plusWeeks(1)
             } else {
                 if (isRightSwipe(e2)) {
                     var dateReturns = date.value.minusDays(1)
-                    if (dateReturns.dayOfWeek == DayOfWeek.SUNDAY && !showSunday) dateReturns =
-                        dateReturns.minusDays(1)
-                    if (dateReturns.dayOfWeek == DayOfWeek.SATURDAY && !showSaturday) dateReturns =
-                        dateReturns.minusDays(1)
+                    if (dateReturns.dayOfWeek == DayOfWeek.SUNDAY && !showSunday) {
+                        dateReturns =
+                            dateReturns.minusDays(1)
+                    }
+                    if (dateReturns.dayOfWeek == DayOfWeek.SATURDAY && !showSaturday) {
+                        dateReturns =
+                            dateReturns.minusDays(1)
+                    }
                     dateReturns
                 } else {
                     var dateReturns = date.value.plusDays(1)
-                    if (dateReturns.dayOfWeek == DayOfWeek.SATURDAY && !showSaturday) dateReturns =
-                        dateReturns.plusDays(1)
-                    if (dateReturns.dayOfWeek == DayOfWeek.SUNDAY && !showSunday) dateReturns =
-                        dateReturns.plusDays(1)
+                    if (dateReturns.dayOfWeek == DayOfWeek.SATURDAY && !showSaturday) {
+                        dateReturns =
+                            dateReturns.plusDays(1)
+                    }
+                    if (dateReturns.dayOfWeek == DayOfWeek.SUNDAY && !showSunday) {
+                        dateReturns =
+                            dateReturns.plusDays(1)
+                    }
                     dateReturns
                 }
             }
-        }
 
         private fun isRightSwipe(upEvent: MotionEvent): Boolean {
             val deltaX = upEvent.x.minus(mDownX)
@@ -927,9 +1063,13 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
     }
 
     private fun updateTextOfDayOfMonthViews(selectedDate: LocalDate? = null) {
-        val daysOfMonthOfWeek = utils.getDaysOfMonthOfWeek(
-            isMondayFirstDayOfWeek, showSaturday, showSunday, selectedDate ?: date.value
-        )
+        val daysOfMonthOfWeek =
+            utils.getDaysOfMonthOfWeek(
+                isMondayFirstDayOfWeek,
+                showSaturday,
+                showSunday,
+                selectedDate ?: date.value,
+            )
         getDaysOfMonthViews().forEachIndexed { index, view ->
             val viewDate = daysOfMonthOfWeek[index]
             view.apply {
@@ -939,24 +1079,30 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
         }
     }
 
-    private fun animateTransition(selectedDate: LocalDate? = null, action: () -> Unit) {
-
+    private fun animateTransition(
+        selectedDate: LocalDate? = null,
+        action: () -> Unit,
+    ) {
         val fadeAnimListContainerAndScheduleGrid =
-            ObjectAnimator.ofFloat(binding.listContainerAndScheduleGrid, "alpha", 1f, 0f)
+            ObjectAnimator
+                .ofFloat(binding.listContainerAndScheduleGrid, "alpha", 1f, 0f)
                 .apply {
                     duration = 500
                 }
 
         val appearAnimListContainerAndScheduleGrid =
-            ObjectAnimator.ofFloat(binding.listContainerAndScheduleGrid, "alpha", 0f, 1f)
+            ObjectAnimator
+                .ofFloat(binding.listContainerAndScheduleGrid, "alpha", 0f, 1f)
                 .apply {
                     duration = 500
-                    addListener(object : AnimatorListenerAdapter() {
-                        override fun onAnimationStart(animation: Animator) {
-                            super.onAnimationStart(animation)
-                            action()
-                        }
-                    })
+                    addListener(
+                        object : AnimatorListenerAdapter() {
+                            override fun onAnimationStart(animation: Animator) {
+                                super.onAnimationStart(animation)
+                                action()
+                            }
+                        },
+                    )
                 }
 
         val fadeAnimTimetableHead =
@@ -969,12 +1115,13 @@ class Timetable(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
                 duration = 500
             }
 
-        val daysOfWeek = utils.getDaysOfMonthOfWeek(
-            isMondayFirstDayOfWeek,
-            showSaturday,
-            showSunday,
-            date.value
-        )
+        val daysOfWeek =
+            utils.getDaysOfMonthOfWeek(
+                isMondayFirstDayOfWeek,
+                showSaturday,
+                showSunday,
+                date.value,
+            )
 
         if (showAsGrid) {
             if (!daysOfWeek.contains(selectedDate)) {

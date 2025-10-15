@@ -11,7 +11,10 @@ import androidx.core.app.NotificationCompat
 import com.studentsapps.data.R
 
 class ScheduleAlarmReceiver : BroadcastReceiver() {
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent,
+    ) {
         val scheduleId = intent.getStringExtra("scheduleId") ?: ""
         val courseName = intent.getStringExtra("courseName") ?: "Class"
         val courseColor = intent.getIntExtra("courseColor", Color.BLUE)
@@ -23,7 +26,7 @@ class ScheduleAlarmReceiver : BroadcastReceiver() {
         context: Context,
         scheduleId: String,
         courseName: String,
-        courseColor: Int
+        courseColor: Int,
     ) {
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -41,13 +44,15 @@ class ScheduleAlarmReceiver : BroadcastReceiver() {
             notificationManager.createNotificationChannel(channel)
         }
 
-        val notificationBuilder = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(R.drawable.ic_notifications)
-            .setContentTitle(context.getString(R.string.class_reminder))
-            .setContentText(context.getString(R.string.class_is_about_begin, courseName))
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setColor(courseColor)
-            .setAutoCancel(true)
+        val notificationBuilder =
+            NotificationCompat
+                .Builder(context, channelId)
+                .setSmallIcon(R.drawable.ic_notifications)
+                .setContentTitle(context.getString(R.string.class_reminder))
+                .setContentText(context.getString(R.string.class_is_about_begin, courseName))
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setColor(courseColor)
+                .setAutoCancel(true)
 
         notificationManager.notify(notificationId, notificationBuilder.build())
     }

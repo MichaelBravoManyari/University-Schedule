@@ -1,13 +1,15 @@
 import java.util.Properties
 
 val apikeysPropertiesFile = rootProject.file("apikeys.properties")
-val apikeysProperties = Properties().apply {
-    load(apikeysPropertiesFile.inputStream())
-}
+val apikeysProperties =
+    Properties().apply {
+        load(apikeysPropertiesFile.inputStream())
+    }
 
 plugins {
     id("universityschedule.android.ui")
     alias(libs.plugins.org.jetbrains.kotlin.android)
+    id("universityschedule.android.lint")
 }
 
 android {
@@ -29,7 +31,7 @@ android {
         buildConfigField(
             "String",
             "GOOGLE_WEB_CLIENT_ID",
-            "\"${apikeysProperties["GOOGLE_WEB_CLIENT_ID"]}\""
+            "\"${apikeysProperties["GOOGLE_WEB_CLIENT_ID"]}\"",
         )
 
         consumerProguardFiles("consumer-rules.pro")
@@ -56,7 +58,7 @@ dependencies {
     implementation(libs.firebase.firestore.ktx)
 
     // Authentication with Credential Manager
-    implementation (libs.googleid)
+    implementation(libs.googleid)
     implementation(libs.play.services.auth)
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)

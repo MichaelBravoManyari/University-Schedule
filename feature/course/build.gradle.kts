@@ -2,6 +2,7 @@ plugins {
     id("universityschedule.android.ui")
     alias(libs.plugins.org.jetbrains.kotlin.android)
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.10"
+    id("universityschedule.android.lint")
 }
 
 android {

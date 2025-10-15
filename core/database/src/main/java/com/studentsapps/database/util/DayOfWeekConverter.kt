@@ -4,7 +4,6 @@ import androidx.room.TypeConverter
 import java.time.DayOfWeek
 
 class DayOfWeekConverter {
-
     @TypeConverter
     fun dayOfWeekToInt(dayOfWeek: DayOfWeek): Int = dayOfWeek.value
 

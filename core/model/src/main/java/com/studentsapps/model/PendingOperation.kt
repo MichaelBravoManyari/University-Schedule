@@ -8,5 +8,5 @@ data class PendingOperation(
     val entityType: String,
     val payload: String,
     val status: String,
-    val timestamp: LocalDateTime
+    val timestamp: LocalDateTime,
 )

@@ -10,8 +10,8 @@ data class NetworkCourse(
     @SerialName("id") val id: String,
     @SerialName("name") val name: String,
     @SerialName("nameProfessor") val nameProfessor: String?,
-    @SerialName("color")  val color: Int,
+    @SerialName("color") val color: Int,
     @Contextual
     @SerialName("lastModified") val lastModified: LocalDateTime = LocalDateTime.now(),
-    @SerialName("userId") val userId: String = ""
+    @SerialName("userId") val userId: String = "",
 )

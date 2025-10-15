@@ -12,11 +12,12 @@ object DayOfWeekSerializer : KSerializer<DayOfWeek> {
     override val descriptor: SerialDescriptor =
         PrimitiveSerialDescriptor("DayOfWeek", PrimitiveKind.STRING)
 
-    override fun serialize(encoder: Encoder, value: DayOfWeek) {
+    override fun serialize(
+        encoder: Encoder,
+        value: DayOfWeek,
+    ) {
         encoder.encodeString(value.name)
     }
 
-    override fun deserialize(decoder: Decoder): DayOfWeek {
-        return DayOfWeek.valueOf(decoder.decodeString())
-    }
+    override fun deserialize(decoder: Decoder): DayOfWeek = DayOfWeek.valueOf(decoder.decodeString())
 }

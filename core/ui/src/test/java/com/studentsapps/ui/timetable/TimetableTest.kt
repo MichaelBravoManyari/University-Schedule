@@ -63,7 +63,6 @@ import java.time.LocalTime
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class TimetableTest {
-
     @get:Rule
     val hiltRule = HiltAndroidRule(this)
 
@@ -143,8 +142,8 @@ class TimetableTest {
         mockUtilsGetDayOfWeekOrder()
         createTimetable().setTimetableUserPreferences(
             baseTimetableUserPreferences.copy(
-                isMondayFirstDayOfWeek = true
-            )
+                isMondayFirstDayOfWeek = true,
+            ),
         )
         verifyDaysOfWeekTexts("Mo", "Tu", "We", "Th", "Fr", "Sa", "Su")
     }
@@ -153,7 +152,7 @@ class TimetableTest {
     fun showDaysOfMonthCurrentWeek_startingMonday() {
         mockUtilsGetDaysOfMonthOfWeek()
         createTimetable().setTimetableUserPreferences(
-            baseTimetableUserPreferences.copy(isMondayFirstDayOfWeek = true)
+            baseTimetableUserPreferences.copy(isMondayFirstDayOfWeek = true),
         )
         verifyDaysOfMonthCurrentWeekTexts("2", "3", "4", "5", "6", "7", "8")
     }
@@ -162,7 +161,7 @@ class TimetableTest {
     fun showDaysOfWeek_startingSunday() {
         mockUtilsGetDayOfWeekOrder()
         createTimetable().setTimetableUserPreferences(
-            baseTimetableUserPreferences.copy(isMondayFirstDayOfWeek = false)
+            baseTimetableUserPreferences.copy(isMondayFirstDayOfWeek = false),
         )
         verifyDaysOfWeekTexts("Su", "Mo", "Tu", "We", "Th", "Fr", "Sa")
     }
@@ -171,7 +170,7 @@ class TimetableTest {
     fun showDaysOfMonthCurrentWeek_startingSunday() {
         mockUtilsGetDaysOfMonthOfWeek()
         createTimetable().setTimetableUserPreferences(
-            baseTimetableUserPreferences.copy(isMondayFirstDayOfWeek = false)
+            baseTimetableUserPreferences.copy(isMondayFirstDayOfWeek = false),
         )
         verifyDaysOfMonthCurrentWeekTexts("1", "2", "3", "4", "5", "6", "7")
     }
@@ -191,7 +190,7 @@ class TimetableTest {
                 any(),
                 expectedVerticalLinesCoordinates,
                 expectedHorizontalHourLinesCoordinates,
-                expectedHalfHourHorizontalLinesCoordinates
+                expectedHalfHourHorizontalLinesCoordinates,
             )
         }
     }
@@ -203,7 +202,7 @@ class TimetableTest {
         val hoursIn24HourFormat = getStringArrayById(R.array.hours_in_24_hour_format).toList()
         val xAxis = hourCellWidth / 2f
         createTimetable().setTimetableUserPreferences(
-            baseTimetableUserPreferences.copy(is12HoursFormat = false)
+            baseTimetableUserPreferences.copy(is12HoursFormat = false),
         )
         onView(withId(R.id.hour_drawing_container_and_grid)).check(matches(isDisplayed()))
         verify(exactly = 1) {
@@ -212,7 +211,7 @@ class TimetableTest {
                 hoursIn24HourFormat,
                 gridCellHeight,
                 any(),
-                xAxis
+                xAxis,
             )
         }
     }
@@ -231,7 +230,7 @@ class TimetableTest {
                 hoursIn12HourFormat,
                 gridCellHeight,
                 any(),
-                xAxis
+                xAxis,
             )
         }
     }
@@ -260,7 +259,7 @@ class TimetableTest {
     @Test
     fun showAsGrid_false() {
         createTimetable().setTimetableUserPreferences(
-            baseTimetableUserPreferences.copy(showAsGrid = false)
+            baseTimetableUserPreferences.copy(showAsGrid = false),
         )
         verifyTimetableListViewIsDisplayed()
     }
@@ -294,8 +293,8 @@ class TimetableTest {
     fun showSaturdayAndStartingSunday() {
         createTimetable().setTimetableUserPreferences(
             baseTimetableUserPreferences.copy(
-                isMondayFirstDayOfWeek = false
-            )
+                isMondayFirstDayOfWeek = false,
+            ),
         )
         onView(withId(R.id.seventh_day)).check(matches(isDisplayed()))
         onView(withId(R.id.seventh_day_of_week)).check(matches(isDisplayed()))
@@ -305,7 +304,7 @@ class TimetableTest {
     @Test
     fun notShowSaturdayAndStartingMonday() {
         createTimetable().setTimetableUserPreferences(
-            baseTimetableUserPreferences.copy(showSaturday = false)
+            baseTimetableUserPreferences.copy(showSaturday = false),
         )
         onView(withId(R.id.seventh_day_of_week)).check(matches(not(isDisplayed())))
         onView(withId(R.id.seventh_day)).check(matches(not(isDisplayed())))
@@ -315,7 +314,7 @@ class TimetableTest {
     @Test
     fun notShowSaturdayAndStartingSunday() {
         createTimetable().setTimetableUserPreferences(
-            baseTimetableUserPreferences.copy(showSaturday = false, isMondayFirstDayOfWeek = false)
+            baseTimetableUserPreferences.copy(showSaturday = false, isMondayFirstDayOfWeek = false),
         )
         onView(withId(R.id.seventh_day_of_week)).check(matches(not(isDisplayed())))
         onView(withId(R.id.seventh_day)).check(matches(not(isDisplayed())))
@@ -333,7 +332,7 @@ class TimetableTest {
     @Test
     fun notShowSundayAndStartingMonday() {
         createTimetable().setTimetableUserPreferences(
-            baseTimetableUserPreferences.copy(showSunday = false)
+            baseTimetableUserPreferences.copy(showSunday = false),
         )
         onView(withId(R.id.seventh_day_of_week)).check(matches(not(isDisplayed())))
         onView(withId(R.id.seventh_day)).check(matches(not(isDisplayed())))
@@ -343,7 +342,7 @@ class TimetableTest {
     @Test
     fun notShowSundayAndStartingSunday() {
         createTimetable().setTimetableUserPreferences(
-            baseTimetableUserPreferences.copy(showSunday = false, isMondayFirstDayOfWeek = false)
+            baseTimetableUserPreferences.copy(showSunday = false, isMondayFirstDayOfWeek = false),
         )
         onView(withId(R.id.seventh_day_of_week)).check(matches(not(isDisplayed())))
         onView(withId(R.id.seventh_day)).check(matches(not(isDisplayed())))
@@ -353,7 +352,7 @@ class TimetableTest {
     @Test
     fun notShowSundayNotShowSaturday() {
         createTimetable().setTimetableUserPreferences(
-            baseTimetableUserPreferences.copy(showSunday = false, showSaturday = false)
+            baseTimetableUserPreferences.copy(showSunday = false, showSaturday = false),
         )
         onView(withId(R.id.seventh_day_of_week)).check(matches(not(isDisplayed())))
         onView(withId(R.id.seventh_day)).check(matches(not(isDisplayed())))
@@ -365,7 +364,7 @@ class TimetableTest {
     @Test
     fun showSchedulesInGrid_courseColorDark() {
         val scheduleId = 1
-        val schedules = listOf(uniqueSchedule.copy(id = scheduleId))
+        val schedules = listOf(uniqueSchedule.copy(id = scheduleId.toString()))
         val expectedColor = getColorById(R.color.timetable_schedule_view_light_text_color)
         val timetable = createTimetable()
         onView(withId(R.id.schedule_container_and_grid)).check(matches(isDisplayed()))
@@ -373,9 +372,9 @@ class TimetableTest {
         onView(withContentDescription(scheduleId.toString())).check(
             matches(
                 withTextColor(
-                    expectedColor
-                )
-            )
+                    expectedColor,
+                ),
+            ),
         )
     }
 
@@ -383,7 +382,7 @@ class TimetableTest {
     fun showSchedulesInGrid_courseColorLight() {
         val scheduleId = 1
         val uniqueScheduleColorLight =
-            listOf(uniqueSchedule.copy(id = scheduleId, color = Color.YELLOW))
+            listOf(uniqueSchedule.copy(id = scheduleId.toString(), color = Color.YELLOW))
         val expectedColor = getColorById(R.color.timetable_schedule_view_dark_text_color)
         val timetable = createTimetable()
         onView(withId(R.id.schedule_container_and_grid)).check(matches(isDisplayed()))
@@ -391,21 +390,22 @@ class TimetableTest {
         onView(withContentDescription(scheduleId.toString())).check(
             matches(
                 withTextColor(
-                    expectedColor
-                )
-            )
+                    expectedColor,
+                ),
+            ),
         )
     }
 
     @Test
     fun showSchedulesInGrid_notShowSunday() {
         val scheduleId = 1
-        val schedule = listOf(uniqueSchedule.copy(id = scheduleId, dayOfWeek = DayOfWeek.SUNDAY))
-        val timetable = createTimetable().apply {
-            setTimetableUserPreferences(
-                baseTimetableUserPreferences.copy(showSunday = false)
-            )
-        }
+        val schedule = listOf(uniqueSchedule.copy(id = scheduleId.toString(), dayOfWeek = DayOfWeek.SUNDAY))
+        val timetable =
+            createTimetable().apply {
+                setTimetableUserPreferences(
+                    baseTimetableUserPreferences.copy(showSunday = false),
+                )
+            }
         onView(withId(R.id.schedule_container_and_grid)).check(matches(isDisplayed()))
         timetable.showSchedules(schedule) {}
         onView(withContentDescription(scheduleId.toString())).check(doesNotExist())
@@ -415,11 +415,12 @@ class TimetableTest {
     fun showSchedulesInGrid_notShowSaturday() {
         val scheduleId = 1
         val schedule = listOf(uniqueSchedule.copy(id = scheduleId, dayOfWeek = DayOfWeek.SATURDAY))
-        val timetable = createTimetable().apply {
-            setTimetableUserPreferences(
-                baseTimetableUserPreferences.copy(showSaturday = false)
-            )
-        }
+        val timetable =
+            createTimetable().apply {
+                setTimetableUserPreferences(
+                    baseTimetableUserPreferences.copy(showSaturday = false),
+                )
+            }
         onView(withId(R.id.schedule_container_and_grid)).check(matches(isDisplayed()))
         timetable.showSchedules(schedule) {}
         onView(withContentDescription(scheduleId.toString())).check(doesNotExist())
@@ -429,20 +430,22 @@ class TimetableTest {
     fun showSchedulesInGrid_notShowSaturday_showSunday() {
         val saturdayScheduleId = 1
         val sundayScheduleId = 2
-        val schedules = listOf(
-            uniqueSchedule.copy(id = saturdayScheduleId, dayOfWeek = DayOfWeek.SATURDAY),
-            uniqueSchedule.copy(id = sundayScheduleId, dayOfWeek = DayOfWeek.SUNDAY)
-        )
-        val timetable = createTimetable().apply {
-            setTimetableUserPreferences(
-                baseTimetableUserPreferences.copy(showSaturday = false)
+        val schedules =
+            listOf(
+                uniqueSchedule.copy(id = saturdayScheduleId, dayOfWeek = DayOfWeek.SATURDAY),
+                uniqueSchedule.copy(id = sundayScheduleId, dayOfWeek = DayOfWeek.SUNDAY),
             )
-        }
+        val timetable =
+            createTimetable().apply {
+                setTimetableUserPreferences(
+                    baseTimetableUserPreferences.copy(showSaturday = false),
+                )
+            }
         onView(withId(R.id.schedule_container_and_grid)).check(matches(isDisplayed()))
         timetable.showSchedules(schedules) {}
         onView(withContentDescription(saturdayScheduleId.toString())).check(doesNotExist())
         onView(withContentDescription(sundayScheduleId.toString())).perform(scrollTo()).check(
-            matches(isDisplayed())
+            matches(isDisplayed()),
         )
     }
 
@@ -488,8 +491,8 @@ class TimetableTest {
                 is12HoursFormat = false,
                 showSaturday = false,
                 isMondayFirstDayOfWeek = false,
-                showSunday = false
-            )
+                showSunday = false,
+            ),
         )
 
         onView(withContentDescription(timetableContentDescription)).check(matches(isDisplayed()))
@@ -634,8 +637,8 @@ class TimetableTest {
             baseTimetableUserPreferences.copy(
                 showAsGrid = false,
                 showSunday = false,
-                showSaturday = false
-            )
+                showSaturday = false,
+            ),
         )
         onView(withId(R.id.fifth_day)).perform(click())
         onView(withContentDescription(timetableContentDescription)).perform(swipeLeft())
@@ -667,8 +670,8 @@ class TimetableTest {
             baseTimetableUserPreferences.copy(
                 showAsGrid = false,
                 showSaturday = false,
-                showSunday = false
-            )
+                showSunday = false,
+            ),
         )
         onView(withContentDescription(timetableContentDescription)).perform(swipeRight())
         assertThat(timetable.date.getOrAwaitValue(), `is`(expectedDate))
@@ -684,8 +687,8 @@ class TimetableTest {
         timetable.setTimetableUserPreferences(
             baseTimetableUserPreferences.copy(
                 isMondayFirstDayOfWeek = false,
-                showAsGrid = false
-            )
+                showAsGrid = false,
+            ),
         )
         onView(withContentDescription(timetableContentDescription)).perform(swipeRight())
         assertThat(timetable.date.getOrAwaitValue(), `is`(expectedDate))
@@ -760,61 +763,62 @@ class TimetableTest {
     @Test
     fun testSchedulesDisplayedInListModeForSpecificDate() {
         val scheduleViewList = listOf(uniqueSchedule)
-        val timetable = createTimetable().apply {
-            setTimetableUserPreferences(baseTimetableUserPreferences.copy(showAsGrid = false))
-        }
+        val timetable =
+            createTimetable().apply {
+                setTimetableUserPreferences(baseTimetableUserPreferences.copy(showAsGrid = false))
+            }
         timetable.showSchedules(scheduleViewList) {}
         onView(
             allOf(
                 withId(R.id.timetable_list_item_course_name),
-                withParent(withTagValue(`is`(2)))
-            )
+                withParent(withTagValue(`is`(2))),
+            ),
         ).check(matches(withText("Math 2")))
         onView(
             allOf(
                 withId(R.id.timetable_list_item_course_hour),
-                withParent(withTagValue(`is`(2)))
-            )
+                withParent(withTagValue(`is`(2))),
+            ),
         ).check(matches(withText("1:00 PM -> 2:00 PM")))
         onView(
             allOf(
                 withId(R.id.timetable_list_item_classroom),
-                withParent(withTagValue(`is`(2)))
-            )
+                withParent(withTagValue(`is`(2))),
+            ),
         ).check(matches(withText("classroom 2")))
     }
 
     @Test
     fun testCheckTimeFormatInListModeIs24HourFormat() {
         val scheduleViewList = listOf(uniqueSchedule)
-        val timetable = createTimetable().apply {
-            setTimetableUserPreferences(
-                baseTimetableUserPreferences.copy(
-                    showAsGrid = false,
-                    is12HoursFormat = false
+        val timetable =
+            createTimetable().apply {
+                setTimetableUserPreferences(
+                    baseTimetableUserPreferences.copy(
+                        showAsGrid = false,
+                        is12HoursFormat = false,
+                    ),
                 )
-            )
-        }
+            }
         timetable.showSchedules(scheduleViewList) {}
         onView(
             allOf(
                 withId(R.id.timetable_list_item_course_hour),
-                withParent(withTagValue(`is`(2)))
-            )
+                withParent(withTagValue(`is`(2))),
+            ),
         ).check(matches(withText("13:00 -> 14:00")))
     }
 
-    private fun createTimetable(
-        attr: AttributeSet? = null
-    ): Timetable {
+    private fun createTimetable(attr: AttributeSet? = null): Timetable {
         var timetable: Timetable? = null
         launchFragmentInHiltContainer<FragmentTest> {
             val attributeSet = attr ?: Robolectric.buildAttributeSet().build()
             timetable = Timetable(this.requireContext(), attributeSet)
-            val layoutParams = FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT
-            )
+            val layoutParams =
+                FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                )
             timetable!!.apply {
                 this.layoutParams = layoutParams
                 contentDescription = timetableContentDescription
@@ -825,13 +829,13 @@ class TimetableTest {
         return timetable!!
     }
 
-    private fun getExpectedBackgroundCurrentMonthDay(): Drawable {
-        return Bitmap.createBitmap(
-            10,
-            10,
-            Bitmap.Config.ARGB_8888
-        ).toDrawable(ApplicationProvider.getApplicationContext<Context>().resources)
-    }
+    private fun getExpectedBackgroundCurrentMonthDay(): Drawable =
+        Bitmap
+            .createBitmap(
+                10,
+                10,
+                Bitmap.Config.ARGB_8888,
+            ).toDrawable(ApplicationProvider.getApplicationContext<Context>().resources)
 
     private fun mockUtilsGetCurrentDate(localDate: LocalDate? = null) {
         every { utils.getCurrentDate() } returns (localDate ?: LocalDate.of(2023, 8, 26))
@@ -842,7 +846,7 @@ class TimetableTest {
             canvasRender.getCurrentMonthDayBackground(
                 any(),
                 any(),
-                any()
+                any(),
             )
         } returns Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888)
     }
@@ -853,7 +857,7 @@ class TimetableTest {
                 any(),
                 any(),
                 any(),
-                any()
+                any(),
             )
         } returns floatArrayOf(12f, 15f, 12f)
         every {
@@ -861,7 +865,7 @@ class TimetableTest {
                 any(),
                 any(),
                 any(),
-                any()
+                any(),
             )
         } returns floatArrayOf(15f, 30f, 45f)
         every {
@@ -869,7 +873,7 @@ class TimetableTest {
                 any(),
                 any(),
                 any(),
-                any()
+                any(),
             )
         } returns floatArrayOf(20f, 15f, 45f)
     }
@@ -879,19 +883,22 @@ class TimetableTest {
             utils.getDaysOfMonthOfWeek(any(), any(), any(), any())
         } answers {
             list?.map { LocalDate.of(2023, 7, it.toInt()) }
-                ?: if (arg(0)) fakeDaysOfMonthCurrentWeekStartingMonday.map {
-                    LocalDate.of(
-                        2023,
-                        7,
-                        it.toInt()
-                    )
-                }
-                else fakeDaysOfMonthCurrentWeekStartingSunday.map {
-                    LocalDate.of(
-                        2023,
-                        7,
-                        it.toInt()
-                    )
+                ?: if (arg(0)) {
+                    fakeDaysOfMonthCurrentWeekStartingMonday.map {
+                        LocalDate.of(
+                            2023,
+                            7,
+                            it.toInt(),
+                        )
+                    }
+                } else {
+                    fakeDaysOfMonthCurrentWeekStartingSunday.map {
+                        LocalDate.of(
+                            2023,
+                            7,
+                            it.toInt(),
+                        )
+                    }
                 }
         }
     }
@@ -901,32 +908,37 @@ class TimetableTest {
             utils.getDaysOfWeekOrder(
                 any(),
                 any(),
-                any()
+                any(),
             )
         } answers { if (arg(0)) fakeDaysOfWeekStartingMonday else fakeDaysOfWeekStartingSunday }
     }
 
-    private fun getTypeface(@FontRes fontId: Int): Typeface {
-        return ResourcesCompat.getFont(ApplicationProvider.getApplicationContext(), fontId)!!
-    }
+    private fun getTypeface(
+        @FontRes fontId: Int,
+    ): Typeface = ResourcesCompat.getFont(ApplicationProvider.getApplicationContext(), fontId)!!
 
-    private fun getDimensionPixelSizeById(@DimenRes dimenId: Int): Int {
-        return ApplicationProvider.getApplicationContext<Application>().resources.getDimensionPixelSize(
-            dimenId
+    private fun getDimensionPixelSizeById(
+        @DimenRes dimenId: Int,
+    ): Int =
+        ApplicationProvider.getApplicationContext<Application>().resources.getDimensionPixelSize(
+            dimenId,
         )
-    }
 
-    private fun getStringArrayById(@ArrayRes arrayId: Int): Array<String> {
-        return ApplicationProvider.getApplicationContext<Context?>().resources.getStringArray(
-            arrayId
+    private fun getStringArrayById(
+        @ArrayRes arrayId: Int,
+    ): Array<String> =
+        ApplicationProvider.getApplicationContext<Context?>().resources.getStringArray(
+            arrayId,
         )
-    }
 
-    private fun getColorById(@ColorRes colorId: Int): Int {
-        return ContextCompat.getColor(ApplicationProvider.getApplicationContext(), colorId)
-    }
+    private fun getColorById(
+        @ColorRes colorId: Int,
+    ): Int = ContextCompat.getColor(ApplicationProvider.getApplicationContext(), colorId)
 
-    private fun verifyTextSize(viewsIds: List<Int>, expectedTextSize: Float) {
+    private fun verifyTextSize(
+        viewsIds: List<Int>,
+        expectedTextSize: Float,
+    ) {
         for (viewId in viewsIds) {
             onView(withId(viewId)).check(matches(withTextSize(expectedTextSize)))
         }
@@ -940,8 +952,10 @@ class TimetableTest {
         verifyTexts(getDaysOfWeekViewsIds(), expectedDaysTexts.toList())
     }
 
-
-    private fun verifyTexts(daysViewsIds: List<Int>, expectedDayTexts: List<String>) {
+    private fun verifyTexts(
+        daysViewsIds: List<Int>,
+        expectedDayTexts: List<String>,
+    ) {
         daysViewsIds.forEachIndexed { index, viewId ->
             onView(withId(viewId))
                 .check(matches(withText(expectedDayTexts[index])))
@@ -961,25 +975,34 @@ class TimetableTest {
         }
     }
 
-    private fun verifyTypeface(viewId: Int, expectedTypeface: Typeface) {
+    private fun verifyTypeface(
+        viewId: Int,
+        expectedTypeface: Typeface,
+    ) {
         onView(withId(viewId)).check(matches(withTypeface(expectedTypeface)))
     }
 
-    private fun getDaysOfWeekViewsIds(): List<Int> {
-        return listOf(
-            R.id.start_day_of_week, R.id.second_day_of_week, R.id.third_day_of_week,
-            R.id.fourth_day_of_week, R.id.fifth_day_of_week, R.id.sixth_day_of_week,
-            R.id.seventh_day_of_week
+    private fun getDaysOfWeekViewsIds(): List<Int> =
+        listOf(
+            R.id.start_day_of_week,
+            R.id.second_day_of_week,
+            R.id.third_day_of_week,
+            R.id.fourth_day_of_week,
+            R.id.fifth_day_of_week,
+            R.id.sixth_day_of_week,
+            R.id.seventh_day_of_week,
         )
-    }
 
-    private fun getDaysOfMonthViewsIds(): List<Int> {
-        return listOf(
-            R.id.first_day, R.id.second_day, R.id.third_day,
-            R.id.fourth_day, R.id.fifth_day, R.id.sixth_day,
-            R.id.seventh_day
+    private fun getDaysOfMonthViewsIds(): List<Int> =
+        listOf(
+            R.id.first_day,
+            R.id.second_day,
+            R.id.third_day,
+            R.id.fourth_day,
+            R.id.fifth_day,
+            R.id.sixth_day,
+            R.id.seventh_day,
         )
-    }
 
     private fun withBackground(expectedBackground: Drawable): Matcher<View> {
         return object : BoundedMatcher<View, TextView>(TextView::class.java) {
@@ -989,97 +1012,92 @@ class TimetableTest {
             }
 
             override fun matchesSafely(item: TextView): Boolean {
-                if (item.background != null)
+                if (item.background != null) {
                     return item.background.toBitmap().sameAs(expectedBackground.toBitmap())
+                }
                 return false
             }
         }
     }
 
-    private fun withTypeface(expectedTypeface: Typeface): Matcher<View> {
-        return object : BoundedMatcher<View, TextView>(TextView::class.java) {
+    private fun withTypeface(expectedTypeface: Typeface): Matcher<View> =
+        object : BoundedMatcher<View, TextView>(TextView::class.java) {
             override fun describeTo(description: Description?) {
                 description?.appendText("with typeface: ")
                 description?.appendValue(expectedTypeface)
             }
 
-            override fun matchesSafely(item: TextView?): Boolean {
-                return item?.typeface == expectedTypeface
-            }
+            override fun matchesSafely(item: TextView?): Boolean = item?.typeface == expectedTypeface
         }
-    }
 
-    private fun withTextSize(expectedTextSize: Float): Matcher<View> {
-        return object : BoundedMatcher<View, TextView>(TextView::class.java) {
+    private fun withTextSize(expectedTextSize: Float): Matcher<View> =
+        object : BoundedMatcher<View, TextView>(TextView::class.java) {
             override fun describeTo(description: Description?) {
                 description?.appendText("with textSize: ")
                 description?.appendValue(expectedTextSize)
             }
 
-            override fun matchesSafely(item: TextView?): Boolean {
-                return item?.textSize == expectedTextSize
-            }
+            override fun matchesSafely(item: TextView?): Boolean = item?.textSize == expectedTextSize
         }
-    }
 
-    private fun withMarginStart(marginStart: Int): Matcher<View> {
-        return object : BoundedMatcher<View, TextView>(TextView::class.java) {
+    private fun withMarginStart(marginStart: Int): Matcher<View> =
+        object : BoundedMatcher<View, TextView>(TextView::class.java) {
             override fun describeTo(description: Description?) {
                 description?.appendText("with marginStart: ")
                 description?.appendValue(marginStart)
             }
 
-            override fun matchesSafely(item: TextView?): Boolean {
-                return item?.marginStart == marginStart
-            }
-
+            override fun matchesSafely(item: TextView?): Boolean = item?.marginStart == marginStart
         }
-    }
 
     private fun verifyTimetableGridViewIsDisplayed() {
         onView(withId(R.id.schedule_container_and_grid))
-            .check(matches(isDisplayed())).check(
-                matches(withEffectiveVisibility(Visibility.VISIBLE))
+            .check(matches(isDisplayed()))
+            .check(
+                matches(withEffectiveVisibility(Visibility.VISIBLE)),
             )
         onView(withId(R.id.schedule_list_container))
-            .check(matches(not(isDisplayed()))).check(
-                matches(withEffectiveVisibility(Visibility.GONE))
+            .check(matches(not(isDisplayed())))
+            .check(
+                matches(withEffectiveVisibility(Visibility.GONE)),
             )
     }
 
     private fun verifyTimetableListViewIsDisplayed() {
         onView(withId(R.id.schedule_list_container)).check(
             matches(
-                withEffectiveVisibility(Visibility.VISIBLE)
-            )
+                withEffectiveVisibility(Visibility.VISIBLE),
+            ),
         )
         onView(withId(R.id.schedule_container_and_grid))
             .check(matches(not(isDisplayed())))
             .check(
-                matches(withEffectiveVisibility(Visibility.GONE))
+                matches(withEffectiveVisibility(Visibility.GONE)),
             )
     }
 
     companion object {
-        private val fakeDaysOfWeekStartingMonday = listOf(
-            R.string.monday_abbr_test,
-            R.string.tuesday_abbr_test,
-            R.string.wednesday_abbr_test,
-            R.string.thursday_abbr_test,
-            R.string.friday_abbr_test,
-            R.string.saturday_abbr_test,
-            R.string.sunday_abbr_test
-        )
+        private val fakeDaysOfWeekStartingMonday =
+            listOf(
+                R.string.monday_abbr_test,
+                R.string.tuesday_abbr_test,
+                R.string.wednesday_abbr_test,
+                R.string.thursday_abbr_test,
+                R.string.friday_abbr_test,
+                R.string.saturday_abbr_test,
+                R.string.sunday_abbr_test,
+            )
 
-        private val fakeDaysOfWeekStartingSunday = listOf(
-            R.string.sunday_abbr_test,
-            R.string.monday_abbr_test,
-            R.string.tuesday_abbr_test,
-            R.string.wednesday_abbr_test,
-            R.string.thursday_abbr_test,
-            R.string.friday_abbr_test,
-            R.string.saturday_abbr_test
-        )
+        private val fakeDaysOfWeekStartingSunday =
+            listOf(
+                R.string.sunday_abbr_test,
+                R.string.monday_abbr_test,
+                R.string.tuesday_abbr_test,
+                R.string.wednesday_abbr_test,
+                R.string.thursday_abbr_test,
+                R.string.friday_abbr_test,
+                R.string.saturday_abbr_test,
+            )
 
         private val fakeDaysOfMonthCurrentWeekStartingMonday =
             listOf("2", "3", "4", "5", "6", "7", "8")
@@ -1087,15 +1105,16 @@ class TimetableTest {
         private val fakeDaysOfMonthCurrentWeekStartingSunday =
             listOf("1", "2", "3", "4", "5", "6", "7")
 
-        private val uniqueSchedule = ScheduleView(
-            2,
-            LocalTime.of(13, 0),
-            LocalTime.of(14, 0),
-            "classroom 2",
-            DayOfWeek.TUESDAY,
-            "Math 2",
-            Color.BLUE
-        )
+        private val uniqueSchedule =
+            ScheduleView(
+                2,
+                LocalTime.of(13, 0),
+                LocalTime.of(14, 0),
+                "classroom 2",
+                DayOfWeek.TUESDAY,
+                "Math 2",
+                Color.BLUE,
+            )
 
         private val baseTimetableUserPreferences =
             TimetableUserPreferences(
@@ -1103,7 +1122,7 @@ class TimetableTest {
                 is12HoursFormat = true,
                 showSaturday = true,
                 showSunday = true,
-                isMondayFirstDayOfWeek = true
+                isMondayFirstDayOfWeek = true,
             )
     }
 }

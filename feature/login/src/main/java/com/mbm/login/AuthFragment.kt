@@ -13,6 +13,7 @@ import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialException
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavDeepLinkRequest
@@ -40,6 +41,8 @@ class AuthFragment : Fragment() {
     private var _binding: FragmentAuthBinding? = null
     private val binding get() = _binding!!
     private lateinit var navController: NavController
+    private val viewModel: SynchronizationViewModel by viewModels()
+    private var dialog: AlertDialog? = null
 
     @Inject
     lateinit var auth: FirebaseAuth
@@ -81,6 +84,10 @@ class AuthFragment : Fragment() {
         binding.btnLoginGoogle.setOnClickListener {
             signInWithGoogle()
         }
+
+        observeViewModelSync()
+
+        viewModel.startSyncIfNeeded()
     }
 
     private fun signInWithGoogle() {
@@ -96,7 +103,7 @@ class AuthFragment : Fragment() {
                 val result = CredentialManager.create(requireActivity())
                     .getCredential(requireActivity(), request)
                 handleSignIn(result)
-            } catch (e: GetCredentialException) {
+            } catch (_: GetCredentialException) {
                 showLoading(false)
                 Toast.makeText(
                     requireContext(),
@@ -147,7 +154,7 @@ class AuthFragment : Fragment() {
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
-                    } catch (e: GoogleIdTokenParsingException) {
+                    } catch (_: GoogleIdTokenParsingException) {
                         showLoading(false)
                         Toast.makeText(
                             requireContext(),
@@ -165,10 +172,10 @@ class AuthFragment : Fragment() {
         val userDocRef = firestore.collection("users").document(userId)
 
         userDocRef.get().addOnSuccessListener { document ->
-            val dialog = createLoadingDialog()
+
             if (!document.exists()) {
                 userDocRef.set(mapOf("userId" to userId)).addOnSuccessListener {
-                    synchronizationManager.startSyncIfNeeded(dialog)
+                    viewModel.startSyncIfNeeded()
                     navigateToScheduleFragment()
                 }.addOnFailureListener { _ ->
                     Toast.makeText(
@@ -178,7 +185,7 @@ class AuthFragment : Fragment() {
                     ).show()
                 }
             } else {
-                synchronizationManager.startSyncIfNeeded(dialog)
+                viewModel.startSyncIfNeeded()
                 navigateToScheduleFragment()
             }
         }.addOnFailureListener { _ ->
@@ -205,6 +212,19 @@ class AuthFragment : Fragment() {
         }
     }
 
+    private fun observeViewModelSync() {
+        lifecycleScope.launch {
+            viewModel.isSyncing.collect { isSyncing ->
+                if (isSyncing) {
+                    if (dialog == null) dialog = createLoadingDialog()
+                    dialog?.show()
+                } else {
+                    dialog?.dismiss()
+                    dialog = null
+                }
+            }
+        }
+    }
 
     private fun navigateToScheduleFragment() {
         val request =

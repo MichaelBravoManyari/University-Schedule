@@ -8,5 +8,5 @@ data class Course(
     @SerialName("id") val id: String,
     @SerialName("name") val name: String,
     @SerialName("nameProfessor") val nameProfessor: String?,
-    @SerialName("color") val color: Int
+    @SerialName("color") val color: Int,
 )

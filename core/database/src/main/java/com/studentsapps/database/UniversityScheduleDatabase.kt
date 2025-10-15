@@ -29,11 +29,12 @@ import com.studentsapps.database.util.LocalTimeConverter
     LocalTimeConverter::class,
     DayOfWeekConverter::class,
     LocalDateConverter::class,
-    LocalDateTimeConverter::class
+    LocalDateTimeConverter::class,
 )
 abstract class UniversityScheduleDatabase : RoomDatabase() {
-
     abstract fun scheduleDao(): ScheduleDao
+
     abstract fun courseDao(): CourseDao
+
     abstract fun pendingOperationDao(): PendingOperationDao
 }

@@ -14,107 +14,109 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class RegisterCourseViewModel @Inject constructor(
-    private val courseRepository: CourseRepository,
-    auth: FirebaseAuth
-) : ViewModel() {
-    private val userId = auth.currentUser?.uid ?: ""
+class RegisterCourseViewModel
+    @Inject
+    constructor(
+        private val courseRepository: CourseRepository,
+        auth: FirebaseAuth,
+    ) : ViewModel() {
+        private val userId = auth.currentUser?.uid ?: ""
 
-    private val _uiState: MutableStateFlow<RegisterCourseUiState> =
-        MutableStateFlow(RegisterCourseUiState())
+        private val _uiState: MutableStateFlow<RegisterCourseUiState> =
+            MutableStateFlow(RegisterCourseUiState())
 
-    val uiState: StateFlow<RegisterCourseUiState> = _uiState
+        val uiState: StateFlow<RegisterCourseUiState> = _uiState
 
-    fun displayCourseData(courseId: String) {
-        viewModelScope.launch {
-            val course = courseRepository.getCourse(courseId).first()
-            _uiState.update {
-                RegisterCourseUiState(
-                    courseId = course.id,
-                    name = course.name,
-                    nameProfessor = course.nameProfessor,
-                    color = course.color
-                )
-            }
-        }
-    }
-
-    fun registerCourse() {
-        viewModelScope.launch {
-            performCourseOperation {
-                courseRepository.registerCourse(it, userId)
-            }
-        }
-    }
-
-    fun updateCourse() {
-        viewModelScope.launch {
-            performCourseOperation {
-                courseRepository.updateCourse(it, userId)
-            }
-        }
-    }
-
-    fun deleteCourse() {
-        viewModelScope.launch {
-            try {
-                courseRepository.deleteCourse(uiState.value.courseId)
-
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        isCourseDeleted = true
+        fun displayCourseData(courseId: String) {
+            viewModelScope.launch {
+                val course = courseRepository.getCourse(courseId).first()
+                _uiState.update {
+                    RegisterCourseUiState(
+                        courseId = course.id,
+                        name = course.name,
+                        nameProfessor = course.nameProfessor,
+                        color = course.color,
                     )
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
             }
         }
-    }
 
+        fun registerCourse() {
+            viewModelScope.launch {
+                performCourseOperation {
+                    courseRepository.registerCourse(it, userId)
+                }
+            }
+        }
 
-    private suspend fun performCourseOperation(courseOperation: suspend (Course) -> Unit) {
-        if (validateCourseFields()) {
-            val course = Course(
-                uiState.value.courseId,
-                uiState.value.name,
-                uiState.value.nameProfessor,
-                uiState.value.color
-            )
-            courseOperation(course)
+        fun updateCourse() {
+            viewModelScope.launch {
+                performCourseOperation {
+                    courseRepository.updateCourse(it, userId)
+                }
+            }
+        }
+
+        fun deleteCourse() {
+            viewModelScope.launch {
+                try {
+                    courseRepository.deleteCourse(uiState.value.courseId)
+
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            isCourseDeleted = true,
+                        )
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }
+
+        private suspend fun performCourseOperation(courseOperation: suspend (Course) -> Unit) {
+            if (validateCourseFields()) {
+                val course =
+                    Course(
+                        uiState.value.courseId,
+                        uiState.value.name,
+                        uiState.value.nameProfessor,
+                        uiState.value.color,
+                    )
+                courseOperation(course)
+                _uiState.update { currentState ->
+                    currentState.copy(isCourseRecorded = true)
+                }
+            }
+        }
+
+        private fun validateCourseFields(): Boolean {
+            val hasNameError = uiState.value.name.isEmpty()
+
             _uiState.update { currentState ->
-                currentState.copy(isCourseRecorded = true)
+                currentState.copy(courseNameError = hasNameError)
+            }
+
+            return !hasNameError
+        }
+
+        fun selectColorCourse(colorCourse: Int) {
+            _uiState.update { currentState ->
+                currentState.copy(color = colorCourse)
+            }
+        }
+
+        fun setCourseName(courseName: String) {
+            _uiState.update { currentState ->
+                currentState.copy(name = courseName)
+            }
+        }
+
+        fun setNameProfessor(nameProfessor: String?) {
+            _uiState.update { currentState ->
+                currentState.copy(nameProfessor = nameProfessor)
             }
         }
     }
-
-    private fun validateCourseFields(): Boolean {
-        val hasNameError = uiState.value.name.isEmpty()
-
-        _uiState.update { currentState ->
-            currentState.copy(courseNameError = hasNameError)
-        }
-
-        return !hasNameError
-    }
-
-    fun selectColorCourse(colorCourse: Int) {
-        _uiState.update { currentState ->
-            currentState.copy(color = colorCourse)
-        }
-    }
-
-    fun setCourseName(courseName: String) {
-        _uiState.update { currentState ->
-            currentState.copy(name = courseName)
-        }
-    }
-
-    fun setNameProfessor(nameProfessor: String?) {
-        _uiState.update { currentState ->
-            currentState.copy(nameProfessor = nameProfessor)
-        }
-    }
-}
 
 data class RegisterCourseUiState(
     val courseId: String = "",

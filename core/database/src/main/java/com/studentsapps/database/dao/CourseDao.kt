@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class CourseDao : BaseDao<CourseEntity> {
-
     @Query("SELECT * FROM courses WHERE id = :courseId")
     abstract fun getCourseById(courseId: String): Flow<CourseEntity>
 

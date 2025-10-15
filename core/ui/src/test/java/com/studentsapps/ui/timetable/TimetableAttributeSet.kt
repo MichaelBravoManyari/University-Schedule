@@ -6,7 +6,6 @@ import com.studentsapps.ui.R
 import org.robolectric.Robolectric
 
 class TimetableAttributeSet {
-
     private val attrs = Robolectric.buildAttributeSet()
 
     fun addIsMondayFirstOfWeek(isMondayFirstOfWeek: Boolean): TimetableAttributeSet {
@@ -24,7 +23,10 @@ class TimetableAttributeSet {
         return this
     }
 
-    fun addDaysFont(@FontRes fontId: Int, isDayOfWeek: Boolean): TimetableAttributeSet {
+    fun addDaysFont(
+        @FontRes fontId: Int,
+        isDayOfWeek: Boolean,
+    ): TimetableAttributeSet {
         val font =
             if (fontId == com.studentsapps.designsystem.R.font.roboto_regular) "@font/roboto_regular" else "@font/roboto_medium"
         val attr = if (isDayOfWeek) R.attr.days_of_week_font else R.attr.days_of_month_font
@@ -37,7 +39,5 @@ class TimetableAttributeSet {
         return this
     }
 
-    fun build(): AttributeSet {
-        return attrs.build()
-    }
+    fun build(): AttributeSet = attrs.build()
 }

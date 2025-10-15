@@ -16,8 +16,7 @@ import kotlin.test.assertEquals
 
 @ExperimentalCoroutinesApi
 class CourseViewModelTest {
-
-    @get: Rule
+    @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
     private lateinit var subject: CourseViewModel
@@ -30,25 +29,29 @@ class CourseViewModelTest {
     }
 
     @Test
-    fun stateIsInitiallyUiState() = runTest {
-        assertEquals(
-            CourseUiState.Loading, subject.uiState.value
-        )
-    }
+    fun stateIsInitiallyUiState() =
+        runTest {
+            assertEquals(
+                CourseUiState.Loading,
+                subject.uiState.value,
+            )
+        }
 
     @Test
-    fun testSendCourseListAfterInitialLoadingState() = runTest {
-        val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
-        assertEquals(
-            CourseUiState.Success(
-                listOf(
-                    Course(1, "Math", null, 1234),
-                    Course(2, "History", null, 1234),
-                    Course(3, "Sciences", null, 1234),
-                    Course(4, "Statistics", null, 1234)
-                )
-            ), subject.uiState.value
-        )
-        collectJob.cancel()
-    }
+    fun testSendCourseListAfterInitialLoadingState() =
+        runTest {
+            val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
+            assertEquals(
+                CourseUiState.Success(
+                    listOf(
+                        Course(1, "Math", null, 1234),
+                        Course(2, "History", null, 1234),
+                        Course(3, "Sciences", null, 1234),
+                        Course(4, "Statistics", null, 1234),
+                    ),
+                ),
+                subject.uiState.value,
+            )
+            collectJob.cancel()
+        }
 }

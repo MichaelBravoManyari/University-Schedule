@@ -16,7 +16,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AdsModule {
-
     @Provides
     @Singleton
     fun provideAdManager(app: Application): AdManager {

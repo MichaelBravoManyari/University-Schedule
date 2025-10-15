@@ -10,7 +10,7 @@ data class ScheduleView(
     val classPlace: String?,
     val dayOfWeek: DayOfWeek,
     val courseName: String,
-    val color: Int
+    val color: Int,
 )
 
 fun ScheduleDetails.asScheduleView() =
@@ -24,10 +24,7 @@ fun ScheduleDetails.asScheduleView() =
         color = courseColor,
     )
 
-fun List<ScheduleView>.groupByDayOfWeek(): Map<DayOfWeek, List<ScheduleView>> {
-    return groupBy { it.dayOfWeek }
-}
-
+fun List<ScheduleView>.groupByDayOfWeek(): Map<DayOfWeek, List<ScheduleView>> = groupBy { it.dayOfWeek }
 
 fun List<ScheduleView>.getUniqueSchedules(): List<ScheduleView> {
     if (size == 1) {
@@ -51,8 +48,9 @@ fun List<ScheduleView>.getUniqueSchedules(): List<ScheduleView> {
             } else if (crossingSet.contains(schedule)) {
                 isUnique = false
                 break
-            } else
+            } else {
                 isUnique = true
+            }
         }
 
         if (isUnique) {
@@ -67,8 +65,9 @@ fun ScheduleView.isCrossingSchedules(scheduleToCompare: ScheduleView): Boolean =
     startTime < scheduleToCompare.endTime && endTime > scheduleToCompare.startTime
 
 fun List<ScheduleView>.getCrossSchedules(): List<List<ScheduleView>> {
-    if (size == 1)
+    if (size == 1) {
         return emptyList()
+    }
 
     val result = mutableListOf<MutableList<ScheduleView>>()
 

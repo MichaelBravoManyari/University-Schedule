@@ -1,6 +1,7 @@
 plugins {
     id("universityschedule.android.library")
     alias(libs.plugins.kotlin.serialization)
+    id("universityschedule.android.lint")
 }
 
 android {

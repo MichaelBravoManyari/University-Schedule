@@ -9,24 +9,27 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class CourseLocalDataSource @Inject constructor(
-    private val courseDao: CourseDao, @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher
-) {
+class CourseLocalDataSource
+    @Inject
+    constructor(
+        private val courseDao: CourseDao,
+        @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher,
+    ) {
+        fun getCourse(courseId: String): Flow<CourseEntity> = courseDao.getCourseById(courseId)
 
-    fun getCourse(courseId: String): Flow<CourseEntity> = courseDao.getCourseById(courseId)
+        suspend fun insert(course: CourseEntity): Long =
+            withContext(ioDispatcher) {
+                courseDao.insert(course)
+            }
 
-    suspend fun insert(course: CourseEntity): Long = withContext(ioDispatcher) {
-        courseDao.insert(course)
+        fun getAllCourse(userId: String): Flow<List<CourseEntity>> = courseDao.getAll(userId)
+
+        suspend fun updateCourse(course: CourseEntity) = courseDao.update(course)
+
+        suspend fun deleteCourse(course: CourseEntity) =
+            withContext(ioDispatcher) {
+                courseDao.delete(course)
+            }
+
+        fun getCoursesByIds(courseIds: List<String>): Flow<List<CourseEntity>> = courseDao.getCoursesByIds(courseIds)
     }
-
-    fun getAllCourse(userId: String): Flow<List<CourseEntity>> = courseDao.getAll(userId)
-
-    suspend fun updateCourse(course: CourseEntity) = courseDao.update(course)
-
-    suspend fun deleteCourse(course: CourseEntity) = withContext(ioDispatcher) {
-        courseDao.delete(course)
-    }
-
-    fun getCoursesByIds(courseIds: List<String>): Flow<List<CourseEntity>> =
-        courseDao.getCoursesByIds(courseIds)
-}

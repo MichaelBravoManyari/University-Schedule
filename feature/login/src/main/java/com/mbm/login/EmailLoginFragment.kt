@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.findNavController
@@ -17,6 +19,7 @@ import com.studentsapps.login.R
 import com.studentsapps.login.databinding.FragmentEmailLoginBinding
 import com.studentsapps.sync.SynchronizationManager
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -24,6 +27,8 @@ class EmailLoginFragment : Fragment() {
     private var _binding: FragmentEmailLoginBinding? = null
     private val binding get() = _binding!!
     private lateinit var navController: NavController
+    private val viewModel: SynchronizationViewModel by viewModels()
+    private var dialog: AlertDialog? = null
 
     @Inject
     lateinit var auth: FirebaseAuth
@@ -46,6 +51,7 @@ class EmailLoginFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         navController = view.findNavController()
         setupClickListeners()
+        observeViewModelSync()
     }
 
     private fun setupClickListeners() {
@@ -75,7 +81,7 @@ class EmailLoginFragment : Fragment() {
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 userManager.updateUserId()
-                synchronizationManager.startSyncIfNeeded(createLoadingDialog())
+                viewModel.startSyncIfNeeded()
                 val request =
                     NavDeepLinkRequest.Builder.fromUri("android-app://studentsapps.app/scheduleFragment".toUri())
                         .build()
@@ -88,6 +94,20 @@ class EmailLoginFragment : Fragment() {
                     setNegativeButton(getString(R.string.accept), null)
                     val dialog: AlertDialog = builder.create()
                     dialog.show()
+                }
+            }
+        }
+    }
+
+    private fun observeViewModelSync() {
+        lifecycleScope.launch {
+            viewModel.isSyncing.collect { isSyncing ->
+                if (isSyncing) {
+                    if (dialog == null) dialog = createLoadingDialog()
+                    dialog?.show()
+                } else {
+                    dialog?.dismiss()
+                    dialog = null
                 }
             }
         }

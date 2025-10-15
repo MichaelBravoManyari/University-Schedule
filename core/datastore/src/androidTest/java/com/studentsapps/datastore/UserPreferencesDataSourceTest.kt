@@ -23,7 +23,6 @@ import kotlin.test.assertTrue
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class UserPreferencesDataSourceTest {
-
     private val testContext: Context = InstrumentationRegistry.getInstrumentation().targetContext
 
     private val testScope = TestScope(UnconfinedTestDispatcher())
@@ -31,7 +30,7 @@ class UserPreferencesDataSourceTest {
     private val testDataStore: DataStore<Preferences> =
         PreferenceDataStoreFactory.create(
             scope = testScope,
-            produceFile = { testContext.preferencesDataStoreFile("user_preferences_test.preferences_pb") }
+            produceFile = { testContext.preferencesDataStoreFile("user_preferences_test.preferences_pb") },
         )
 
     private val subject = UserPreferencesDataSource(testDataStore)
@@ -39,13 +38,14 @@ class UserPreferencesDataSourceTest {
     @Test
     fun getUserPreferencesFromTimetable_returnDefaultsValues() =
         testScope.runTestAndClearPreferences(testDataStore) {
-            val expectedTimetableUserPreferences = TimetableUserPreferences(
-                showAsGrid = true,
-                is12HoursFormat = true,
-                showSaturday = true,
-                showSunday = true,
-                isMondayFirstDayOfWeek = true
-            )
+            val expectedTimetableUserPreferences =
+                TimetableUserPreferences(
+                    showAsGrid = true,
+                    is12HoursFormat = true,
+                    showSaturday = true,
+                    showSunday = true,
+                    isMondayFirstDayOfWeek = true,
+                )
 
             val actualTimetableUserPreferences = subject.userData.first()
 
@@ -53,36 +53,40 @@ class UserPreferencesDataSourceTest {
         }
 
     @Test
-    fun updateShowAsGrid_falseTrue() = testScope.runTestAndClearPreferences(testDataStore) {
-        subject.updateShowAsGrid()
-        assertFalse(subject.userData.first().showAsGrid)
-        subject.updateShowAsGrid()
-        assertTrue(subject.userData.first().showAsGrid)
-    }
+    fun updateShowAsGrid_falseTrue() =
+        testScope.runTestAndClearPreferences(testDataStore) {
+            subject.updateShowAsGrid()
+            assertFalse(subject.userData.first().showAsGrid)
+            subject.updateShowAsGrid()
+            assertTrue(subject.userData.first().showAsGrid)
+        }
 
     @Test
-    fun updateIs12HoursFormat_falseTrue() = testScope.runTestAndClearPreferences(testDataStore) {
-        subject.updateIs12HoursFormat()
-        assertFalse(subject.userData.first().is12HoursFormat)
-        subject.updateIs12HoursFormat()
-        assertTrue(subject.userData.first().is12HoursFormat)
-    }
+    fun updateIs12HoursFormat_falseTrue() =
+        testScope.runTestAndClearPreferences(testDataStore) {
+            subject.updateIs12HoursFormat()
+            assertFalse(subject.userData.first().is12HoursFormat)
+            subject.updateIs12HoursFormat()
+            assertTrue(subject.userData.first().is12HoursFormat)
+        }
 
     @Test
-    fun updateShowSaturday_falseTrue() = testScope.runTestAndClearPreferences(testDataStore) {
-        subject.updateShowSaturday()
-        assertFalse(subject.userData.first().showSaturday)
-        subject.updateShowSaturday()
-        assertTrue(subject.userData.first().showSaturday)
-    }
+    fun updateShowSaturday_falseTrue() =
+        testScope.runTestAndClearPreferences(testDataStore) {
+            subject.updateShowSaturday()
+            assertFalse(subject.userData.first().showSaturday)
+            subject.updateShowSaturday()
+            assertTrue(subject.userData.first().showSaturday)
+        }
 
     @Test
-    fun updateShowSunday_falseTrue() = testScope.runTestAndClearPreferences(testDataStore) {
-        subject.updateShowSunday()
-        assertFalse(subject.userData.first().showSunday)
-        subject.updateShowSunday()
-        assertTrue(subject.userData.first().showSunday)
-    }
+    fun updateShowSunday_falseTrue() =
+        testScope.runTestAndClearPreferences(testDataStore) {
+            subject.updateShowSunday()
+            assertFalse(subject.userData.first().showSunday)
+            subject.updateShowSunday()
+            assertTrue(subject.userData.first().showSunday)
+        }
 
     @Test
     fun updateIsMondayFirstDayOfWeek_falseTrue() =

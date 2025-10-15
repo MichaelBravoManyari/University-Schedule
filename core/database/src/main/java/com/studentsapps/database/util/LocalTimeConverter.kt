@@ -5,7 +5,6 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 class LocalTimeConverter {
-
     private val formatter = DateTimeFormatter.ofPattern("HH:mm")
 
     @TypeConverter

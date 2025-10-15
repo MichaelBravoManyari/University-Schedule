@@ -13,97 +13,109 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.inject.Inject
 
-class FakeScheduleRepository @Inject constructor() : ScheduleRepository {
+class FakeScheduleRepository
+    @Inject
+    constructor() : ScheduleRepository {
+        private val scheduleDao = TestScheduleDao()
 
-    private val scheduleDao = TestScheduleDao()
+        override fun getSchedulesForTimetableInGridMode(
+            showSaturday: Boolean,
+            showSunday: Boolean,
+            startDate: LocalDate,
+            endDate: LocalDate,
+            userId: String,
+        ): Flow<List<ScheduleDetails>> =
+            scheduleDao
+                .getSchedulesForTimetableInGridMode(
+                    showSaturday,
+                    showSunday,
+                    startDate,
+                    endDate,
+                    userId,
+                ).map { list -> list.map(ScheduleDetailsView::asExternalModel) }
 
-    override fun getSchedulesForTimetableInGridMode(
-        showSaturday: Boolean,
-        showSunday: Boolean,
-        startDate: LocalDate,
-        endDate: LocalDate,
-        userId: String
-    ): Flow<List<ScheduleDetails>> {
-        return scheduleDao.getSchedulesForTimetableInGridMode(
-            showSaturday, showSunday, startDate, endDate, userId
-        ).map{list -> list.map(ScheduleDetailsView::asExternalModel)}
-    }
+        override fun getSchedulesForTimetableInListMode(
+            date: LocalDate,
+            userId: String,
+        ): Flow<List<ScheduleDetails>> =
+            scheduleDao
+                .getSchedulesForTimetableInListMode(date.dayOfWeek, date, userId)
+                .map { list -> list.map(ScheduleDetailsView::asExternalModel) }
 
-    override fun getSchedulesForTimetableInListMode(
-        date: LocalDate,
-        userId: String
-    ): Flow<List<ScheduleDetails>> {
-        return scheduleDao.getSchedulesForTimetableInListMode(date.dayOfWeek, date, userId)
-            .map{list -> list.map(ScheduleDetailsView::asExternalModel)}
-    }
-
-    override suspend fun registerSchedule(
-        schedule: Schedule,
-        specificDate: LocalDate?,
-        courseName: String,
-        courseColor: Int,
-        userId: String
-    ) {
-        scheduleDao.insert(with(schedule) {
-            ScheduleEntity(
-                id,
-                startTime,
-                endTime,
-                classPlace,
-                dayOfWeek,
-                specificDate,
-                LocalDateTime.now(),
-                courseId,
-                userId
+        override suspend fun registerSchedule(
+            schedule: Schedule,
+            specificDate: LocalDate?,
+            courseName: String,
+            courseColor: Int,
+            userId: String,
+        ) {
+            scheduleDao.insert(
+                with(schedule) {
+                    ScheduleEntity(
+                        id,
+                        startTime,
+                        endTime,
+                        classPlace,
+                        dayOfWeek,
+                        specificDate,
+                        LocalDateTime.now(),
+                        courseId,
+                        userId,
+                    )
+                },
             )
-        })
-    }
+        }
 
-    override suspend fun scheduleAllUserAlarms(userId: String) {
-        TODO("Not yet implemented")
-    }
+        override suspend fun scheduleAllUserAlarms(userId: String) {
+            TODO("Not yet implemented")
+        }
 
-    override suspend fun registerScheduleEntity(scheduleEntity: ScheduleEntity) {
-        TODO("Not yet implemented")
-    }
+        override suspend fun registerScheduleEntity(scheduleEntity: ScheduleEntity) {
+            TODO("Not yet implemented")
+        }
 
-    override suspend fun getScheduleDetailsById(
-        scheduleId: String,
-        userId: String
-    ): ScheduleDetails =
-        scheduleDao.getScheduleDetailsById(scheduleId).asExternalModel()
+        override suspend fun getScheduleDetailsById(
+            scheduleId: String,
+            userId: String,
+        ): ScheduleDetails = scheduleDao.getScheduleDetailsById(scheduleId).asExternalModel()
 
-    override suspend fun updateSchedule(
-        schedule: Schedule,
-        specificDate: LocalDate?,
-        courseName: String,
-        courseColor: Int,
-        userId: String
-    ) {
-        TODO("Not yet implemented")
-    }
+        override suspend fun updateSchedule(
+            schedule: Schedule,
+            specificDate: LocalDate?,
+            courseName: String,
+            courseColor: Int,
+            userId: String,
+        ) {
+            TODO("Not yet implemented")
+        }
 
-    override suspend fun updateScheduleEntity(scheduleEntity: ScheduleEntity) {
-        TODO("Not yet implemented")
-    }
+        override suspend fun updateScheduleEntity(scheduleEntity: ScheduleEntity) {
+            TODO("Not yet implemented")
+        }
 
-    override suspend fun deleteSchedule(scheduleId: String, userId: String) {
-        TODO("Not yet implemented")
-    }
+        override suspend fun deleteSchedule(
+            scheduleId: String,
+            userId: String,
+        ) {
+            TODO("Not yet implemented")
+        }
 
-    override suspend fun deleteScheduleEntity(scheduleId: String, userId: String) {
-        TODO("Not yet implemented")
-    }
+        override suspend fun deleteScheduleEntity(
+            scheduleId: String,
+            userId: String,
+        ) {
+            TODO("Not yet implemented")
+        }
 
-    override suspend fun cancelUserAlarms(userId: String) {
-        TODO("Not yet implemented")
-    }
+        override suspend fun cancelUserAlarms(userId: String) {
+            TODO("Not yet implemented")
+        }
 
-    override suspend fun getAllScheduleDetails(userId: String): List<ScheduleDetails> {
-        TODO("Not yet implemented")
-    }
+        override suspend fun getAllScheduleDetails(userId: String): List<ScheduleDetails> {
+            TODO("Not yet implemented")
+        }
 
-    override fun getAllScheduleEntity(userId: String): Flow<List<ScheduleEntity>> {
-        TODO("Not yet implemented")
+        override fun getAllScheduleEntity(userId: String): Flow<List<ScheduleEntity>> {
+            TODO("Not yet implemented")
+        }
     }
-}

@@ -32,7 +32,6 @@ import kotlin.test.assertEquals
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class CourseFragmentTest {
-
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
 
@@ -52,22 +51,22 @@ class CourseFragmentTest {
         createCourseFragment()
 
         onView(withId(R.id.recycler_view_course)).perform(
-            RecyclerViewActions.scrollTo<CourseAdapter.CourseViewHolder>(hasDescendant(withText("Math")))
+            RecyclerViewActions.scrollTo<CourseAdapter.CourseViewHolder>(hasDescendant(withText("Math"))),
         )
         onView(withText("Math")).check(matches(isDisplayed()))
 
         onView(withId(R.id.recycler_view_course)).perform(
-            RecyclerViewActions.scrollTo<CourseAdapter.CourseViewHolder>(hasDescendant(withText("History")))
+            RecyclerViewActions.scrollTo<CourseAdapter.CourseViewHolder>(hasDescendant(withText("History"))),
         )
         onView(withText("History")).check(matches(isDisplayed()))
 
         onView(withId(R.id.recycler_view_course)).perform(
-            RecyclerViewActions.scrollTo<CourseAdapter.CourseViewHolder>(hasDescendant(withText("Sciences")))
+            RecyclerViewActions.scrollTo<CourseAdapter.CourseViewHolder>(hasDescendant(withText("Sciences"))),
         )
         onView(withText("Sciences")).check(matches(isDisplayed()))
 
         onView(withId(R.id.recycler_view_course)).perform(
-            RecyclerViewActions.scrollTo<CourseAdapter.CourseViewHolder>(hasDescendant(withText("Statistics")))
+            RecyclerViewActions.scrollTo<CourseAdapter.CourseViewHolder>(hasDescendant(withText("Statistics"))),
         )
         onView(withText("Statistics")).check(matches(isDisplayed()))
     }
@@ -83,7 +82,7 @@ class CourseFragmentTest {
     fun testNavigateToCourseRegistrationScreenWithCorrectCourseIdOnClick() {
         createCourseFragment()
         onView(withId(R.id.recycler_view_course)).perform(
-            RecyclerViewActions.scrollTo<CourseAdapter.CourseViewHolder>(hasDescendant(withText("Math")))
+            RecyclerViewActions.scrollTo<CourseAdapter.CourseViewHolder>(hasDescendant(withText("Math"))),
         )
         onView(withText("Math")).perform(click())
         assertEquals(R.id.registerCourseFragment, navController.currentDestination?.id)

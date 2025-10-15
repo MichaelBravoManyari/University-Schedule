@@ -21,14 +21,15 @@ data class PendingOperationEntity(
     @ColumnInfo(name = "timestamp")
     val timestamp: LocalDateTime,
     @ColumnInfo(name = "user_id")
-    val userId: String
+    val userId: String,
 )
 
-fun PendingOperationEntity.asExternalModel() = PendingOperation(
-    id = id,
-    operationType = operationType,
-    entityType = entityType,
-    payload = payload,
-    status = status,
-    timestamp = timestamp
-)
+fun PendingOperationEntity.asExternalModel() =
+    PendingOperation(
+        id = id,
+        operationType = operationType,
+        entityType = entityType,
+        payload = payload,
+        status = status,
+        timestamp = timestamp,
+    )

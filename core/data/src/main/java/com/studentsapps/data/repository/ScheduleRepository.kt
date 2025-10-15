@@ -7,17 +7,17 @@ import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
 interface ScheduleRepository {
-
     fun getSchedulesForTimetableInGridMode(
         showSaturday: Boolean,
         showSunday: Boolean,
         startDate: LocalDate,
         endDate: LocalDate,
-        userId: String
+        userId: String,
     ): Flow<List<ScheduleDetails>>
 
     fun getSchedulesForTimetableInListMode(
-        date: LocalDate, userId: String
+        date: LocalDate,
+        userId: String,
     ): Flow<List<ScheduleDetails>>
 
     suspend fun registerSchedule(
@@ -25,28 +25,37 @@ interface ScheduleRepository {
         specificDate: LocalDate?,
         courseName: String,
         courseColor: Int,
-        userId: String
+        userId: String,
     )
 
     suspend fun scheduleAllUserAlarms(userId: String)
 
     suspend fun registerScheduleEntity(scheduleEntity: ScheduleEntity)
 
-    suspend fun getScheduleDetailsById(scheduleId: String, userId: String): ScheduleDetails
+    suspend fun getScheduleDetailsById(
+        scheduleId: String,
+        userId: String,
+    ): ScheduleDetails
 
     suspend fun updateSchedule(
         schedule: Schedule,
         specificDate: LocalDate?,
         courseName: String,
         courseColor: Int,
-        userId: String
+        userId: String,
     )
 
     suspend fun updateScheduleEntity(scheduleEntity: ScheduleEntity)
 
-    suspend fun deleteSchedule(scheduleId: String, userId: String)
+    suspend fun deleteSchedule(
+        scheduleId: String,
+        userId: String,
+    )
 
-    suspend fun deleteScheduleEntity(scheduleId: String, userId: String)
+    suspend fun deleteScheduleEntity(
+        scheduleId: String,
+        userId: String,
+    )
 
     suspend fun cancelUserAlarms(userId: String)
 

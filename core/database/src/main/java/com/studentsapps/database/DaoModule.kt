@@ -12,13 +12,11 @@ import dagger.hilt.components.SingletonComponent
 @InstallIn(SingletonComponent::class)
 object DaoModule {
     @Provides
-    fun providesScheduleDao(database: UniversityScheduleDatabase): ScheduleDao =
-        database.scheduleDao()
+    fun providesScheduleDao(database: UniversityScheduleDatabase): ScheduleDao = database.scheduleDao()
 
     @Provides
     fun providesCourseDao(database: UniversityScheduleDatabase): CourseDao = database.courseDao()
 
     @Provides
-    fun providesPendingOperationDao(database: UniversityScheduleDatabase): PendingOperationDao =
-        database.pendingOperationDao()
+    fun providesPendingOperationDao(database: UniversityScheduleDatabase): PendingOperationDao = database.pendingOperationDao()
 }

@@ -18,12 +18,13 @@ data class CourseEntity(
     @ColumnInfo(name = "last_modified")
     val lastModified: LocalDateTime,
     @ColumnInfo(name = "user_id")
-    val userId: String
+    val userId: String,
 )
 
-fun CourseEntity.asExternalModel() = Course(
-    id = id,
-    name = name,
-    nameProfessor = nameProfessor,
-    color = color
-)
+fun CourseEntity.asExternalModel() =
+    Course(
+        id = id,
+        name = name,
+        nameProfessor = nameProfessor,
+        color = color,
+    )

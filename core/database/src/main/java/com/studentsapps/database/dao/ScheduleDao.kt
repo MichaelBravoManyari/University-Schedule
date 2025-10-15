@@ -10,7 +10,6 @@ import java.time.LocalDate
 
 @Dao
 abstract class ScheduleDao : BaseDao<ScheduleEntity> {
-
     @Query("SELECT * FROM schedules where id = :scheduleId")
     abstract fun getScheduleById(scheduleId: String): Flow<ScheduleEntity>
 
@@ -50,14 +49,14 @@ abstract class ScheduleDao : BaseDao<ScheduleEntity> {
                 specific_date BETWEEN :startDate AND :endDate
              AND
                 user_id = :userId
-        """
+        """,
     )
     abstract fun getSchedulesForTimetableInGridMode(
         showSaturday: Boolean,
         showSunday: Boolean,
         startDate: LocalDate,
         endDate: LocalDate,
-        userId: String
+        userId: String,
     ): Flow<List<ScheduleDetailsView>>
 
     @Query(
@@ -69,12 +68,12 @@ abstract class ScheduleDao : BaseDao<ScheduleEntity> {
                 specific_date = :specificDate)
             AND 
                 user_id = :userId
-        """
+        """,
     )
     abstract fun getSchedulesForTimetableInListMode(
         dayOfWeek: DayOfWeek,
         specificDate: LocalDate,
-        userId: String
+        userId: String,
     ): Flow<List<ScheduleDetailsView>>
 
     @Query("SELECT * FROM schedule_details WHERE user_id = :userId")
