@@ -3,9 +3,11 @@ package com.studentsapps.data.repository.fake
 import com.studentsapps.data.repository.CourseRepository
 import com.studentsapps.database.model.CourseEntity
 import com.studentsapps.database.model.asExternalModel
+import com.studentsapps.database.test.data.courseList
 import com.studentsapps.database.test.data.testdoubles.TestCourseDao
 import com.studentsapps.model.Course
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -43,7 +45,7 @@ class FakeCourseRepository
             shouldSync: Boolean,
             userId: String,
         ): Flow<List<Course>> {
-            TODO("Not yet implemented")
+            return flowOf(courseList.map(CourseEntity::asExternalModel))
         }
 
         override suspend fun updateCourse(

@@ -5,7 +5,7 @@ import com.studentsapps.database.model.ScheduleDetailsView
 import com.studentsapps.database.model.ScheduleEntity
 import com.studentsapps.database.test.data.scheduleDetailsList
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import java.time.DayOfWeek
 import java.time.LocalDate
 
@@ -31,7 +31,7 @@ class TestScheduleDao : ScheduleDao() {
             it.specificDate != null && (showSaturday || it.dayOfWeek != DayOfWeek.SATURDAY) && (showSunday || it.dayOfWeek != DayOfWeek.SUNDAY) && it.specificDate!! in startDate..endDate
         }
 
-        return flow { filteredByDayOfWeek + filteredBySpecificDate }
+        return flowOf(filteredByDayOfWeek + filteredBySpecificDate)
     }
 
     override fun getSchedulesForTimetableInListMode(
@@ -39,12 +39,12 @@ class TestScheduleDao : ScheduleDao() {
         specificDate: LocalDate,
         userId: String
     ): Flow<List<ScheduleDetailsView>> {
-        return flow {
+        return flowOf(
             scheduleDetailsList.filter {
                 (it.dayOfWeek == dayOfWeek && it.specificDate == null) ||
                         it.specificDate == specificDate
             }
-        }
+        )
     }
 
     override suspend fun getAllSchedule(userId: String): List<ScheduleDetailsView> {

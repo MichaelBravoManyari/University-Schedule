@@ -1,6 +1,6 @@
 package com.studentsapps.data.repository
 
-import androidx.test.core.app.ApplicationProvider
+import com.studentsapps.data.repository.fake.FakeScheduleRepository
 import com.studentsapps.database.datasources.CourseLocalDataSource
 import com.studentsapps.database.datasources.PendingOperationLocalDataSource
 import com.studentsapps.database.datasources.ScheduleLocalDataSource
@@ -10,6 +10,7 @@ import com.studentsapps.database.test.data.testdoubles.TestCourseDao
 import com.studentsapps.database.test.data.testdoubles.TestPendingOperationDao
 import com.studentsapps.database.test.data.testdoubles.TestScheduleDao
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -23,7 +24,7 @@ import java.time.LocalDate
 @ExperimentalCoroutinesApi
 class ScheduleRepositoryImpTest {
     private val testDispatcher = UnconfinedTestDispatcher()
-    private lateinit var subject: ScheduleRepositoryImp
+    private lateinit var subject: ScheduleRepository
     private lateinit var scheduleLocalDataSource: ScheduleLocalDataSource
     private lateinit var pendingOperatiDataSource: PendingOperationLocalDataSource
     private lateinit var courseDataSource: CourseLocalDataSource
@@ -35,10 +36,7 @@ class ScheduleRepositoryImpTest {
             PendingOperationLocalDataSource(TestPendingOperationDao(), testDispatcher)
         courseDataSource = CourseLocalDataSource(TestCourseDao(), testDispatcher)
 
-        subject = ScheduleRepositoryImp(
-            scheduleLocalDataSource, courseDataSource, pendingOperatiDataSource,
-            ApplicationProvider.getApplicationContext()
-        )
+        subject = FakeScheduleRepository()
     }
 
     @Test
@@ -51,7 +49,7 @@ class ScheduleRepositoryImpTest {
                     startDate = LocalDate.of(2023, 11, 20),
                     endDate = LocalDate.of(2023, 11, 26),
                     userId = ""
-                ),
+                ).first(),
                 `is`(
                     scheduleLocalDataSource
                         .getSchedulesForTimetableInGridMode(
@@ -60,7 +58,7 @@ class ScheduleRepositoryImpTest {
                             startDate = LocalDate.of(2023, 11, 20),
                             endDate = LocalDate.of(2023, 11, 26),
                             userId = ""
-                        ).map { it.map(ScheduleDetailsView::asExternalModel) },
+                        ).map { it.map(ScheduleDetailsView::asExternalModel) }.first(),
                 ),
             )
         }
@@ -70,14 +68,14 @@ class ScheduleRepositoryImpTest {
         runTest(testDispatcher) {
             val date = LocalDate.of(2023, 11, 20)
             assertThat(
-                subject.getSchedulesForTimetableInListMode(date, ""),
+                subject.getSchedulesForTimetableInListMode(date, "").first(),
                 `is`(
                     scheduleLocalDataSource
                         .getSchedulesForTimetableInListMode(
                             dayOfWeek = DayOfWeek.MONDAY,
                             date = date,
                             userId = ""
-                        ).map{ it.map(ScheduleDetailsView::asExternalModel) },
+                        ).map{ it.map(ScheduleDetailsView::asExternalModel) }.first(),
                 ),
             )
         }

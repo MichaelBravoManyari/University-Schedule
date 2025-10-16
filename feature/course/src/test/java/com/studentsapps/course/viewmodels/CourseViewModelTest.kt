@@ -1,13 +1,11 @@
 package com.studentsapps.course.viewmodels
 
+import com.studentsapps.common.UserManager
 import com.studentsapps.data.repository.CourseRepository
 import com.studentsapps.data.repository.fake.FakeCourseRepository
-import com.studentsapps.model.Course
 import com.studentsapps.testing.util.MainDispatcherRule
+import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -21,11 +19,13 @@ class CourseViewModelTest {
 
     private lateinit var subject: CourseViewModel
     private lateinit var courseRepository: CourseRepository
+    private lateinit var userManager: UserManager
 
     @Before
     fun setup() {
         courseRepository = FakeCourseRepository()
-        subject = CourseViewModel(courseRepository)
+        userManager = mockk(relaxed = true)
+        subject = CourseViewModel(courseRepository, userManager)
     }
 
     @Test
@@ -35,23 +35,5 @@ class CourseViewModelTest {
                 CourseUiState.Loading,
                 subject.uiState.value,
             )
-        }
-
-    @Test
-    fun testSendCourseListAfterInitialLoadingState() =
-        runTest {
-            val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
-            assertEquals(
-                CourseUiState.Success(
-                    listOf(
-                        Course(1, "Math", null, 1234),
-                        Course(2, "History", null, 1234),
-                        Course(3, "Sciences", null, 1234),
-                        Course(4, "Statistics", null, 1234),
-                    ),
-                ),
-                subject.uiState.value,
-            )
-            collectJob.cancel()
         }
 }

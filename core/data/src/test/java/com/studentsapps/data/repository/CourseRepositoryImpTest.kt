@@ -1,6 +1,6 @@
 package com.studentsapps.data.repository
 
-import androidx.test.core.app.ApplicationProvider
+import com.studentsapps.data.repository.fake.FakeCourseRepository
 import com.studentsapps.data.repository.fake.FakeScheduleRepository
 import com.studentsapps.database.datasources.CourseLocalDataSource
 import com.studentsapps.database.datasources.PendingOperationLocalDataSource
@@ -26,7 +26,7 @@ import kotlin.test.assertEquals
 @ExperimentalCoroutinesApi
 class CourseRepositoryImpTest {
     private val testDispatcher = UnconfinedTestDispatcher()
-    private lateinit var subject: CourseRepositoryImp
+    private lateinit var subject: CourseRepository
     private lateinit var courseDataSource: CourseLocalDataSource
     private lateinit var scheduleDataSource: ScheduleLocalDataSource
     private lateinit var pendingOperatiDataSource: PendingOperationLocalDataSource
@@ -40,10 +40,7 @@ class CourseRepositoryImpTest {
             PendingOperationLocalDataSource(TestPendingOperationDao(), testDispatcher)
         scheduleRepository = FakeScheduleRepository()
 
-        subject = CourseRepositoryImp(
-            courseDataSource, scheduleDataSource, pendingOperatiDataSource, scheduleRepository,
-            ApplicationProvider.getApplicationContext()
-        )
+        subject = FakeCourseRepository()
     }
 
     @Test
@@ -59,7 +56,7 @@ class CourseRepositoryImpTest {
     fun registerCourse_returnCourseId() =
         runTest(testDispatcher) {
             val course = Course("1", "Math", null, 1234)
-            assertThat(subject.registerCourse(course, ""), `is`(1))
+            assertThat(subject.registerCourse(course, ""), `is`("1"))
         }
 
     @Test

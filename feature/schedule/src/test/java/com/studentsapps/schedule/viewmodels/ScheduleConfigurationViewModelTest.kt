@@ -1,10 +1,12 @@
 package com.studentsapps.schedule.viewmodels
 
+import com.google.firebase.auth.FirebaseAuth
 import com.studentsapps.data.repository.TimetableUserPreferencesRepository
 import com.studentsapps.data.repository.fake.FakeTimetableUserPreferencesRepository
 import com.studentsapps.schedule.viewmodels.ScheduleConfigurationUiState.Loading
 import com.studentsapps.schedule.viewmodels.ScheduleConfigurationUiState.Success
 import com.studentsapps.testing.util.MainDispatcherRule
+import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -25,11 +27,13 @@ class ScheduleConfigurationViewModelTest {
 
     private lateinit var timetableUserPreferencesRepository: TimetableUserPreferencesRepository
     private lateinit var subject: ScheduleConfigurationViewModel
+    private lateinit var firebaseAuth: FirebaseAuth
 
     @Before
     fun setup() {
         timetableUserPreferencesRepository = FakeTimetableUserPreferencesRepository()
-        subject = ScheduleConfigurationViewModel(timetableUserPreferencesRepository)
+        firebaseAuth = mockk(relaxed = true)
+        subject = ScheduleConfigurationViewModel(timetableUserPreferencesRepository, firebaseAuth)
     }
 
     @Test
@@ -47,7 +51,8 @@ class ScheduleConfigurationViewModelTest {
                     isMondayFirstDayOfWeek = false,
                     is12HoursFormat = true,
                     showSaturday = true,
-                    showSunday = true
+                    showSunday = true,
+                    ""
                 )
             )
         )
@@ -58,7 +63,8 @@ class ScheduleConfigurationViewModelTest {
                     isMondayFirstDayOfWeek = true,
                     is12HoursFormat = true,
                     showSaturday = true,
-                    showSunday = true
+                    showSunday = true,
+                    ""
                 )
             )
         )
@@ -75,7 +81,8 @@ class ScheduleConfigurationViewModelTest {
                     isMondayFirstDayOfWeek = true,
                     is12HoursFormat = false,
                     showSaturday = true,
-                    showSunday = true
+                    showSunday = true,
+                    ""
                 )
             )
         )
@@ -86,7 +93,8 @@ class ScheduleConfigurationViewModelTest {
                     isMondayFirstDayOfWeek = true,
                     is12HoursFormat = true,
                     showSaturday = true,
-                    showSunday = true
+                    showSunday = true,
+                    ""
                 )
             )
         )
@@ -103,7 +111,8 @@ class ScheduleConfigurationViewModelTest {
                     isMondayFirstDayOfWeek = true,
                     is12HoursFormat = true,
                     showSaturday = false,
-                    showSunday = true
+                    showSunday = true,
+                    ""
                 )
             )
         )
@@ -114,7 +123,8 @@ class ScheduleConfigurationViewModelTest {
                     isMondayFirstDayOfWeek = true,
                     is12HoursFormat = true,
                     showSaturday = true,
-                    showSunday = true
+                    showSunday = true,
+                    ""
                 )
             )
         )
@@ -131,7 +141,8 @@ class ScheduleConfigurationViewModelTest {
                     isMondayFirstDayOfWeek = true,
                     is12HoursFormat = true,
                     showSaturday = true,
-                    showSunday = false
+                    showSunday = false,
+                    ""
                 )
             )
         )
@@ -142,7 +153,8 @@ class ScheduleConfigurationViewModelTest {
                     isMondayFirstDayOfWeek = true,
                     is12HoursFormat = true,
                     showSaturday = true,
-                    showSunday = true
+                    showSunday = true,
+                    ""
                 )
             )
         )

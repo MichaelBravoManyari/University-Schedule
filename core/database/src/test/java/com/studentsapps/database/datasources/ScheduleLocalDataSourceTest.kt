@@ -4,6 +4,7 @@ import com.studentsapps.database.dao.ScheduleDao
 import com.studentsapps.database.model.ScheduleEntity
 import com.studentsapps.database.test.data.testdoubles.TestScheduleDao
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.`is`
@@ -37,7 +38,7 @@ class ScheduleLocalDataSourceTest {
                     startDate = LocalDate.of(2023, 11, 20),
                     endDate = LocalDate.of(2023, 11, 26),
                     userId = ""
-                ),
+                ).first(),
                 `is`(
                     scheduleDao.getSchedulesForTimetableInGridMode(
                         showSaturday = true,
@@ -45,7 +46,7 @@ class ScheduleLocalDataSourceTest {
                         startDate = LocalDate.of(2023, 11, 20),
                         endDate = LocalDate.of(2023, 11, 26),
                         userId = ""
-                    ),
+                    ).first(),
                 ),
             )
         }
@@ -59,13 +60,13 @@ class ScheduleLocalDataSourceTest {
                     date = date,
                     dayOfWeek = date.dayOfWeek,
                     userId = ""
-                ),
+                ).first(),
                 `is`(
                     scheduleDao.getSchedulesForTimetableInListMode(
                         specificDate = date,
                         dayOfWeek = date.dayOfWeek,
                         userId = ""
-                    ),
+                    ).first(),
                 ),
             )
         }

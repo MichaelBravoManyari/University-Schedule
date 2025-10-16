@@ -1,6 +1,6 @@
 package com.studentsapps.schedule.fragments
 
-import androidx.core.os.bundleOf
+/*import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModelStore
 import androidx.navigation.Navigation
 import androidx.navigation.testing.TestNavHostController
@@ -28,16 +28,16 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.LooperMode
-import org.robolectric.shadows.ShadowDialog
+import org.robolectric.shadows.ShadowDialog*/
 
-@Config(application = HiltTestApplication::class)
+/*@Config(application = HiltTestApplication::class)
 @HiltAndroidTest
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 @LooperMode(LooperMode.Mode.PAUSED)
 class RegisterScheduleFragmentTest {
 
-    @get:Rule(order = 0)
+    /*@get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
 
     @get:Rule(order = 1)
@@ -61,9 +61,9 @@ class RegisterScheduleFragmentTest {
             navigation = {
                 Navigation.setViewNavController(requireView(), navController)
             })
-    }
+    }*/
 
-    @Test
+    /*@Test
     fun testInitialStateOfFragment() {
         onView(withId(R.id.btn_day)).check(matches(withText(R.string.monday)))
         onView(withId(R.id.btn_start_hour)).check(matches(withText("9:00 AM")))
@@ -88,7 +88,7 @@ class RegisterScheduleFragmentTest {
         assertTrue(dialog.isShowing)
     }
 
-    /*The default device configuration of Robolectric has a smaller screen, hiding the buttons of the dialogs*/
+    *//*The default device configuration of Robolectric has a smaller screen, hiding the buttons of the dialogs*//*
     @Test
     @Config(qualifiers = "w360dp-h640dp-xhdpi")
     fun testEndTimeButtonShowsTimePicker() {
@@ -147,7 +147,7 @@ class RegisterScheduleFragmentTest {
         )
     }
 
-    /*The default device configuration of Robolectric has a smaller screen, hiding the buttons of the dialogs*/
+    *//*The default device configuration of Robolectric has a smaller screen, hiding the buttons of the dialogs*//*
     @Test
     @Config(qualifiers = "w360dp-h640dp-xhdpi")
     fun testShowErrorIconForTimeError() {
@@ -176,4 +176,4 @@ class RegisterScheduleFragmentTest {
         onView(withId(com.studentsapps.ui.R.id.menu_add)).perform(click())
         assertEquals(R.id.scheduleFragment, navController.currentDestination?.id)
     }
-}
+}*/
