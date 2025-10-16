@@ -12,6 +12,7 @@ import org.junit.Before
 import org.junit.Test
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 
 @ExperimentalCoroutinesApi
@@ -35,6 +36,7 @@ class ScheduleLocalDataSourceTest {
                     showSunday = true,
                     startDate = LocalDate.of(2023, 11, 20),
                     endDate = LocalDate.of(2023, 11, 26),
+                    userId = ""
                 ),
                 `is`(
                     scheduleDao.getSchedulesForTimetableInGridMode(
@@ -42,6 +44,7 @@ class ScheduleLocalDataSourceTest {
                         showSunday = true,
                         startDate = LocalDate.of(2023, 11, 20),
                         endDate = LocalDate.of(2023, 11, 26),
+                        userId = ""
                     ),
                 ),
             )
@@ -55,11 +58,13 @@ class ScheduleLocalDataSourceTest {
                 subject.getSchedulesForTimetableInListMode(
                     date = date,
                     dayOfWeek = date.dayOfWeek,
+                    userId = ""
                 ),
                 `is`(
                     scheduleDao.getSchedulesForTimetableInListMode(
                         specificDate = date,
                         dayOfWeek = date.dayOfWeek,
+                        userId = ""
                     ),
                 ),
             )
@@ -70,13 +75,15 @@ class ScheduleLocalDataSourceTest {
         runTest(testDispatcher) {
             val scheduleEntity =
                 ScheduleEntity(
-                    id = 10,
+                    id = "10",
                     LocalTime.of(12, 0),
                     LocalTime.of(13, 0),
                     null,
                     DayOfWeek.MONDAY,
                     null,
-                    1,
+                    LocalDateTime.now(),
+                    userId = "",
+                    "1"
                 )
             assertThat(
                 subject.insert(scheduleEntity),
@@ -89,8 +96,8 @@ class ScheduleLocalDataSourceTest {
         runTest(testDispatcher) {
             val scheduleId = 1
             assertThat(
-                subject.getScheduleDetailsView(scheduleId),
-                `is`(scheduleDao.getScheduleDetailsById(scheduleId)),
+                subject.getScheduleDetailsView(scheduleId.toString()),
+                `is`(scheduleDao.getScheduleDetailsById(scheduleId.toString())),
             )
         }
 }

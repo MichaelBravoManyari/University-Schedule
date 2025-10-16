@@ -12,6 +12,7 @@ import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
 import org.junit.Test
+import java.time.LocalDateTime
 import kotlin.test.assertEquals
 
 @ExperimentalCoroutinesApi
@@ -30,8 +31,8 @@ class CourseLocalDataSourceTest {
     fun getCourse_courseEntity() =
         runTest(testDispatcher) {
             assertThat(
-                subject.getCourse(1).first(),
-                `is`(courseDao.getCourseById(1).first()),
+                subject.getCourse("1").first(),
+                `is`(courseDao.getCourseById("1").first()),
             )
         }
 
@@ -40,10 +41,12 @@ class CourseLocalDataSourceTest {
         runTest(testDispatcher) {
             val courseEntity =
                 CourseEntity(
-                    id = 10,
+                    id = "10",
                     name = "Philosophy",
                     nameProfessor = null,
                     color = 1234,
+                    lastModified = LocalDateTime.now(),
+                    userId = ""
                 )
             assertThat(
                 subject.insert(courseEntity),
@@ -55,15 +58,15 @@ class CourseLocalDataSourceTest {
     fun getAllCourses_returnCourses() =
         runTest {
             val expectedCourseList = courseList
-            val actualCourseList = subject.getAllCourse().first()
+            val actualCourseList = subject.getAllCourse(userId = "").first()
             assertEquals(actualCourseList, expectedCourseList)
         }
 
     @Test
     fun updateCourse_courseEntity() =
         runTest {
-            val expectedCourse = CourseEntity(1, "Math 1", "Professor 1", 1234)
+            val expectedCourse = CourseEntity("1", "Math 1", "Professor 1", 1234, lastModified = LocalDateTime.now(), userId = "")
             subject.updateCourse(expectedCourse)
-            assertThat(subject.getCourse(1).first(), `is`(expectedCourse))
+            assertThat(subject.getCourse("1").first(), `is`(expectedCourse))
         }
 }
