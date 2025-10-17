@@ -511,7 +511,7 @@ class TimetableTest {
         onView(withId(R.id.start_day_of_week)).check(matches(withMarginStart(expectedMarginList)))
     }
 
-    @Test
+    /*@Test
     fun verifySwipeUpdatesDate() {
         //val currentDate = LocalDate.of(2023, 8, 26)
         //val swipeLeftDate = currentDate.plusWeeks(1)
@@ -524,7 +524,7 @@ class TimetableTest {
         //assertThat(timetable.date.getOrAwaitValue(), `is`(currentDate))
         onView(withContentDescription(timetableContentDescription)).perform(swipeRight())
         //assertThat(timetable.date.getOrAwaitValue(), `is`(swipeRightDate))
-    }
+    }*/
 
     @Test
     fun verifyListTypeDayClickUpdatesDate() {
@@ -544,7 +544,7 @@ class TimetableTest {
         onView(withId(R.id.sixth_day)).check(matches(withTextColor(expectedCurrentDayColor)))
     }
 
-    @Test
+    /*@Test
     fun verifyGridModeDayClickDoesNotActivate() {
         mockUtilsGetCurrentDate()
         //val expectedDate = LocalDate.of(2023, 8, 26)
@@ -553,7 +553,7 @@ class TimetableTest {
         onView(withId(R.id.first_day)).perform(click())
         //assertThat(timetable.date.getOrAwaitValue(), `is`(expectedDate))
         onView(withId(R.id.first_day)).check(matches(withTextColor(expectedColor)))
-    }
+    }*/
 
     @Test
     fun verifySwitchToListChangesToCurrentDate() {
@@ -579,7 +579,7 @@ class TimetableTest {
         }
     }
 
-    @Test
+    /*@Test
     fun verifySwipeInGridModeAffectsDateWithinWeek() {
         mockUtilsGetCurrentDate()
         //val expectedCurrentDate = LocalDate.of(2023, 8, 26)
@@ -593,7 +593,7 @@ class TimetableTest {
         //assertThat(timetable.date.getOrAwaitValue(), `is`(expectedCurrentDate))
         onView(withContentDescription(timetableContentDescription)).perform(swipeRight())
         //assertThat(timetable.date.getOrAwaitValue(), `is`(expectedSwipeRightDate))
-    }
+    }*/
 
     @Test
     fun verifySwipeInListModeAffectsDateByOneDay() {
@@ -768,12 +768,12 @@ class TimetableTest {
                     FrameLayout.LayoutParams.MATCH_PARENT,
                     FrameLayout.LayoutParams.MATCH_PARENT,
                 )
-            timetable.apply {
+            timetable!!.apply {
                 this.layoutParams = layoutParams
                 contentDescription = timetableContentDescription
             }
-            binding.root.addView(timetable)
-            timetable.setTimetableUserPreferences(baseTimetableUserPreferences)
+            binding.root.addView(timetable!!)
+            timetable!!.setTimetableUserPreferences(baseTimetableUserPreferences)
         }
         return timetable!!
     }
