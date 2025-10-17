@@ -13,25 +13,26 @@ import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
-class BottomSheetCourseViewModel @Inject constructor(
-    courseRepository: CourseRepository,
-    auth: FirebaseAuth
-) : ViewModel() {
-    private val userId = auth.currentUser?.uid ?: ""
+class BottomSheetCourseViewModel
+    @Inject
+    constructor(
+        courseRepository: CourseRepository,
+        auth: FirebaseAuth,
+    ) : ViewModel() {
+        private val userId = auth.currentUser?.uid ?: ""
 
-    val uiState: StateFlow<BottomSheetCourseUiState> =
-        courseRepository.getAllCourse(userId = userId).map(BottomSheetCourseUiState::Success).stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = BottomSheetCourseUiState.Loading
-        )
-}
+        val uiState: StateFlow<BottomSheetCourseUiState> =
+            courseRepository.getAllCourse(userId = userId).map(BottomSheetCourseUiState::Success).stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = BottomSheetCourseUiState.Loading,
+            )
+    }
 
 sealed interface BottomSheetCourseUiState {
-
     data object Loading : BottomSheetCourseUiState
 
     data class Success(
-        val courseList: List<Course>
+        val courseList: List<Course>,
     ) : BottomSheetCourseUiState
 }

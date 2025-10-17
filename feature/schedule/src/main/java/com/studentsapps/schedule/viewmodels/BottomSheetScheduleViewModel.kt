@@ -13,39 +13,41 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class BottomSheetScheduleViewModel @Inject constructor(
-    private val scheduleRepository: ScheduleRepository,
-    auth: FirebaseAuth
-) : ViewModel() {
-    private val userId = auth.currentUser?.uid ?: ""
+class BottomSheetScheduleViewModel
+    @Inject
+    constructor(
+        private val scheduleRepository: ScheduleRepository,
+        auth: FirebaseAuth,
+    ) : ViewModel() {
+        private val userId = auth.currentUser?.uid ?: ""
 
-    private val _uiState: MutableStateFlow<BottomSheetScheduleUiState> =
-        MutableStateFlow(BottomSheetScheduleUiState())
+        private val _uiState: MutableStateFlow<BottomSheetScheduleUiState> =
+            MutableStateFlow(BottomSheetScheduleUiState())
 
-    val uiState: StateFlow<BottomSheetScheduleUiState> = _uiState
+        val uiState: StateFlow<BottomSheetScheduleUiState> = _uiState
 
-    fun setScheduleDetails(scheduleId: String) {
-        viewModelScope.launch {
-            _uiState.update {
-                val scheduleDetails = scheduleRepository.getScheduleDetailsById(scheduleId, userId)
-                BottomSheetScheduleUiState(scheduleDetails)
+        fun setScheduleDetails(scheduleId: String) {
+            viewModelScope.launch {
+                _uiState.update {
+                    val scheduleDetails = scheduleRepository.getScheduleDetailsById(scheduleId, userId)
+                    BottomSheetScheduleUiState(scheduleDetails)
+                }
+            }
+        }
+
+        fun deleteSchedule(scheduleId: String) {
+            viewModelScope.launch {
+                scheduleRepository.deleteSchedule(scheduleId, userId)
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        isScheduleDeleted = true,
+                    )
+                }
             }
         }
     }
-
-    fun deleteSchedule(scheduleId: String) {
-        viewModelScope.launch {
-            scheduleRepository.deleteSchedule(scheduleId, userId)
-            _uiState.update { currentState ->
-                currentState.copy(
-                    isScheduleDeleted = true
-                )
-            }
-        }
-    }
-}
 
 data class BottomSheetScheduleUiState(
     val scheduleDetails: ScheduleDetails? = null,
-    val isScheduleDeleted: Boolean = false
+    val isScheduleDeleted: Boolean = false,
 )

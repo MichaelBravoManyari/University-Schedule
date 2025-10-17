@@ -21,15 +21,15 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ScheduleConfigurationFragment : Fragment() {
-
     private var _binding: FragmentScheduleConfigurationBinding? = null
-    private val binding get() = _binding!!
+    val binding get() = _binding!!
     private val viewModel: ScheduleConfigurationViewModel by viewModels()
     private lateinit var navController: NavController
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentScheduleConfigurationBinding.inflate(inflater, container, false)
         binding.apply {
@@ -39,7 +39,10 @@ class ScheduleConfigurationFragment : Fragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         navController = view.findNavController()
 
@@ -48,28 +51,32 @@ class ScheduleConfigurationFragment : Fragment() {
                 viewModel.uiState.collect { currentState ->
                     if (currentState is Success) {
                         binding.btnDayOfTheWeek.text =
-                            if (currentState.isMondayFirstDayOfWeek)
+                            if (currentState.isMondayFirstDayOfWeek) {
                                 getText(R.string.monday)
-                            else
+                            } else {
                                 getText(R.string.sunday)
+                            }
 
                         binding.btnTimeFormat.text =
-                            if (currentState.is12HoursFormat)
+                            if (currentState.is12HoursFormat) {
                                 getText(R.string.twelve_hours)
-                            else
+                            } else {
                                 getText(R.string.twenty_four_hours)
+                            }
 
                         binding.saturdayDisplaySwitch.apply {
-                            if (isChecked != currentState.showSaturday)
+                            if (isChecked != currentState.showSaturday) {
                                 isChecked = currentState.showSaturday
+                            }
                             setOnCheckedChangeListener { _, _ ->
                                 viewModel.setShowSaturday()
                             }
                         }
 
                         binding.sundayDisplaySwitch.apply {
-                            if (isChecked != currentState.showSunday)
+                            if (isChecked != currentState.showSunday) {
                                 isChecked = currentState.showSunday
+                            }
 
                             setOnCheckedChangeListener { _, _ ->
                                 viewModel.setShowSunday()

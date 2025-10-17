@@ -72,7 +72,7 @@ class RegisterCourseViewModelTest {
             subject.registerCourse()
             assertEquals(
                 RegisterCourseUiState().copy(courseNameError = true),
-                subject.uiState.value
+                subject.uiState.value,
             )
             collectJob.cancel()
         }

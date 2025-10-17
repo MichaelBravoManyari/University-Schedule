@@ -21,7 +21,6 @@ import kotlin.test.assertEquals
 
 @ExperimentalCoroutinesApi
 class ScheduleConfigurationViewModelTest {
-
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
@@ -37,127 +36,140 @@ class ScheduleConfigurationViewModelTest {
     }
 
     @Test
-    fun stateIsInitiallyLoading() = runTest {
-        assertEquals(Loading, subject.uiState.value)
-    }
+    fun stateIsInitiallyLoading() =
+        runTest {
+            assertEquals(Loading, subject.uiState.value)
+        }
 
     @Test
-    fun setIsMondayFirstDayOfWeek_trueAndFalse() = runTest {
-        val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
-        subject.setIsMondayFirstDayOfWeek()
-        assertThat(
-            subject.uiState.value, `is`(
-                Success(
-                    isMondayFirstDayOfWeek = false,
-                    is12HoursFormat = true,
-                    showSaturday = true,
-                    showSunday = true,
-                    ""
-                )
+    fun setIsMondayFirstDayOfWeek_trueAndFalse() =
+        runTest {
+            val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
+            subject.setIsMondayFirstDayOfWeek()
+            assertThat(
+                subject.uiState.value,
+                `is`(
+                    Success(
+                        isMondayFirstDayOfWeek = false,
+                        is12HoursFormat = true,
+                        showSaturday = true,
+                        showSunday = true,
+                        "",
+                    ),
+                ),
             )
-        )
-        subject.setIsMondayFirstDayOfWeek()
-        assertThat(
-            subject.uiState.value, `is`(
-                Success(
-                    isMondayFirstDayOfWeek = true,
-                    is12HoursFormat = true,
-                    showSaturday = true,
-                    showSunday = true,
-                    ""
-                )
+            subject.setIsMondayFirstDayOfWeek()
+            assertThat(
+                subject.uiState.value,
+                `is`(
+                    Success(
+                        isMondayFirstDayOfWeek = true,
+                        is12HoursFormat = true,
+                        showSaturday = true,
+                        showSunday = true,
+                        "",
+                    ),
+                ),
             )
-        )
-        collectJob.cancel()
-    }
+            collectJob.cancel()
+        }
 
     @Test
-    fun setIs12HoursFormat_trueAndFalse() = runTest {
-        val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
-        subject.setIs12HoursFormat()
-        assertThat(
-            subject.uiState.value, `is`(
-                Success(
-                    isMondayFirstDayOfWeek = true,
-                    is12HoursFormat = false,
-                    showSaturday = true,
-                    showSunday = true,
-                    ""
-                )
+    fun setIs12HoursFormat_trueAndFalse() =
+        runTest {
+            val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
+            subject.setIs12HoursFormat()
+            assertThat(
+                subject.uiState.value,
+                `is`(
+                    Success(
+                        isMondayFirstDayOfWeek = true,
+                        is12HoursFormat = false,
+                        showSaturday = true,
+                        showSunday = true,
+                        "",
+                    ),
+                ),
             )
-        )
-        subject.setIs12HoursFormat()
-        assertThat(
-            subject.uiState.value, `is`(
-                Success(
-                    isMondayFirstDayOfWeek = true,
-                    is12HoursFormat = true,
-                    showSaturday = true,
-                    showSunday = true,
-                    ""
-                )
+            subject.setIs12HoursFormat()
+            assertThat(
+                subject.uiState.value,
+                `is`(
+                    Success(
+                        isMondayFirstDayOfWeek = true,
+                        is12HoursFormat = true,
+                        showSaturday = true,
+                        showSunday = true,
+                        "",
+                    ),
+                ),
             )
-        )
-        collectJob.cancel()
-    }
+            collectJob.cancel()
+        }
 
     @Test
-    fun setShowSaturday_trueAndFalse() = runTest {
-        val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
-        subject.setShowSaturday()
-        assertThat(
-            subject.uiState.value, `is`(
-                Success(
-                    isMondayFirstDayOfWeek = true,
-                    is12HoursFormat = true,
-                    showSaturday = false,
-                    showSunday = true,
-                    ""
-                )
+    fun setShowSaturday_trueAndFalse() =
+        runTest {
+            val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
+            subject.setShowSaturday()
+            assertThat(
+                subject.uiState.value,
+                `is`(
+                    Success(
+                        isMondayFirstDayOfWeek = true,
+                        is12HoursFormat = true,
+                        showSaturday = false,
+                        showSunday = true,
+                        "",
+                    ),
+                ),
             )
-        )
-        subject.setShowSaturday()
-        assertThat(
-            subject.uiState.value, `is`(
-                Success(
-                    isMondayFirstDayOfWeek = true,
-                    is12HoursFormat = true,
-                    showSaturday = true,
-                    showSunday = true,
-                    ""
-                )
+            subject.setShowSaturday()
+            assertThat(
+                subject.uiState.value,
+                `is`(
+                    Success(
+                        isMondayFirstDayOfWeek = true,
+                        is12HoursFormat = true,
+                        showSaturday = true,
+                        showSunday = true,
+                        "",
+                    ),
+                ),
             )
-        )
-        collectJob.cancel()
-    }
+            collectJob.cancel()
+        }
 
     @Test
-    fun setShowSunday_trueAndFalse() = runTest {
-        val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
-        subject.setShowSunday()
-        assertThat(
-            subject.uiState.value, `is`(
-                Success(
-                    isMondayFirstDayOfWeek = true,
-                    is12HoursFormat = true,
-                    showSaturday = true,
-                    showSunday = false,
-                    ""
-                )
+    fun setShowSunday_trueAndFalse() =
+        runTest {
+            val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
+            subject.setShowSunday()
+            assertThat(
+                subject.uiState.value,
+                `is`(
+                    Success(
+                        isMondayFirstDayOfWeek = true,
+                        is12HoursFormat = true,
+                        showSaturday = true,
+                        showSunday = false,
+                        "",
+                    ),
+                ),
             )
-        )
-        subject.setShowSunday()
-        assertThat(
-            subject.uiState.value, `is`(
-                Success(
-                    isMondayFirstDayOfWeek = true,
-                    is12HoursFormat = true,
-                    showSaturday = true,
-                    showSunday = true,
-                    ""
-                )
+            subject.setShowSunday()
+            assertThat(
+                subject.uiState.value,
+                `is`(
+                    Success(
+                        isMondayFirstDayOfWeek = true,
+                        is12HoursFormat = true,
+                        showSaturday = true,
+                        showSunday = true,
+                        "",
+                    ),
+                ),
             )
-        )
-        collectJob.cancel()
-    }
+            collectJob.cancel()
+        }
 }

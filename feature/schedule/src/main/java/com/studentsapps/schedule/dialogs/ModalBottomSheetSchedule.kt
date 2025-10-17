@@ -23,10 +23,9 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class ModalBottomSheetSchedule : BaseBottomSheetDialogFragment() {
-
     private var _binding: ModalBottomSheetScheduleBinding? = null
     private lateinit var navController: NavController
-    private val binding get() = _binding!!
+    val binding get() = _binding!!
     private val args: ModalBottomSheetScheduleArgs by navArgs()
     private val viewModel: BottomSheetScheduleViewModel by viewModels()
 
@@ -41,7 +40,7 @@ class ModalBottomSheetSchedule : BaseBottomSheetDialogFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = ModalBottomSheetScheduleBinding.inflate(inflater, container, false)
         binding.apply {
@@ -51,7 +50,10 @@ class ModalBottomSheetSchedule : BaseBottomSheetDialogFragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         navController = findNavController()
         val scheduleId = args.scheduleId
@@ -59,23 +61,23 @@ class ModalBottomSheetSchedule : BaseBottomSheetDialogFragment() {
         binding.btnEditSchedule.setOnClickListener {
             navController.navigate(
                 ModalBottomSheetScheduleDirections.actionModalBottomSheetScheduleToRegisterScheduleFragment(
-                    scheduleId
-                )
+                    scheduleId,
+                ),
             )
         }
         binding.btnDeleteSchedule.setOnClickListener {
-            MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.delete)
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.delete)
                 .setMessage(R.string.delete_schedule)
                 .setPositiveButton(R.string.accept_dialog) { _, _ ->
                     viewModel.deleteSchedule(args.scheduleId)
                     adManager.showInterstitial(requireActivity()) {
                         navController.previousBackStackEntry?.savedStateHandle?.set(
                             "updateScheduleList",
-                            true
+                            true,
                         )
                     }
-                }
-                .setNegativeButton(R.string.cancel) { dialog, _ ->
+                }.setNegativeButton(R.string.cancel) { dialog, _ ->
                     dialog.dismiss()
                 }.show()
         }

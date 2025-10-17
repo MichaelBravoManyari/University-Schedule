@@ -11,13 +11,14 @@ import com.studentsapps.ui.dialogs.BaseBottomSheetDialogFragment
 import com.studentsapps.ui.timetable.animateOpacity
 
 class ModalBottomSheetDay : BaseBottomSheetDialogFragment() {
-
     private var _binding: ModalBottomSheetDayBinding? = null
-    private val binding get() = _binding!!
+    val binding get() = _binding!!
     private lateinit var navController: NavController
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View {
         _binding = ModalBottomSheetDayBinding.inflate(inflater, container, false)
         navController = findNavController()
@@ -25,7 +26,10 @@ class ModalBottomSheetDay : BaseBottomSheetDialogFragment() {
         return binding.root
     }
 
-    fun goToRegisterScheduleFragment(day: Int, view: View) {
+    fun goToRegisterScheduleFragment(
+        day: Int,
+        view: View,
+    ) {
         animateOpacity(view, 0.5f) {
             animateOpacity(view, 1.0f) {
                 navController.previousBackStackEntry?.savedStateHandle?.set("day", day)

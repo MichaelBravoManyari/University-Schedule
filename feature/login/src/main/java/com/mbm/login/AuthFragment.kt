@@ -1,7 +1,6 @@
 package com.mbm.login
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +12,7 @@ import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialException
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
@@ -37,9 +37,8 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class AuthFragment : Fragment() {
-
     private var _binding: FragmentAuthBinding? = null
-    private val binding get() = _binding!!
+    val binding get() = _binding!!
     private lateinit var navController: NavController
     private val viewModel: SynchronizationViewModel by viewModels()
     private var dialog: AlertDialog? = null
@@ -54,14 +53,18 @@ class AuthFragment : Fragment() {
     lateinit var userManager: UserManager
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentAuthBinding.inflate(layoutInflater, container, false)
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
@@ -69,7 +72,8 @@ class AuthFragment : Fragment() {
                 override fun handleOnBackPressed() {
                     requireActivity().finishAffinity()
                 }
-            })
+            },
+        )
 
         navController = view.findNavController()
 
@@ -91,26 +95,28 @@ class AuthFragment : Fragment() {
     }
 
     private fun signInWithGoogle() {
-
         showLoading(true)
 
         val googleIdOption =
-            GetSignInWithGoogleOption.Builder(BuildConfig.GOOGLE_WEB_CLIENT_ID)
+            GetSignInWithGoogleOption
+                .Builder(BuildConfig.GOOGLE_WEB_CLIENT_ID)
                 .build()
         val request = GetCredentialRequest.Builder().addCredentialOption(googleIdOption).build()
         lifecycleScope.launch {
             try {
-                val result = CredentialManager.create(requireActivity())
-                    .getCredential(requireActivity(), request)
+                val result =
+                    CredentialManager
+                        .create(requireActivity())
+                        .getCredential(requireActivity(), request)
                 handleSignIn(result)
             } catch (_: GetCredentialException) {
                 showLoading(false)
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.login_error),
-                    Toast.LENGTH_SHORT
-                )
-                    .show()
+                Toast
+                    .makeText(
+                        requireContext(),
+                        getString(R.string.login_error),
+                        Toast.LENGTH_SHORT,
+                    ).show()
             }
         }
     }
@@ -120,47 +126,54 @@ class AuthFragment : Fragment() {
             is CustomCredential -> {
                 if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
                     try {
-                        val googleIdTokenCredential = GoogleIdTokenCredential
-                            .createFrom(credential.data)
+                        val googleIdTokenCredential =
+                            GoogleIdTokenCredential
+                                .createFrom(credential.data)
                         val idToken = googleIdTokenCredential.idToken
                         val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
-                        auth.signInWithCredential(firebaseCredential).addOnCompleteListener {
-                            if (it.isSuccessful) {
-                                val userId = auth.currentUser?.uid
-                                if (userId != null) {
-                                    userManager.updateUserId()
-                                    checkAndRegisterUser(userId)
+                        auth
+                            .signInWithCredential(firebaseCredential)
+                            .addOnCompleteListener {
+                                if (it.isSuccessful) {
+                                    val userId = auth.currentUser?.uid
+                                    if (userId != null) {
+                                        userManager.updateUserId()
+                                        checkAndRegisterUser(userId)
+                                    } else {
+                                        showLoading(false)
+                                        Toast
+                                            .makeText(
+                                                requireContext(),
+                                                getString(R.string.login_error),
+                                                Toast.LENGTH_SHORT,
+                                            ).show()
+                                    }
                                 } else {
                                     showLoading(false)
-                                    Toast.makeText(
+                                    Toast
+                                        .makeText(
+                                            requireContext(),
+                                            getString(R.string.login_error),
+                                            Toast.LENGTH_SHORT,
+                                        ).show()
+                                }
+                            }.addOnFailureListener {
+                                showLoading(false)
+                                Toast
+                                    .makeText(
                                         requireContext(),
                                         getString(R.string.login_error),
-                                        Toast.LENGTH_SHORT
+                                        Toast.LENGTH_SHORT,
                                     ).show()
-                                }
-                            } else {
-                                showLoading(false)
-                                Toast.makeText(
-                                    requireContext(),
-                                    getString(R.string.login_error),
-                                    Toast.LENGTH_SHORT
-                                ).show()
                             }
-                        }.addOnFailureListener {
-                            showLoading(false)
-                            Toast.makeText(
-                                requireContext(),
-                                getString(R.string.login_error),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
                     } catch (_: GoogleIdTokenParsingException) {
                         showLoading(false)
-                        Toast.makeText(
-                            requireContext(),
-                            getString(R.string.login_error),
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Toast
+                            .makeText(
+                                requireContext(),
+                                getString(R.string.login_error),
+                                Toast.LENGTH_SHORT,
+                            ).show()
                     }
                 }
             }
@@ -171,30 +184,36 @@ class AuthFragment : Fragment() {
         val firestore = FirebaseFirestore.getInstance()
         val userDocRef = firestore.collection("users").document(userId)
 
-        userDocRef.get().addOnSuccessListener { document ->
+        userDocRef
+            .get()
+            .addOnSuccessListener { document ->
 
-            if (!document.exists()) {
-                userDocRef.set(mapOf("userId" to userId)).addOnSuccessListener {
+                if (!document.exists()) {
+                    userDocRef
+                        .set(mapOf("userId" to userId))
+                        .addOnSuccessListener {
+                            viewModel.startSyncIfNeeded()
+                            navigateToScheduleFragment()
+                        }.addOnFailureListener { _ ->
+                            Toast
+                                .makeText(
+                                    requireContext(),
+                                    getString(R.string.login_error),
+                                    Toast.LENGTH_SHORT,
+                                ).show()
+                        }
+                } else {
                     viewModel.startSyncIfNeeded()
                     navigateToScheduleFragment()
-                }.addOnFailureListener { _ ->
-                    Toast.makeText(
+                }
+            }.addOnFailureListener { _ ->
+                Toast
+                    .makeText(
                         requireContext(),
                         getString(R.string.login_error),
-                        Toast.LENGTH_SHORT
+                        Toast.LENGTH_SHORT,
                     ).show()
-                }
-            } else {
-                viewModel.startSyncIfNeeded()
-                navigateToScheduleFragment()
             }
-        }.addOnFailureListener { _ ->
-            Toast.makeText(
-                requireContext(),
-                getString(R.string.login_error),
-                Toast.LENGTH_SHORT
-            ).show()
-        }
     }
 
     private fun showLoading(isLoading: Boolean) {
@@ -228,27 +247,29 @@ class AuthFragment : Fragment() {
 
     private fun navigateToScheduleFragment() {
         val request =
-            NavDeepLinkRequest.Builder.fromUri("android-app://studentsapps.app/scheduleFragment".toUri())
+            NavDeepLinkRequest.Builder
+                .fromUri("android-app://studentsapps.app/scheduleFragment".toUri())
                 .build()
 
-        val options = NavOptions.Builder()
-            .setLaunchSingleTop(true)
-            .setEnterAnim(android.R.anim.fade_in)
-            .setExitAnim(android.R.anim.fade_out)
-            .setPopEnterAnim(android.R.anim.fade_in)
-            .setPopExitAnim(android.R.anim.fade_out)
-            .build()
+        val options =
+            NavOptions
+                .Builder()
+                .setLaunchSingleTop(true)
+                .setEnterAnim(android.R.anim.fade_in)
+                .setExitAnim(android.R.anim.fade_out)
+                .setPopEnterAnim(android.R.anim.fade_in)
+                .setPopExitAnim(android.R.anim.fade_out)
+                .build()
 
         navController.navigate(request, options)
     }
 
-    private fun createLoadingDialog(): AlertDialog {
-        return MaterialAlertDialogBuilder(requireActivity())
+    private fun createLoadingDialog(): AlertDialog =
+        MaterialAlertDialogBuilder(requireActivity())
             .setView(com.studentsapps.common.R.layout.dialog_progress)
             .setTitle(this.getText(com.studentsapps.common.R.string.synchronizing))
             .setCancelable(false)
             .create()
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()

@@ -13,55 +13,56 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ScheduleConfigurationViewModel @Inject constructor(
-    private val timetableUserPreferencesRepository: TimetableUserPreferencesRepository,
-    private val auth: FirebaseAuth,
-) : ViewModel() {
-
-    val uiState: StateFlow<ScheduleConfigurationUiState> =
-        timetableUserPreferencesRepository.userData.map { preferences ->
-            with(preferences) {
-                ScheduleConfigurationUiState.Success(
-                    isMondayFirstDayOfWeek,
-                    is12HoursFormat,
-                    showSaturday,
-                    showSunday,
-                    auth.currentUser?.email
+class ScheduleConfigurationViewModel
+    @Inject
+    constructor(
+        private val timetableUserPreferencesRepository: TimetableUserPreferencesRepository,
+        private val auth: FirebaseAuth,
+    ) : ViewModel() {
+        val uiState: StateFlow<ScheduleConfigurationUiState> =
+            timetableUserPreferencesRepository.userData
+                .map { preferences ->
+                    with(preferences) {
+                        ScheduleConfigurationUiState.Success(
+                            isMondayFirstDayOfWeek,
+                            is12HoursFormat,
+                            showSaturday,
+                            showSunday,
+                            auth.currentUser?.email,
+                        )
+                    }
+                }.stateIn(
+                    scope = viewModelScope,
+                    started = SharingStarted.WhileSubscribed(5_000),
+                    initialValue = ScheduleConfigurationUiState.Loading,
                 )
+
+        fun setIsMondayFirstDayOfWeek() {
+            viewModelScope.launch {
+                timetableUserPreferencesRepository.updateIsMondayFirstDayOfWeek()
             }
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = ScheduleConfigurationUiState.Loading
-        )
+        }
 
-    fun setIsMondayFirstDayOfWeek() {
-        viewModelScope.launch {
-            timetableUserPreferencesRepository.updateIsMondayFirstDayOfWeek()
+        fun setIs12HoursFormat() {
+            viewModelScope.launch {
+                timetableUserPreferencesRepository.updateIs12HoursFormat()
+            }
+        }
+
+        fun setShowSaturday() {
+            viewModelScope.launch {
+                timetableUserPreferencesRepository.updateShowSaturday()
+            }
+        }
+
+        fun setShowSunday() {
+            viewModelScope.launch {
+                timetableUserPreferencesRepository.updateShowSunday()
+            }
         }
     }
-
-    fun setIs12HoursFormat() {
-        viewModelScope.launch {
-            timetableUserPreferencesRepository.updateIs12HoursFormat()
-        }
-    }
-
-    fun setShowSaturday() {
-        viewModelScope.launch {
-            timetableUserPreferencesRepository.updateShowSaturday()
-        }
-    }
-
-    fun setShowSunday() {
-        viewModelScope.launch {
-            timetableUserPreferencesRepository.updateShowSunday()
-        }
-    }
-}
 
 sealed interface ScheduleConfigurationUiState {
-
     data object Loading : ScheduleConfigurationUiState
 
     data class Success(

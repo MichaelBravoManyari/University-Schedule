@@ -46,7 +46,7 @@ class CourseLocalDataSourceTest {
                     nameProfessor = null,
                     color = 1234,
                     lastModified = LocalDateTime.now(),
-                    userId = ""
+                    userId = "",
                 )
             assertThat(
                 subject.insert(courseEntity),

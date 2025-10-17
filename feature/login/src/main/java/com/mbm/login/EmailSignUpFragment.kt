@@ -2,13 +2,13 @@ package com.mbm.login
 
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
+import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.findNavController
@@ -24,7 +24,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class EmailSignUpFragment : Fragment() {
     private var _binding: FragmentEmailSignUpBinding? = null
-    private val binding get() = _binding!!
+    val binding get() = _binding!!
     private lateinit var navController: NavController
 
     @Inject
@@ -36,14 +36,18 @@ class EmailSignUpFragment : Fragment() {
     private lateinit var backPressCallback: OnBackPressedCallback
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentEmailSignUpBinding.inflate(inflater, container, false)
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         navController = view.findNavController()
         setupBackPressHandler()
@@ -51,11 +55,12 @@ class EmailSignUpFragment : Fragment() {
     }
 
     private fun setupBackPressHandler() {
-        backPressCallback = object : OnBackPressedCallback(false) {
-            override fun handleOnBackPressed() {
-                // No se hace nada mientras la carga esté activa
+        backPressCallback =
+            object : OnBackPressedCallback(false) {
+                override fun handleOnBackPressed() {
+                    // No se hace nada mientras la carga esté activa
+                }
             }
-        }
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, backPressCallback)
     }
 
@@ -69,16 +74,29 @@ class EmailSignUpFragment : Fragment() {
     }
 
     private fun handleSignUp() {
-        val email = binding.editTextEmail.text.toString().trim()
-        val password = binding.editTextPassword.text.toString().trim()
-        val passwordRe = binding.editTextValPassword.text.toString().trim()
+        val email =
+            binding.editTextEmail.text
+                .toString()
+                .trim()
+        val password =
+            binding.editTextPassword.text
+                .toString()
+                .trim()
+        val passwordRe =
+            binding.editTextValPassword.text
+                .toString()
+                .trim()
         if (isInputValid(email, password, passwordRe)) {
             createUser(email, password)
         }
     }
 
-    private fun isInputValid(email: String, password: String, passwordRe: String): Boolean {
-        return when {
+    private fun isInputValid(
+        email: String,
+        password: String,
+        passwordRe: String,
+    ): Boolean =
+        when {
             email.isEmpty() -> {
                 binding.editTextLayoutEmail.error = getString(R.string.enter_your_email)
                 false
@@ -106,7 +124,6 @@ class EmailSignUpFragment : Fragment() {
 
             else -> true
         }
-    }
 
     private fun isValidPassword(password: String): Boolean {
         val regex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$"
@@ -115,7 +132,10 @@ class EmailSignUpFragment : Fragment() {
         return matcher.matches()
     }
 
-    private fun createUser(email: String, password: String) {
+    private fun createUser(
+        email: String,
+        password: String,
+    ) {
         showLoading(true)
         auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
             if (task.isSuccessful) {
@@ -139,15 +159,18 @@ class EmailSignUpFragment : Fragment() {
 
     private fun saveUserToFirestore(userId: String) {
         val firestore = FirebaseFirestore.getInstance()
-        firestore.collection("users").document(userId).set(emptyMap<String, Any>())
+        firestore
+            .collection("users")
+            .document(userId)
+            .set(emptyMap<String, Any>())
             .addOnSuccessListener {
                 showLoading(false)
                 val request =
-                    NavDeepLinkRequest.Builder.fromUri("android-app://studentsapps.app/scheduleFragment".toUri())
+                    NavDeepLinkRequest.Builder
+                        .fromUri("android-app://studentsapps.app/scheduleFragment".toUri())
                         .build()
                 navController.navigate(request)
-            }
-            .addOnFailureListener { e ->
+            }.addOnFailureListener { e ->
                 showLoading(false)
                 val builder = AlertDialog.Builder(requireContext())
                 builder.apply {

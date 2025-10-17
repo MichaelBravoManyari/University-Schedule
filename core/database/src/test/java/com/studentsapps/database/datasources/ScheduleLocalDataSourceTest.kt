@@ -32,21 +32,23 @@ class ScheduleLocalDataSourceTest {
     fun getSchedulesForTimetableInGridMode_returnScheduleDetailsView() =
         runTest(testDispatcher) {
             assertThat(
-                subject.getSchedulesForTimetableInGridMode(
-                    showSaturday = true,
-                    showSunday = true,
-                    startDate = LocalDate.of(2023, 11, 20),
-                    endDate = LocalDate.of(2023, 11, 26),
-                    userId = ""
-                ).first(),
-                `is`(
-                    scheduleDao.getSchedulesForTimetableInGridMode(
+                subject
+                    .getSchedulesForTimetableInGridMode(
                         showSaturday = true,
                         showSunday = true,
                         startDate = LocalDate.of(2023, 11, 20),
                         endDate = LocalDate.of(2023, 11, 26),
-                        userId = ""
+                        userId = "",
                     ).first(),
+                `is`(
+                    scheduleDao
+                        .getSchedulesForTimetableInGridMode(
+                            showSaturday = true,
+                            showSunday = true,
+                            startDate = LocalDate.of(2023, 11, 20),
+                            endDate = LocalDate.of(2023, 11, 26),
+                            userId = "",
+                        ).first(),
                 ),
             )
         }
@@ -56,17 +58,19 @@ class ScheduleLocalDataSourceTest {
         runTest(testDispatcher) {
             val date = LocalDate.of(2023, 11, 20)
             assertThat(
-                subject.getSchedulesForTimetableInListMode(
-                    date = date,
-                    dayOfWeek = date.dayOfWeek,
-                    userId = ""
-                ).first(),
-                `is`(
-                    scheduleDao.getSchedulesForTimetableInListMode(
-                        specificDate = date,
+                subject
+                    .getSchedulesForTimetableInListMode(
+                        date = date,
                         dayOfWeek = date.dayOfWeek,
-                        userId = ""
+                        userId = "",
                     ).first(),
+                `is`(
+                    scheduleDao
+                        .getSchedulesForTimetableInListMode(
+                            specificDate = date,
+                            dayOfWeek = date.dayOfWeek,
+                            userId = "",
+                        ).first(),
                 ),
             )
         }
@@ -84,7 +88,7 @@ class ScheduleLocalDataSourceTest {
                     null,
                     LocalDateTime.now(),
                     userId = "",
-                    "1"
+                    "1",
                 )
             assertThat(
                 subject.insert(scheduleEntity),

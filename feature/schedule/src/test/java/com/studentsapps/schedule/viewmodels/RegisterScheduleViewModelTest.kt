@@ -24,7 +24,6 @@ import kotlin.test.assertEquals
 
 @ExperimentalCoroutinesApi
 class RegisterScheduleViewModelTest {
-
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
@@ -42,134 +41,156 @@ class RegisterScheduleViewModelTest {
     }
 
     @Test
-    fun stateIsInitiallyRegisterUiState() = runTest {
-        assertEquals(
-            RegisterScheduleUiState(), subject.uiState.value
-        )
-    }
+    fun stateIsInitiallyRegisterUiState() =
+        runTest {
+            assertEquals(
+                RegisterScheduleUiState(),
+                subject.uiState.value,
+            )
+        }
 
     @Test
-    fun selectDay_dayOfWeek() = runTest {
-        val dayOfWeek = DayOfWeek.WEDNESDAY
-        val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
-        subject.selectDay(dayOfWeek)
-        assertEquals(
-            RegisterScheduleUiState().copy(day = dayOfWeek), subject.uiState.value
-        )
-        collectJob.cancel()
-    }
+    fun selectDay_dayOfWeek() =
+        runTest {
+            val dayOfWeek = DayOfWeek.WEDNESDAY
+            val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
+            subject.selectDay(dayOfWeek)
+            assertEquals(
+                RegisterScheduleUiState().copy(day = dayOfWeek),
+                subject.uiState.value,
+            )
+            collectJob.cancel()
+        }
 
     @Test
-    fun selectStartHour_9AM() = runTest {
-        val startTime = LocalTime.of(9, 0)
-        val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
-        subject.selectStartHour(startTime)
-        assertEquals(
-            RegisterScheduleUiState().copy(startTime = startTime), subject.uiState.value
-        )
-        collectJob.cancel()
-    }
+    fun selectStartHour_9AM() =
+        runTest {
+            val startTime = LocalTime.of(9, 0)
+            val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
+            subject.selectStartHour(startTime)
+            assertEquals(
+                RegisterScheduleUiState().copy(startTime = startTime),
+                subject.uiState.value,
+            )
+            collectJob.cancel()
+        }
 
     @Test
-    fun selectEndHour_10AM() = runTest {
-        val endTime = LocalTime.of(10, 0)
-        val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
-        subject.selectEndHour(endTime)
-        assertEquals(
-            RegisterScheduleUiState().copy(endTime = endTime), subject.uiState.value
-        )
-        collectJob.cancel()
-    }
+    fun selectEndHour_10AM() =
+        runTest {
+            val endTime = LocalTime.of(10, 0)
+            val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
+            subject.selectEndHour(endTime)
+            assertEquals(
+                RegisterScheduleUiState().copy(endTime = endTime),
+                subject.uiState.value,
+            )
+            collectJob.cancel()
+        }
 
     @Test
-    fun selectCourse_courseId1() = runTest {
-        val expectedCourse = courseRepository.getCourse("1").first()
-        val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
-        subject.selectCourse("1")
-        assertEquals(
-            RegisterScheduleUiState().copy(
-                selectedCourse = expectedCourse, noSelectCourse = false
-            ), subject.uiState.value
-        )
-        collectJob.cancel()
-    }
+    fun selectCourse_courseId1() =
+        runTest {
+            val expectedCourse = courseRepository.getCourse("1").first()
+            val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
+            subject.selectCourse("1")
+            assertEquals(
+                RegisterScheduleUiState().copy(
+                    selectedCourse = expectedCourse,
+                    noSelectCourse = false,
+                ),
+                subject.uiState.value,
+            )
+            collectJob.cancel()
+        }
 
     @Test
-    fun selectColorCourse_colorRed() = runTest {
-        val expectedColor = Color.RED
-        val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
-        subject.selectColorCourse(expectedColor)
-        assertEquals(
-            RegisterScheduleUiState().copy(colorCourse = expectedColor), subject.uiState.value
-        )
-        collectJob.cancel()
-    }
+    fun selectColorCourse_colorRed() =
+        runTest {
+            val expectedColor = Color.RED
+            val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
+            subject.selectColorCourse(expectedColor)
+            assertEquals(
+                RegisterScheduleUiState().copy(colorCourse = expectedColor),
+                subject.uiState.value,
+            )
+            collectJob.cancel()
+        }
 
     @Test
-    fun existingCourseChecked_TruAndFalse() = runTest {
-        val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
-        subject.existingCourseChecked(true)
-        assertEquals(
-            RegisterScheduleUiState().copy(
-                existingCourses = true,
-                visibilityEditTextCourse = false,
-                visibilitySelectCourse = true,
-                visibilityColorSection = false
-            ), subject.uiState.value
-        )
-        subject.existingCourseChecked(false)
-        assertEquals(
-            RegisterScheduleUiState().copy(
-                existingCourses = false,
-                visibilityEditTextCourse = true,
-                visibilitySelectCourse = false,
-                visibilityColorSection = true
-            ), subject.uiState.value
-        )
-        collectJob.cancel()
-    }
+    fun existingCourseChecked_TruAndFalse() =
+        runTest {
+            val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
+            subject.existingCourseChecked(true)
+            assertEquals(
+                RegisterScheduleUiState().copy(
+                    existingCourses = true,
+                    visibilityEditTextCourse = false,
+                    visibilitySelectCourse = true,
+                    visibilityColorSection = false,
+                ),
+                subject.uiState.value,
+            )
+            subject.existingCourseChecked(false)
+            assertEquals(
+                RegisterScheduleUiState().copy(
+                    existingCourses = false,
+                    visibilityEditTextCourse = true,
+                    visibilitySelectCourse = false,
+                    visibilityColorSection = true,
+                ),
+                subject.uiState.value,
+            )
+            collectJob.cancel()
+        }
 
     @Test
-    fun setClassroom_notNullAndNull() = runTest {
-        val classroom = "Ed. New"
-        val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
-        subject.setClassroom(classroom)
-        assertEquals(
-            RegisterScheduleUiState().copy(classroom = classroom), subject.uiState.value
-        )
-        subject.setClassroom(null)
-        assertEquals(
-            RegisterScheduleUiState().copy(classroom = null), subject.uiState.value
-        )
-        collectJob.cancel()
-    }
+    fun setClassroom_notNullAndNull() =
+        runTest {
+            val classroom = "Ed. New"
+            val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
+            subject.setClassroom(classroom)
+            assertEquals(
+                RegisterScheduleUiState().copy(classroom = classroom),
+                subject.uiState.value,
+            )
+            subject.setClassroom(null)
+            assertEquals(
+                RegisterScheduleUiState().copy(classroom = null),
+                subject.uiState.value,
+            )
+            collectJob.cancel()
+        }
 
     @Test
-    fun setCourseName_notNullAndNull() = runTest {
-        val courseName = "Math"
-        val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
-        subject.setCourseName(courseName)
-        assertEquals(
-            RegisterScheduleUiState().copy(courseName = courseName, noSelectCourse = false),
-            subject.uiState.value
-        )
-        subject.setCourseName(null)
-        assertEquals(
-            RegisterScheduleUiState().copy(courseName = null, noSelectCourse = false),
-            subject.uiState.value
-        )
-        collectJob.cancel()
-    }
+    fun setCourseName_notNullAndNull() =
+        runTest {
+            val courseName = "Math"
+            val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
+            subject.setCourseName(courseName)
+            assertEquals(
+                RegisterScheduleUiState().copy(courseName = courseName, noSelectCourse = false),
+                subject.uiState.value,
+            )
+            subject.setCourseName(null)
+            assertEquals(
+                RegisterScheduleUiState().copy(courseName = null, noSelectCourse = false),
+                subject.uiState.value,
+            )
+            collectJob.cancel()
+        }
 
     @Test
-    fun userMessageShown_null() = runTest {
-        val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
-        subject.userMessageShown()
-        assertEquals(
-            RegisterScheduleUiState().copy(userMessage = null), subject.uiState.value
-        )
-        collectJob.cancel()
-    }
+    fun userMessageShown_null() =
+        runTest {
+            val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
+            subject.userMessageShown()
+            assertEquals(
+                RegisterScheduleUiState().copy(userMessage = null),
+                subject.uiState.value,
+            )
+            collectJob.cancel()
+        }
 
     /*@Test
     fun registerSchedule_correctTimes() = runTest {
@@ -202,16 +223,19 @@ class RegisterScheduleViewModelTest {
     }*/
 
     @Test
-    fun registerSchedule_noSelectCourse() = runTest {
-        val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
-        subject.registerSchedule()
-        assertEquals(
-            RegisterScheduleUiState().copy(
-                noSelectCourse = true, userMessage = subject.uiState.value.userMessage
-            ), subject.uiState.value
-        )
-        collectJob.cancel()
-    }
+    fun registerSchedule_noSelectCourse() =
+        runTest {
+            val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
+            subject.registerSchedule()
+            assertEquals(
+                RegisterScheduleUiState().copy(
+                    noSelectCourse = true,
+                    userMessage = subject.uiState.value.userMessage,
+                ),
+                subject.uiState.value,
+            )
+            collectJob.cancel()
+        }
 
     /*@Test
     fun registerSchedule_noExistingCourses_withCourseName() = runTest {
@@ -239,60 +263,68 @@ class RegisterScheduleViewModelTest {
     }*/
 
     @Test
-    fun registerSchedule_noExistingCoursesAndCourseName() = runTest {
-        val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
-        subject.existingCourseChecked(false)
-        subject.registerSchedule()
-        assertEquals(
-            RegisterScheduleUiState().copy(
-                existingCourses = false,
-                visibilityEditTextCourse = true,
-                visibilitySelectCourse = false,
-                visibilityColorSection = true,
-                noSelectCourse = true,
-                userMessage = subject.uiState.value.userMessage,
-            ), subject.uiState.value
-        )
-        collectJob.cancel()
-    }
+    fun registerSchedule_noExistingCoursesAndCourseName() =
+        runTest {
+            val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
+            subject.existingCourseChecked(false)
+            subject.registerSchedule()
+            assertEquals(
+                RegisterScheduleUiState().copy(
+                    existingCourses = false,
+                    visibilityEditTextCourse = true,
+                    visibilitySelectCourse = false,
+                    visibilityColorSection = true,
+                    noSelectCourse = true,
+                    userMessage = subject.uiState.value.userMessage,
+                ),
+                subject.uiState.value,
+            )
+            collectJob.cancel()
+        }
 
     @Test
-    fun setRecurrentOption_everyWeekAndSpecificDate() = runTest {
-        val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
-        subject.setRecurrentOption(RecurrenceOption.SPECIFIC_DATE)
-        assertEquals(
-            RegisterScheduleUiState().copy(
-                repetition = RecurrenceOption.SPECIFIC_DATE,
-                specificDate = LocalDate.now(),
-                day = LocalDate.now().dayOfWeek
-            ), subject.uiState.value
-        )
-        subject.setRecurrentOption(RecurrenceOption.EVERY_WEEK)
-        assertEquals(
-            RegisterScheduleUiState().copy(
-                repetition = RecurrenceOption.EVERY_WEEK,
-                specificDate = null,
-                day = DayOfWeek.MONDAY
-            ), subject.uiState.value
-        )
-        collectJob.cancel()
-    }
+    fun setRecurrentOption_everyWeekAndSpecificDate() =
+        runTest {
+            val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
+            subject.setRecurrentOption(RecurrenceOption.SPECIFIC_DATE)
+            assertEquals(
+                RegisterScheduleUiState().copy(
+                    repetition = RecurrenceOption.SPECIFIC_DATE,
+                    specificDate = LocalDate.now(),
+                    day = LocalDate.now().dayOfWeek,
+                ),
+                subject.uiState.value,
+            )
+            subject.setRecurrentOption(RecurrenceOption.EVERY_WEEK)
+            assertEquals(
+                RegisterScheduleUiState().copy(
+                    repetition = RecurrenceOption.EVERY_WEEK,
+                    specificDate = null,
+                    day = DayOfWeek.MONDAY,
+                ),
+                subject.uiState.value,
+            )
+            collectJob.cancel()
+        }
 
     @Test
-    fun setSpecificDate_dateAndNull() = runTest {
-        val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
-        val expectedDate = LocalDate.now()
-        subject.setSpecificDate(expectedDate)
-        assertEquals(
-            RegisterScheduleUiState().copy(
-                specificDate = expectedDate,
-                day = expectedDate.dayOfWeek
-            ), subject.uiState.value
-        )
-        subject.setSpecificDate(null)
-        assertEquals(
-            RegisterScheduleUiState(day = expectedDate.dayOfWeek), subject.uiState.value
-        )
-        collectJob.cancel()
-    }
+    fun setSpecificDate_dateAndNull() =
+        runTest {
+            val collectJob = launch(UnconfinedTestDispatcher()) { subject.uiState.collect() }
+            val expectedDate = LocalDate.now()
+            subject.setSpecificDate(expectedDate)
+            assertEquals(
+                RegisterScheduleUiState().copy(
+                    specificDate = expectedDate,
+                    day = expectedDate.dayOfWeek,
+                ),
+                subject.uiState.value,
+            )
+            subject.setSpecificDate(null)
+            assertEquals(
+                RegisterScheduleUiState(day = expectedDate.dayOfWeek),
+                subject.uiState.value,
+            )
+            collectJob.cancel()
+        }
 }

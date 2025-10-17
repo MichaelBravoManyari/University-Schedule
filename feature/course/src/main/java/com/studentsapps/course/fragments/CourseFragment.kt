@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class CourseFragment : Fragment() {
     private var _binding: FragmentCourseBinding? = null
-    private val binding get() = _binding!!
+    val binding get() = _binding!!
     private lateinit var navController: NavController
     private val viewModel: CourseViewModel by viewModels()
 

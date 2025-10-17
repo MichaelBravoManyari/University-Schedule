@@ -17,7 +17,7 @@ import kotlin.math.floor
 
 class ModalBottomSheetColor : BaseBottomSheetDialogFragment() {
     private var _binding: ModalBottomSheetColorBinding? = null
-    private val binding get() = _binding!!
+    val binding get() = _binding!!
     private lateinit var navController: NavController
 
     private var color = 0xffffff00.toInt()

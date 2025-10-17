@@ -21,298 +21,313 @@ import java.time.LocalTime
 import javax.inject.Inject
 
 @HiltViewModel
-class RegisterScheduleViewModel @Inject constructor(
-    private val courseRepository: CourseRepository,
-    private val scheduleRepository: ScheduleRepository,
-    auth: FirebaseAuth
-) : ViewModel() {
-    private var _uiState = MutableStateFlow(RegisterScheduleUiState())
-    private val userId = auth.currentUser?.uid ?: ""
-    val uiState: StateFlow<RegisterScheduleUiState> = _uiState
+class RegisterScheduleViewModel
+    @Inject
+    constructor(
+        private val courseRepository: CourseRepository,
+        private val scheduleRepository: ScheduleRepository,
+        auth: FirebaseAuth,
+    ) : ViewModel() {
+        private var _uiState = MutableStateFlow(RegisterScheduleUiState())
+        private val userId = auth.currentUser?.uid ?: ""
+        val uiState: StateFlow<RegisterScheduleUiState> = _uiState
 
-    fun selectDay(day: DayOfWeek) {
-        _uiState.update { currentState ->
-            currentState.copy(day = day)
-        }
-    }
-
-    fun selectStartHour(time: LocalTime) {
-        _uiState.update { currentState ->
-            currentState.copy(startTime = time, hourError = false)
-        }
-    }
-
-    fun selectEndHour(time: LocalTime) {
-        _uiState.update { currentState ->
-            currentState.copy(endTime = time, hourError = false)
-        }
-    }
-
-    fun selectCourse(courseId: String) {
-        viewModelScope.launch {
-            val course = courseRepository.getCourse(courseId).first()
+        fun selectDay(day: DayOfWeek) {
             _uiState.update { currentState ->
-                currentState.copy(
-                    selectedCourse = course.copy(
-                        name = truncateCourseName(course.name) ?: course.name
-                    ),
-                    noSelectCourse = false
-                )
+                currentState.copy(day = day)
             }
         }
-    }
 
-    fun selectColorCourse(colorCourse: Int) {
-        _uiState.update { currentState ->
-            currentState.copy(colorCourse = colorCourse)
-        }
-    }
-
-    fun existingCourseChecked(isChecked: Boolean) {
-        _uiState.update { currentState ->
-            if (isChecked) {
-                currentState.copy(
-                    existingCourses = true,
-                    visibilityEditTextCourse = false,
-                    visibilitySelectCourse = true,
-                    visibilityColorSection = false
-                )
-            } else {
-                currentState.copy(
-                    existingCourses = false,
-                    visibilityEditTextCourse = true,
-                    visibilitySelectCourse = false,
-                    visibilityColorSection = true
-                )
-            }
-        }
-    }
-
-    fun setClassroom(classroom: String?) {
-        _uiState.update { currentState ->
-            currentState.copy(classroom = classroom)
-        }
-    }
-
-    fun setCourseName(courseName: String?) {
-        _uiState.update { currentState ->
-            currentState.copy(
-                courseName = courseName,
-                noSelectCourse = false
-            )
-        }
-    }
-
-    fun setRecurrentOption(recurrenceOption: RecurrenceOption) {
-        _uiState.update { currentState ->
-            if (recurrenceOption == RecurrenceOption.EVERY_WEEK) currentState.copy(
-                repetition = recurrenceOption, day = DayOfWeek.MONDAY, specificDate = null
-            )
-            else currentState.copy(
-                repetition = recurrenceOption,
-                day = LocalDate.now().dayOfWeek,
-                specificDate = LocalDate.now()
-            )
-        }
-    }
-
-    fun registerSchedule() {
-        if (startTimeIsLessThanEndTime()) {
-            if (uiState.value.existingCourses) {
-                registerScheduleWithExistingCourse()
-            } else {
-                registerScheduleWithNewCourse()
-            }
-        } else {
+        fun selectStartHour(time: LocalTime) {
             _uiState.update { currentState ->
-                currentState.copy(
-                    userMessage = R.string.hour_error, hourError = true
-                )
+                currentState.copy(startTime = time, hourError = false)
             }
         }
-    }
 
-    fun displayScheduleData(scheduleId: String) {
-        viewModelScope.launch {
-            val schedule = scheduleRepository.getScheduleDetailsById(scheduleId, userId)
-            val course = courseRepository.getCourse(schedule.courseId).first()
+        fun selectEndHour(time: LocalTime) {
             _uiState.update { currentState ->
-                with(schedule) {
+                currentState.copy(endTime = time, hourError = false)
+            }
+        }
+
+        fun selectCourse(courseId: String) {
+            viewModelScope.launch {
+                val course = courseRepository.getCourse(courseId).first()
+                _uiState.update { currentState ->
                     currentState.copy(
-                        scheduleId = scheduleId,
-                        day = dayOfWeek,
-                        startTime = startTime,
-                        endTime = endTime,
-                        selectedCourse = course.copy(
-                            name = truncateCourseName(course.name) ?: course.name
-                        ),
-                        repetition = if (specificDate != null) RecurrenceOption.SPECIFIC_DATE else RecurrenceOption.EVERY_WEEK,
-                        specificDate = specificDate,
-                        classroom = classPlace
+                        selectedCourse =
+                            course.copy(
+                                name = truncateCourseName(course.name) ?: course.name,
+                            ),
+                        noSelectCourse = false,
                     )
                 }
             }
         }
-    }
 
-    fun updateSchedule() {
-        if (startTimeIsLessThanEndTime()) {
-            if (uiState.value.existingCourses) {
-                updateScheduleWithExistingCourse()
+        fun selectColorCourse(colorCourse: Int) {
+            _uiState.update { currentState ->
+                currentState.copy(colorCourse = colorCourse)
+            }
+        }
+
+        fun existingCourseChecked(isChecked: Boolean) {
+            _uiState.update { currentState ->
+                if (isChecked) {
+                    currentState.copy(
+                        existingCourses = true,
+                        visibilityEditTextCourse = false,
+                        visibilitySelectCourse = true,
+                        visibilityColorSection = false,
+                    )
+                } else {
+                    currentState.copy(
+                        existingCourses = false,
+                        visibilityEditTextCourse = true,
+                        visibilitySelectCourse = false,
+                        visibilityColorSection = true,
+                    )
+                }
+            }
+        }
+
+        fun setClassroom(classroom: String?) {
+            _uiState.update { currentState ->
+                currentState.copy(classroom = classroom)
+            }
+        }
+
+        fun setCourseName(courseName: String?) {
+            _uiState.update { currentState ->
+                currentState.copy(
+                    courseName = courseName,
+                    noSelectCourse = false,
+                )
+            }
+        }
+
+        fun setRecurrentOption(recurrenceOption: RecurrenceOption) {
+            _uiState.update { currentState ->
+                if (recurrenceOption == RecurrenceOption.EVERY_WEEK) {
+                    currentState.copy(
+                        repetition = recurrenceOption,
+                        day = DayOfWeek.MONDAY,
+                        specificDate = null,
+                    )
+                } else {
+                    currentState.copy(
+                        repetition = recurrenceOption,
+                        day = LocalDate.now().dayOfWeek,
+                        specificDate = LocalDate.now(),
+                    )
+                }
+            }
+        }
+
+        fun registerSchedule() {
+            if (startTimeIsLessThanEndTime()) {
+                if (uiState.value.existingCourses) {
+                    registerScheduleWithExistingCourse()
+                } else {
+                    registerScheduleWithNewCourse()
+                }
             } else {
-                updateScheduleWithNewCourse()
-            }
-        } else {
-            _uiState.update { currentState ->
-                currentState.copy(
-                    userMessage = R.string.hour_error, hourError = true
-                )
-            }
-        }
-    }
-
-    private fun registerScheduleWithExistingCourse() {
-        if (uiState.value.selectedCourse != null) {
-            val schedule = createSchedule(uiState.value.selectedCourse!!.id)
-            viewModelScope.launch {
-                scheduleRepository.registerSchedule(
-                    schedule,
-                    uiState.value.specificDate,
-                    uiState.value.selectedCourse!!.name,
-                    uiState.value.selectedCourse!!.color,
-                    userId
-                )
                 _uiState.update { currentState ->
-                    currentState.copy(isScheduleRecorded = true)
+                    currentState.copy(
+                        userMessage = R.string.hour_error,
+                        hourError = true,
+                    )
                 }
             }
-        } else {
-            _uiState.update { currentState ->
-                currentState.copy(
-                    noSelectCourse = true, userMessage = R.string.select_course
-                )
-            }
         }
-    }
 
-    private fun updateScheduleWithExistingCourse() {
-        if (uiState.value.selectedCourse != null) {
-            val schedule = createSchedule(uiState.value.selectedCourse!!.id)
+        fun displayScheduleData(scheduleId: String) {
             viewModelScope.launch {
-                scheduleRepository.updateSchedule(
-                    schedule,
-                    uiState.value.specificDate,
-                    uiState.value.selectedCourse!!.name,
-                    uiState.value.selectedCourse!!.color,
-                    userId
-                )
+                val schedule = scheduleRepository.getScheduleDetailsById(scheduleId, userId)
+                val course = courseRepository.getCourse(schedule.courseId).first()
                 _uiState.update { currentState ->
-                    currentState.copy(isScheduleRecorded = true)
+                    with(schedule) {
+                        currentState.copy(
+                            scheduleId = scheduleId,
+                            day = dayOfWeek,
+                            startTime = startTime,
+                            endTime = endTime,
+                            selectedCourse =
+                                course.copy(
+                                    name = truncateCourseName(course.name) ?: course.name,
+                                ),
+                            repetition = if (specificDate != null) RecurrenceOption.SPECIFIC_DATE else RecurrenceOption.EVERY_WEEK,
+                            specificDate = specificDate,
+                            classroom = classPlace,
+                        )
+                    }
                 }
             }
-        } else {
-            _uiState.update { currentState ->
-                currentState.copy(
-                    noSelectCourse = true, userMessage = R.string.select_course
-                )
-            }
         }
-    }
 
-    private fun updateScheduleWithNewCourse() {
-        if (!uiState.value.courseName.isNullOrBlank()) {
-            val course = createCourse()
-            viewModelScope.launch {
-                val courseId = courseRepository.registerCourse(course, userId)
-                val schedule = createSchedule(courseId)
-                scheduleRepository.updateSchedule(
-                    schedule,
-                    uiState.value.specificDate,
-                    uiState.value.courseName!!,
-                    uiState.value.colorCourse,
-                    userId
-                )
+        fun updateSchedule() {
+            if (startTimeIsLessThanEndTime()) {
+                if (uiState.value.existingCourses) {
+                    updateScheduleWithExistingCourse()
+                } else {
+                    updateScheduleWithNewCourse()
+                }
+            } else {
                 _uiState.update { currentState ->
-                    currentState.copy(isScheduleRecorded = true)
+                    currentState.copy(
+                        userMessage = R.string.hour_error,
+                        hourError = true,
+                    )
                 }
             }
-        } else {
-            _uiState.update { currentState ->
-                currentState.copy(
-                    noSelectCourse = true, userMessage = R.string.enter_course_name
-                )
-            }
         }
-    }
 
-    private fun registerScheduleWithNewCourse() {
-        if (!uiState.value.courseName.isNullOrBlank()) {
-            val course = createCourse()
-            viewModelScope.launch {
-                val courseId = courseRepository.registerCourse(course, userId)
-                val schedule = createSchedule(courseId)
-                scheduleRepository.registerSchedule(
-                    schedule,
-                    uiState.value.specificDate,
-                    course.name,
-                    course.color,
-                    userId
-                )
+        private fun registerScheduleWithExistingCourse() {
+            if (uiState.value.selectedCourse != null) {
+                val schedule = createSchedule(uiState.value.selectedCourse!!.id)
+                viewModelScope.launch {
+                    scheduleRepository.registerSchedule(
+                        schedule,
+                        uiState.value.specificDate,
+                        uiState.value.selectedCourse!!.name,
+                        uiState.value.selectedCourse!!.color,
+                        userId,
+                    )
+                    _uiState.update { currentState ->
+                        currentState.copy(isScheduleRecorded = true)
+                    }
+                }
+            } else {
                 _uiState.update { currentState ->
-                    currentState.copy(isScheduleRecorded = true)
+                    currentState.copy(
+                        noSelectCourse = true,
+                        userMessage = R.string.select_course,
+                    )
                 }
             }
-        } else {
-            _uiState.update { currentState ->
-                currentState.copy(
-                    noSelectCourse = true, userMessage = R.string.enter_course_name
-                )
+        }
+
+        private fun updateScheduleWithExistingCourse() {
+            if (uiState.value.selectedCourse != null) {
+                val schedule = createSchedule(uiState.value.selectedCourse!!.id)
+                viewModelScope.launch {
+                    scheduleRepository.updateSchedule(
+                        schedule,
+                        uiState.value.specificDate,
+                        uiState.value.selectedCourse!!.name,
+                        uiState.value.selectedCourse!!.color,
+                        userId,
+                    )
+                    _uiState.update { currentState ->
+                        currentState.copy(isScheduleRecorded = true)
+                    }
+                }
+            } else {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        noSelectCourse = true,
+                        userMessage = R.string.select_course,
+                    )
+                }
             }
         }
-    }
 
-    private fun createSchedule(courseId: String): Schedule {
-        return Schedule(
-            uiState.value.scheduleId,
-            uiState.value.startTime,
-            uiState.value.endTime,
-            uiState.value.classroom,
-            uiState.value.day,
-            null,
-            courseId
-        )
-    }
+        private fun updateScheduleWithNewCourse() {
+            if (!uiState.value.courseName.isNullOrBlank()) {
+                val course = createCourse()
+                viewModelScope.launch {
+                    val courseId = courseRepository.registerCourse(course, userId)
+                    val schedule = createSchedule(courseId)
+                    scheduleRepository.updateSchedule(
+                        schedule,
+                        uiState.value.specificDate,
+                        uiState.value.courseName!!,
+                        uiState.value.colorCourse,
+                        userId,
+                    )
+                    _uiState.update { currentState ->
+                        currentState.copy(isScheduleRecorded = true)
+                    }
+                }
+            } else {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        noSelectCourse = true,
+                        userMessage = R.string.enter_course_name,
+                    )
+                }
+            }
+        }
 
-    private fun createCourse(): Course {
-        return Course("", uiState.value.courseName!!, null, uiState.value.colorCourse)
-    }
+        private fun registerScheduleWithNewCourse() {
+            if (!uiState.value.courseName.isNullOrBlank()) {
+                val course = createCourse()
+                viewModelScope.launch {
+                    val courseId = courseRepository.registerCourse(course, userId)
+                    val schedule = createSchedule(courseId)
+                    scheduleRepository.registerSchedule(
+                        schedule,
+                        uiState.value.specificDate,
+                        course.name,
+                        course.color,
+                        userId,
+                    )
+                    _uiState.update { currentState ->
+                        currentState.copy(isScheduleRecorded = true)
+                    }
+                }
+            } else {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        noSelectCourse = true,
+                        userMessage = R.string.enter_course_name,
+                    )
+                }
+            }
+        }
 
-    fun setSpecificDate(date: LocalDate?) {
-        _uiState.update { currentState ->
-            currentState.copy(
-                specificDate = date, day = date?.dayOfWeek ?: currentState.day
+        private fun createSchedule(courseId: String): Schedule =
+            Schedule(
+                uiState.value.scheduleId,
+                uiState.value.startTime,
+                uiState.value.endTime,
+                uiState.value.classroom,
+                uiState.value.day,
+                null,
+                courseId,
             )
+
+        private fun createCourse(): Course = Course("", uiState.value.courseName!!, null, uiState.value.colorCourse)
+
+        fun setSpecificDate(date: LocalDate?) {
+            _uiState.update { currentState ->
+                currentState.copy(
+                    specificDate = date,
+                    day = date?.dayOfWeek ?: currentState.day,
+                )
+            }
+        }
+
+        fun userMessageShown() {
+            _uiState.update { currentState ->
+                currentState.copy(userMessage = null)
+            }
+        }
+
+        private fun startTimeIsLessThanEndTime(): Boolean = uiState.value.startTime < uiState.value.endTime
+
+        private fun truncateCourseName(
+            name: String?,
+            maxLength: Int = 25,
+        ): String? {
+            if (name.isNullOrBlank()) return name
+            return if (name.length > maxLength) {
+                name.substring(0, maxLength).trimEnd() + "..."
+            } else {
+                name
+            }
         }
     }
-
-    fun userMessageShown() {
-        _uiState.update { currentState ->
-            currentState.copy(userMessage = null)
-        }
-    }
-
-    private fun startTimeIsLessThanEndTime(): Boolean =
-        uiState.value.startTime < uiState.value.endTime
-
-    private fun truncateCourseName(name: String?, maxLength: Int = 25): String? {
-        if (name.isNullOrBlank()) return name
-        return if (name.length > maxLength) {
-            name.substring(0, maxLength).trimEnd() + "..."
-        } else {
-            name
-        }
-    }
-}
 
 data class RegisterScheduleUiState(
     val scheduleId: String = "",
@@ -336,5 +351,6 @@ data class RegisterScheduleUiState(
 )
 
 enum class RecurrenceOption {
-    EVERY_WEEK, SPECIFIC_DATE
+    EVERY_WEEK,
+    SPECIFIC_DATE,
 }

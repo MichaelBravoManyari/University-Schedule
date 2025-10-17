@@ -10,20 +10,21 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SynchronizationViewModel @Inject constructor(
-    private val synchronizationManager: SynchronizationManager
-) : ViewModel() {
+class SynchronizationViewModel
+    @Inject
+    constructor(
+        private val synchronizationManager: SynchronizationManager,
+    ) : ViewModel() {
+        private val _isSyncing = MutableStateFlow(false)
+        val isSyncing: StateFlow<Boolean> = _isSyncing
 
-    private val _isSyncing = MutableStateFlow(false)
-    val isSyncing: StateFlow<Boolean> = _isSyncing
+        fun startSyncIfNeeded() {
+            if (_isSyncing.value) return
 
-    fun startSyncIfNeeded() {
-        if (_isSyncing.value) return
-
-        viewModelScope.launch {
-            _isSyncing.value = true
-            synchronizationManager.startSyncIfNeeded()
-            _isSyncing.value = false
+            viewModelScope.launch {
+                _isSyncing.value = true
+                synchronizationManager.startSyncIfNeeded()
+                _isSyncing.value = false
+            }
         }
     }
-}

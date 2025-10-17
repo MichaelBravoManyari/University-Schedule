@@ -24,23 +24,22 @@ import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupWithNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.studentsapps.common.UserManager
 import com.studentsapps.schedule.R
+import com.studentsapps.schedule.TimetableCompose
 import com.studentsapps.schedule.databinding.FragmentScheduleBinding
 import com.studentsapps.schedule.viewmodels.ScheduleUiState
 import com.studentsapps.schedule.viewmodels.ScheduleViewModel
+import com.studentsapps.ui.theme.UniversityScheduleTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.studentsapps.common.UserManager
-import com.studentsapps.ui.theme.UniversityScheduleTheme
-import com.studentsapps.schedule.TimetableCompose
 
 @AndroidEntryPoint
 class ScheduleFragment : Fragment() {
-
     private lateinit var navController: NavController
     private var _binding: FragmentScheduleBinding? = null
-    private val binding get() = _binding!!
+    val binding get() = _binding!!
     private val viewModel: ScheduleViewModel by viewModels()
 
     private val destinationChangedListener =
@@ -55,7 +54,9 @@ class ScheduleFragment : Fragment() {
     lateinit var userManager: UserManager
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentScheduleBinding.inflate(inflater, container, false)
 
@@ -67,7 +68,7 @@ class ScheduleFragment : Fragment() {
 
         binding.composeView.apply {
             setViewCompositionStrategy(
-                ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+                ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
             )
 
             setContent {
@@ -75,8 +76,8 @@ class ScheduleFragment : Fragment() {
                     TimetableCompose(viewModel) { scheduleId ->
                         navController.navigate(
                             ScheduleFragmentDirections.actionScheduleFragmentToModalBottomSheetSchedule(
-                                scheduleId
-                            )
+                                scheduleId,
+                            ),
                         )
                     }
                 }
@@ -86,7 +87,10 @@ class ScheduleFragment : Fragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
@@ -94,7 +98,8 @@ class ScheduleFragment : Fragment() {
                 override fun handleOnBackPressed() {
                     requireActivity().finishAffinity()
                 }
-            })
+            },
+        )
 
         navController = view.findNavController()
         val appBarConfiguration = AppBarConfiguration(setOf(R.id.scheduleFragment))
@@ -105,7 +110,9 @@ class ScheduleFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.uiState.collect { currentState ->
                     if (currentState is ScheduleUiState.Success) {
-                        binding.toolbar.menu.findItem(R.id.change_timetable_view)?.icon =
+                        binding.toolbar.menu
+                            .findItem(R.id.change_timetable_view)
+                            ?.icon =
                             if (currentState.timetableUserPreferences.showAsGrid) {
                                 ContextCompat.getDrawable(requireContext(), R.drawable.ic_view_list)
                             } else {
@@ -123,9 +130,10 @@ class ScheduleFragment : Fragment() {
     }
 
     private fun observeCurrentMonth() {
-        val observer = Observer<String> { currentMonth ->
-            navController.currentDestination?.label = currentMonth
-        }
+        val observer =
+            Observer<String> { currentMonth ->
+                navController.currentDestination?.label = currentMonth
+            }
         viewModel.currentMonth.observe(viewLifecycleOwner, observer)
     }
 
@@ -155,15 +163,18 @@ class ScheduleFragment : Fragment() {
                         userManager.updateUserId()
                         navController.popBackStack(navController.graph.startDestinationId, true)
                         val request =
-                            NavDeepLinkRequest.Builder.fromUri("android-app://studentsapps.app/authFragment".toUri())
+                            NavDeepLinkRequest.Builder
+                                .fromUri("android-app://studentsapps.app/authFragment".toUri())
                                 .build()
-                        val options = NavOptions.Builder()
-                            .setLaunchSingleTop(true)
-                            .setEnterAnim(android.R.anim.fade_in)
-                            .setExitAnim(android.R.anim.fade_out)
-                            .setPopEnterAnim(android.R.anim.fade_in)
-                            .setPopExitAnim(android.R.anim.fade_out)
-                            .build()
+                        val options =
+                            NavOptions
+                                .Builder()
+                                .setLaunchSingleTop(true)
+                                .setEnterAnim(android.R.anim.fade_in)
+                                .setExitAnim(android.R.anim.fade_out)
+                                .setPopEnterAnim(android.R.anim.fade_in)
+                                .setPopExitAnim(android.R.anim.fade_out)
+                                .build()
                         navController.navigate(request, options)
                         true
                     }
@@ -182,8 +193,8 @@ class ScheduleFragment : Fragment() {
         navController.navigate(
             ScheduleFragmentDirections.actionScheduleFragmentToRegisterScheduleFragment(
                 scheduleId = "",
-                title = R.string.new_schedule
-            )
+                title = R.string.new_schedule,
+            ),
         )
     }
 
@@ -191,7 +202,8 @@ class ScheduleFragment : Fragment() {
         super.onStart()
         if (auth.currentUser == null) {
             val request =
-                NavDeepLinkRequest.Builder.fromUri("android-app://studentsapps.app/authFragment".toUri())
+                NavDeepLinkRequest.Builder
+                    .fromUri("android-app://studentsapps.app/authFragment".toUri())
                     .build()
             navController.navigate(request)
         } else {
@@ -202,11 +214,13 @@ class ScheduleFragment : Fragment() {
             userDocRef.get().addOnSuccessListener { document ->
                 if (!document.exists()) {
                     // Registrar al usuario si no existe
-                    userDocRef.set(mapOf("userId" to userId)).addOnSuccessListener {
-                        Log.d("AuthFragment", "Usuario registrado correctamente en Firestore.")
-                    }.addOnFailureListener { e ->
-                        Log.e("AuthFragment", "Error al registrar el usuario en Firestore.", e)
-                    }
+                    userDocRef
+                        .set(mapOf("userId" to userId))
+                        .addOnSuccessListener {
+                            Log.d("AuthFragment", "Usuario registrado correctamente en Firestore.")
+                        }.addOnFailureListener { e ->
+                            Log.e("AuthFragment", "Error al registrar el usuario en Firestore.", e)
+                        }
                 }
             }
         }

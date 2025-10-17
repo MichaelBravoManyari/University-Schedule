@@ -1,12 +1,12 @@
 package com.mbm.login
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
@@ -25,7 +25,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class EmailLoginFragment : Fragment() {
     private var _binding: FragmentEmailLoginBinding? = null
-    private val binding get() = _binding!!
+    val binding get() = _binding!!
     private lateinit var navController: NavController
     private val viewModel: SynchronizationViewModel by viewModels()
     private var dialog: AlertDialog? = null
@@ -40,14 +40,18 @@ class EmailLoginFragment : Fragment() {
     lateinit var userManager: UserManager
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentEmailLoginBinding.inflate(inflater, container, false)
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         navController = view.findNavController()
         setupClickListeners()
@@ -68,8 +72,14 @@ class EmailLoginFragment : Fragment() {
     }
 
     private fun handleLogin() {
-        val email = binding.editTextEmail.text.toString().trim()
-        val password = binding.editTextPassword.text.toString().trim()
+        val email =
+            binding.editTextEmail.text
+                .toString()
+                .trim()
+        val password =
+            binding.editTextPassword.text
+                .toString()
+                .trim()
         if (isValidEmail(email) && password.isNotEmpty()) {
             signInWithEmail(email, password)
         } else {
@@ -77,13 +87,17 @@ class EmailLoginFragment : Fragment() {
         }
     }
 
-    private fun signInWithEmail(email: String, password: String) {
+    private fun signInWithEmail(
+        email: String,
+        password: String,
+    ) {
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 userManager.updateUserId()
                 viewModel.startSyncIfNeeded()
                 val request =
-                    NavDeepLinkRequest.Builder.fromUri("android-app://studentsapps.app/scheduleFragment".toUri())
+                    NavDeepLinkRequest.Builder
+                        .fromUri("android-app://studentsapps.app/scheduleFragment".toUri())
                         .build()
                 navController.navigate(request)
             } else {
@@ -113,7 +127,10 @@ class EmailLoginFragment : Fragment() {
         }
     }
 
-    private fun showValidationErrors(email: String, password: String) {
+    private fun showValidationErrors(
+        email: String,
+        password: String,
+    ) {
         if (email.isNotEmpty()) {
             if (!isValidEmail(email)) {
                 binding.editTextLayoutEmail.error = getString(R.string.invalid_email)
@@ -126,13 +143,12 @@ class EmailLoginFragment : Fragment() {
         }
     }
 
-    private fun createLoadingDialog(): AlertDialog {
-        return MaterialAlertDialogBuilder(requireActivity())
+    private fun createLoadingDialog(): AlertDialog =
+        MaterialAlertDialogBuilder(requireActivity())
             .setView(com.studentsapps.common.R.layout.dialog_progress)
             .setTitle(this.getText(com.studentsapps.common.R.string.synchronizing))
             .setCancelable(false)
             .create()
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()

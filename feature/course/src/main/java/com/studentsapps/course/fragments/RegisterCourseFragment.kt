@@ -31,7 +31,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class RegisterCourseFragment : Fragment() {
     private var _binding: FragmentRegisterCourseBinding? = null
-    private val binding get() = _binding!!
+    val binding get() = _binding!!
     private val args: RegisterCourseFragmentArgs by navArgs()
     private lateinit var navController: NavController
     private val viewModel: RegisterCourseViewModel by viewModels()

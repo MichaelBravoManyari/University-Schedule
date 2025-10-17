@@ -12,15 +12,14 @@ import com.studentsapps.ui.dialogs.BaseBottomSheetDialogFragment
 import com.studentsapps.ui.timetable.animateOpacity
 
 class ModalBottomSheetRepetition : BaseBottomSheetDialogFragment() {
-
     private var _binding: ModalBottomSheetRepetitionBinding? = null
-    private val binding get() = _binding!!
+    val binding get() = _binding!!
     private lateinit var navController: NavController
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = ModalBottomSheetRepetitionBinding.inflate(inflater, container, false)
         navController = findNavController()
@@ -28,12 +27,15 @@ class ModalBottomSheetRepetition : BaseBottomSheetDialogFragment() {
         return binding.root
     }
 
-    fun goToRegisterScheduleFragment(recurrenceOption: RecurrenceOption, view: View) {
+    fun goToRegisterScheduleFragment(
+        recurrenceOption: RecurrenceOption,
+        view: View,
+    ) {
         animateOpacity(view, 0.5f) {
             animateOpacity(view, 1.0f) {
                 navController.previousBackStackEntry?.savedStateHandle?.set(
                     "repetition",
-                    recurrenceOption
+                    recurrenceOption,
                 )
                 dismiss()
             }

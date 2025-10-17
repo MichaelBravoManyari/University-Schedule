@@ -43,13 +43,14 @@ class ScheduleRepositoryImpTest {
     fun getSchedulesForTimetableInGridMode_returnsScheduleDetails() =
         runTest(testDispatcher) {
             assertThat(
-                subject.getSchedulesForTimetableInGridMode(
-                    showSaturday = true,
-                    showSunday = true,
-                    startDate = LocalDate.of(2023, 11, 20),
-                    endDate = LocalDate.of(2023, 11, 26),
-                    userId = ""
-                ).first(),
+                subject
+                    .getSchedulesForTimetableInGridMode(
+                        showSaturday = true,
+                        showSunday = true,
+                        startDate = LocalDate.of(2023, 11, 20),
+                        endDate = LocalDate.of(2023, 11, 26),
+                        userId = "",
+                    ).first(),
                 `is`(
                     scheduleLocalDataSource
                         .getSchedulesForTimetableInGridMode(
@@ -57,8 +58,9 @@ class ScheduleRepositoryImpTest {
                             showSunday = true,
                             startDate = LocalDate.of(2023, 11, 20),
                             endDate = LocalDate.of(2023, 11, 26),
-                            userId = ""
-                        ).map { it.map(ScheduleDetailsView::asExternalModel) }.first(),
+                            userId = "",
+                        ).map { it.map(ScheduleDetailsView::asExternalModel) }
+                        .first(),
                 ),
             )
         }
@@ -74,8 +76,9 @@ class ScheduleRepositoryImpTest {
                         .getSchedulesForTimetableInListMode(
                             dayOfWeek = DayOfWeek.MONDAY,
                             date = date,
-                            userId = ""
-                        ).map{ it.map(ScheduleDetailsView::asExternalModel) }.first(),
+                            userId = "",
+                        ).map { it.map(ScheduleDetailsView::asExternalModel) }
+                        .first(),
                 ),
             )
         }

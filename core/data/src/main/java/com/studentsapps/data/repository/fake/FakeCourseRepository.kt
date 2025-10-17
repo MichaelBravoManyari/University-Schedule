@@ -44,9 +44,7 @@ class FakeCourseRepository
         override fun getAllCourse(
             shouldSync: Boolean,
             userId: String,
-        ): Flow<List<Course>> {
-            return flowOf(courseList.map(CourseEntity::asExternalModel))
-        }
+        ): Flow<List<Course>> = flowOf(courseList.map(CourseEntity::asExternalModel))
 
         override suspend fun updateCourse(
             course: Course,

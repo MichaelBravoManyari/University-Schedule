@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.colorResource
 import com.studentsapps.designsystem.R
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun UniversityScheduleTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),

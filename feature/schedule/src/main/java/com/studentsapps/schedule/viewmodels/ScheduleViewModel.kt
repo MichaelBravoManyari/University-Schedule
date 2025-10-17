@@ -26,25 +26,27 @@ import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
-class ScheduleViewModel @Inject constructor(
-    private val timetableUserPreferencesRepository: TimetableUserPreferencesRepository,
-    private val scheduleRepository: ScheduleRepository,
-    private val timetableUtils: TimetableUtils,
-    auth: FirebaseAuth
-) : ViewModel() {
-    private val userId = auth.currentUser?.uid ?: ""
+class ScheduleViewModel
+    @Inject
+    constructor(
+        private val timetableUserPreferencesRepository: TimetableUserPreferencesRepository,
+        private val scheduleRepository: ScheduleRepository,
+        private val timetableUtils: TimetableUtils,
+        auth: FirebaseAuth,
+    ) : ViewModel() {
+        private val userId = auth.currentUser?.uid ?: ""
 
-    private val _uiState: MutableStateFlow<ScheduleUiState> =
-        MutableStateFlow(ScheduleUiState.Loading)
+        private val _uiState: MutableStateFlow<ScheduleUiState> =
+            MutableStateFlow(ScheduleUiState.Loading)
 
-    val uiState: StateFlow<ScheduleUiState> = _uiState
+        val uiState: StateFlow<ScheduleUiState> = _uiState
 
-    private val _currentMonth = MutableLiveData(getMonth())
+        private val _currentMonth = MutableLiveData(getMonth())
 
-    val currentMonth = _currentMonth as LiveData<String>
+        val currentMonth = _currentMonth as LiveData<String>
 
-    init {
-        viewModelScope.launch {
+        init {
+            viewModelScope.launch {
             /*timetableUserPreferencesRepository.userData.collect { prefs ->
                 val initialDate = LocalDate.now()
                 val initialScheduleList = if (prefs.showAsGrid) {
@@ -62,140 +64,158 @@ class ScheduleViewModel @Inject constructor(
                     scheduleByDate = mapOf(initialDate to initialScheduleList)
                 )
             }*/
-            timetableUserPreferencesRepository.userData
-                .flatMapLatest { prefs ->
-                    val initialDate = LocalDate.now()
+                timetableUserPreferencesRepository.userData
+                    .flatMapLatest { prefs ->
+                        val initialDate = LocalDate.now()
 
-                    val scheduleFlow: Flow<List<ScheduleDetails>> = if (prefs.showAsGrid) {
-                        val startDate = getStartDate(prefs, initialDate)
-                        val endDate = getEndDate(prefs, initialDate)
-                        scheduleRepository.getSchedulesForTimetableInGridMode(
-                            prefs.showSaturday, prefs.showSunday, startDate, endDate, userId
-                        )
-                    } else {
-                        scheduleRepository.getSchedulesForTimetableInListMode(initialDate, userId)
-                    }
-
-                    scheduleFlow.map { scheduleList ->
-                        ScheduleUiState.Success(
-                            timetableUserPreferences = prefs,
-                            scheduleByDate = mapOf(initialDate to scheduleList),
-                            selectNowDay = false
-                        )
-                    }
-                }
-                .collect { uiState ->
-                    _uiState.value = uiState
-                }
-        }
-    }
-
-    fun setShowAsGrid() {
-        viewModelScope.launch {
-            timetableUserPreferencesRepository.updateShowAsGrid()
-        }
-    }
-
-    fun setCurrentMonth(date: LocalDate) {
-        _currentMonth.value = getMonth(date)
-    }
-
-    fun loadScheduleForDate(date: LocalDate) {
-        viewModelScope.launch {
-            val currentState = _uiState.value
-            if (currentState is ScheduleUiState.Success && !currentState.scheduleByDate.containsKey(date)) {
-                val prefs = currentState.timetableUserPreferences
-
-                val scheduleFlow: Flow<List<ScheduleDetails>> =
-                    if (prefs.showAsGrid) {
-                        val startDate = getStartDate(prefs, date)
-                        val endDate = getEndDate(prefs, date)
-                        scheduleRepository.getSchedulesForTimetableInGridMode(
-                            prefs.showSaturday, prefs.showSunday, startDate, endDate, userId
-                        )
-                    } else {
-                        scheduleRepository.getSchedulesForTimetableInListMode(date, userId)
-                    }
-
-                // Observar el flujo y actualizar el UiState cada vez que cambie
-                launch {
-                    scheduleFlow.collect { updatedList ->
-                        _uiState.update { ui ->
-                            if (ui is ScheduleUiState.Success) {
-                                ui.copy(
-                                    scheduleByDate = ui.scheduleByDate + (date to updatedList)
+                        val scheduleFlow: Flow<List<ScheduleDetails>> =
+                            if (prefs.showAsGrid) {
+                                val startDate = getStartDate(prefs, initialDate)
+                                val endDate = getEndDate(prefs, initialDate)
+                                scheduleRepository.getSchedulesForTimetableInGridMode(
+                                    prefs.showSaturday,
+                                    prefs.showSunday,
+                                    startDate,
+                                    endDate,
+                                    userId,
                                 )
-                            } else ui
+                            } else {
+                                scheduleRepository.getSchedulesForTimetableInListMode(initialDate, userId)
+                            }
+
+                        scheduleFlow.map { scheduleList ->
+                            ScheduleUiState.Success(
+                                timetableUserPreferences = prefs,
+                                scheduleByDate = mapOf(initialDate to scheduleList),
+                                selectNowDay = false,
+                            )
+                        }
+                    }.collect { uiState ->
+                        _uiState.value = uiState
+                    }
+            }
+        }
+
+        fun setShowAsGrid() {
+            viewModelScope.launch {
+                timetableUserPreferencesRepository.updateShowAsGrid()
+            }
+        }
+
+        fun setCurrentMonth(date: LocalDate) {
+            _currentMonth.value = getMonth(date)
+        }
+
+        fun loadScheduleForDate(date: LocalDate) {
+            viewModelScope.launch {
+                val currentState = _uiState.value
+                if (currentState is ScheduleUiState.Success && !currentState.scheduleByDate.containsKey(date)) {
+                    val prefs = currentState.timetableUserPreferences
+
+                    val scheduleFlow: Flow<List<ScheduleDetails>> =
+                        if (prefs.showAsGrid) {
+                            val startDate = getStartDate(prefs, date)
+                            val endDate = getEndDate(prefs, date)
+                            scheduleRepository.getSchedulesForTimetableInGridMode(
+                                prefs.showSaturday,
+                                prefs.showSunday,
+                                startDate,
+                                endDate,
+                                userId,
+                            )
+                        } else {
+                            scheduleRepository.getSchedulesForTimetableInListMode(date, userId)
+                        }
+
+                    // Observar el flujo y actualizar el UiState cada vez que cambie
+                    launch {
+                        scheduleFlow.collect { updatedList ->
+                            _uiState.update { ui ->
+                                if (ui is ScheduleUiState.Success) {
+                                    ui.copy(
+                                        scheduleByDate = ui.scheduleByDate + (date to updatedList),
+                                    )
+                                } else {
+                                    ui
+                                }
+                            }
                         }
                     }
                 }
             }
         }
-    }
 
-    fun cancelUserAlarms() {
-        viewModelScope.launch {
-            scheduleRepository.cancelUserAlarms(userId)
-        }
-    }
-
-    fun getDaysOfMonthOfWeek(
-        isMondayFirstDayOfWeek: Boolean,
-        showSaturday: Boolean,
-        showSunday: Boolean,
-        date: LocalDate = LocalDate.now()
-    ): List<LocalDate> {
-        return timetableUtils.getDaysOfMonthOfWeek(
-            isMondayFirstDayOfWeek,
-            showSaturday,
-            showSunday,
-            date
-        )
-    }
-
-    fun getDaysOfWeekOrder(
-        isMondayFirstDayOfWeek: Boolean,
-        showSaturday: Boolean,
-        showSunday: Boolean
-    ): List<Int> {
-        return timetableUtils.getDaysOfWeekOrder(isMondayFirstDayOfWeek, showSaturday, showSunday)
-    }
-
-    fun selectNowDay(select: Boolean) {
-        viewModelScope.launch {
-            _uiState.update { currentState ->
-                if (currentState is ScheduleUiState.Success) {
-                    currentState.copy(selectNowDay = select)
-                } else currentState
+        fun cancelUserAlarms() {
+            viewModelScope.launch {
+                scheduleRepository.cancelUserAlarms(userId)
             }
         }
-    }
 
-    private fun getStartDate(prefs: TimetableUserPreferences, date: LocalDate) =
-        getDaysOfMonthOfWeek(
-            prefs.isMondayFirstDayOfWeek, prefs.showSaturday, prefs.showSunday, date
+        fun getDaysOfMonthOfWeek(
+            isMondayFirstDayOfWeek: Boolean,
+            showSaturday: Boolean,
+            showSunday: Boolean,
+            date: LocalDate = LocalDate.now(),
+        ): List<LocalDate> =
+            timetableUtils.getDaysOfMonthOfWeek(
+                isMondayFirstDayOfWeek,
+                showSaturday,
+                showSunday,
+                date,
+            )
+
+        fun getDaysOfWeekOrder(
+            isMondayFirstDayOfWeek: Boolean,
+            showSaturday: Boolean,
+            showSunday: Boolean,
+        ): List<Int> = timetableUtils.getDaysOfWeekOrder(isMondayFirstDayOfWeek, showSaturday, showSunday)
+
+        fun selectNowDay(select: Boolean) {
+            viewModelScope.launch {
+                _uiState.update { currentState ->
+                    if (currentState is ScheduleUiState.Success) {
+                        currentState.copy(selectNowDay = select)
+                    } else {
+                        currentState
+                    }
+                }
+            }
+        }
+
+        private fun getStartDate(
+            prefs: TimetableUserPreferences,
+            date: LocalDate,
+        ) = getDaysOfMonthOfWeek(
+            prefs.isMondayFirstDayOfWeek,
+            prefs.showSaturday,
+            prefs.showSunday,
+            date,
         ).first()
 
-    private fun getEndDate(prefs: TimetableUserPreferences, date: LocalDate) =
-        getDaysOfMonthOfWeek(
-            prefs.isMondayFirstDayOfWeek, prefs.showSaturday, prefs.showSunday, date
+        private fun getEndDate(
+            prefs: TimetableUserPreferences,
+            date: LocalDate,
+        ) = getDaysOfMonthOfWeek(
+            prefs.isMondayFirstDayOfWeek,
+            prefs.showSaturday,
+            prefs.showSunday,
+            date,
         ).last()
 
-    private fun getMonth(date: LocalDate = LocalDate.now()): String {
-        return date.month.getDisplayName(TextStyle.FULL, Locale.getDefault())
-            .replaceFirstChar {
-                if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
-            }
+        private fun getMonth(date: LocalDate = LocalDate.now()): String =
+            date.month
+                .getDisplayName(TextStyle.FULL, Locale.getDefault())
+                .replaceFirstChar {
+                    if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+                }
     }
-}
 
 sealed interface ScheduleUiState {
-
     data object Loading : ScheduleUiState
 
     data class Success(
         val timetableUserPreferences: TimetableUserPreferences,
         val scheduleByDate: Map<LocalDate, List<ScheduleDetails>>,
-        val selectNowDay: Boolean = false
+        val selectNowDay: Boolean = false,
     ) : ScheduleUiState
 }

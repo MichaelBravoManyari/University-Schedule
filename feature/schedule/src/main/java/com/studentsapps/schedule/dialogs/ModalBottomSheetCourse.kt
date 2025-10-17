@@ -24,14 +24,15 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ModalBottomSheetCourse : BaseBottomSheetDialogFragment() {
-
     private var _binding: ModalBottomSheetCourseBinding? = null
-    private val binding get() = _binding!!
+    val binding get() = _binding!!
     private lateinit var navController: NavController
     private val viewModel: BottomSheetCourseViewModel by viewModels()
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View {
         _binding = ModalBottomSheetCourseBinding.inflate(inflater, container, false)
         navController = findNavController()
@@ -42,12 +43,16 @@ class ModalBottomSheetCourse : BaseBottomSheetDialogFragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
-        val courseAdapter = CourseAdapter {
-            navController.previousBackStackEntry?.savedStateHandle?.set("course", it.id)
-            dismiss()
-        }
+        val courseAdapter =
+            CourseAdapter {
+                navController.previousBackStackEntry?.savedStateHandle?.set("course", it.id)
+                dismiss()
+            }
         binding.recyclerViewCourses.adapter = courseAdapter
         binding.recyclerViewCourses.layoutManager = LinearLayoutManager(context)
         lifecycleScope.launch {
@@ -62,14 +67,20 @@ class ModalBottomSheetCourse : BaseBottomSheetDialogFragment() {
     }
 
     fun goToRegisterCourseFragment() {
-        val navOptions = NavOptions.Builder().setEnterAnim(android.R.anim.slide_in_left)
-            .setExitAnim(android.R.anim.slide_out_right)
-            .setPopEnterAnim(android.R.anim.slide_in_left)
-            .setPopExitAnim(android.R.anim.slide_out_right).build()
+        val navOptions =
+            NavOptions
+                .Builder()
+                .setEnterAnim(android.R.anim.slide_in_left)
+                .setExitAnim(android.R.anim.slide_out_right)
+                .setPopEnterAnim(android.R.anim.slide_in_left)
+                .setPopExitAnim(android.R.anim.slide_out_right)
+                .build()
         val navigatedFromTimeLoggingDestination = true
         val request =
-            NavDeepLinkRequest.Builder.fromUri("android-app://studentsapps.app/registerCourseFragment/$navigatedFromTimeLoggingDestination".toUri())
-                .build()
+            NavDeepLinkRequest.Builder
+                .fromUri(
+                    "android-app://studentsapps.app/registerCourseFragment/$navigatedFromTimeLoggingDestination".toUri(),
+                ).build()
         navController.navigate(request = request, navOptions = navOptions)
     }
 
