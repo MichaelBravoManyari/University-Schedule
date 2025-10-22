@@ -395,7 +395,8 @@ class ScheduleRepositoryImp
                 .getAllSchedules(userId)
                 .map(ScheduleDetailsView::asExternalModel)
 
-        override fun getAllScheduleEntity(userId: String): Flow<List<ScheduleEntity>> = scheduleLocalDataSource.getAllScheduleEntity(userId)
+        override fun getAllScheduleEntity(userId: String): Flow<List<ScheduleEntity>> =
+            scheduleLocalDataSource.getAllScheduleEntity(userId)
 
         private fun serializeSchedule(schedule: Schedule): String = appJson.encodeToString(schedule)
 

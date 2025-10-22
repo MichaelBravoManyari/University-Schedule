@@ -36,7 +36,8 @@ class PendingOperationLocalDataSource
             operationType: String,
             entityType: String,
             userId: String,
-        ): Flow<List<PendingOperationEntity>> = pendingOperationDao.getPendingReadOperations(operationType, entityType, userId)
+        ): Flow<List<PendingOperationEntity>> =
+            pendingOperationDao.getPendingReadOperations(operationType, entityType, userId)
 
         fun getFirstPendingOperation(
             status: String,

@@ -25,7 +25,11 @@ interface PendingOperationDao {
     )
 
     @Query(
-        "SELECT * FROM pending_operations WHERE status = 'PENDING' AND operation_type = :operationType AND entity_type = :entityType AND user_id = :userId",
+        "SELECT * FROM pending_operations " +
+                "WHERE status = 'PENDING' " +
+                "AND operation_type = :operationType " +
+                "AND entity_type = :entityType " +
+                "AND user_id = :userId",
     )
     fun getPendingReadOperations(
         operationType: String,
@@ -33,7 +37,10 @@ interface PendingOperationDao {
         userId: String,
     ): Flow<List<PendingOperationEntity>>
 
-    @Query("SELECT * FROM pending_operations WHERE status = :status AND user_id = :userId ORDER BY timestamp ASC LIMIT 1")
+    @Query("SELECT * FROM pending_operations " +
+            "WHERE status = :status " +
+            "AND user_id = :userId " +
+            "ORDER BY timestamp ASC LIMIT 1")
     fun getFirstPendingOperation(
         status: String,
         userId: String,

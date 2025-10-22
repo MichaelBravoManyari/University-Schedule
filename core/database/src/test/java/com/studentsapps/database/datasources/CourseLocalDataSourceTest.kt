@@ -65,7 +65,15 @@ class CourseLocalDataSourceTest {
     @Test
     fun updateCourse_courseEntity() =
         runTest {
-            val expectedCourse = CourseEntity("1", "Math 1", "Professor 1", 1234, lastModified = LocalDateTime.now(), userId = "")
+            val expectedCourse =
+                CourseEntity(
+                    "1",
+                    "Math 1",
+                    "Professor 1",
+                    1234,
+                    lastModified = LocalDateTime.now(),
+                    userId = ""
+                )
             subject.updateCourse(expectedCourse)
             assertThat(subject.getCourse("1").first(), `is`(expectedCourse))
         }

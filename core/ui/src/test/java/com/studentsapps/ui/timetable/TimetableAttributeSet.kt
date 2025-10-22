@@ -28,7 +28,10 @@ class TimetableAttributeSet {
         isDayOfWeek: Boolean,
     ): TimetableAttributeSet {
         val font =
-            if (fontId == com.studentsapps.designsystem.R.font.roboto_regular) "@font/roboto_regular" else "@font/roboto_medium"
+            if (fontId == com.studentsapps.designsystem.R.font.roboto_regular)
+                "@font/roboto_regular"
+            else
+                "@font/roboto_medium"
         val attr = if (isDayOfWeek) R.attr.days_of_week_font else R.attr.days_of_month_font
         attrs.addAttribute(attr, font)
         return this

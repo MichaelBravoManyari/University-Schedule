@@ -17,7 +17,8 @@ class FakeCourseRepository
     constructor() : CourseRepository {
         private val courseDao = TestCourseDao()
 
-        override fun getCourse(courseId: String): Flow<Course> = courseDao.getCourseById(courseId).map(CourseEntity::asExternalModel)
+        override fun getCourse(courseId: String): Flow<Course> =
+            courseDao.getCourseById(courseId).map(CourseEntity::asExternalModel)
 
         override suspend fun registerCourse(
             course: Course,

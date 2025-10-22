@@ -156,7 +156,10 @@ class RegisterScheduleViewModel
                                 course.copy(
                                     name = truncateCourseName(course.name) ?: course.name,
                                 ),
-                            repetition = if (specificDate != null) RecurrenceOption.SPECIFIC_DATE else RecurrenceOption.EVERY_WEEK,
+                            repetition = if (specificDate != null)
+                                RecurrenceOption.SPECIFIC_DATE
+                            else
+                                RecurrenceOption.EVERY_WEEK,
                             specificDate = specificDate,
                             classroom = classPlace,
                         )

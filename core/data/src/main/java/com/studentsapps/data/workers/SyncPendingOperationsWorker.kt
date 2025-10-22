@@ -180,7 +180,7 @@ class SyncPendingOperationsWorker
                                     val entity =
                                         deserializeCourse(pendingOp.payload, pendingOp.timestamp, userId)
                                     entity.id == targetCourse.id
-                                } catch (e: Exception) {
+                                } catch (_: Exception) {
                                     false
                                 }
                             }.forEach { pendingOp ->
@@ -196,7 +196,7 @@ class SyncPendingOperationsWorker
                                     val entity =
                                         deserializeSchedule(pendingOp.payload, pendingOp.timestamp, userId)
                                     entity.id == targetSchedule.id
-                                } catch (e: Exception) {
+                                } catch (_: Exception) {
                                     false
                                 }
                             }.forEach { pendingOp ->
@@ -219,7 +219,7 @@ class SyncPendingOperationsWorker
                                         deserializeCourses(pendingOp.payload, pendingOp.timestamp, userId)
                                     val storedCourseIds = storedCourses.map { it.id }.sorted()
                                     storedCourseIds == targetCourseIds
-                                } catch (e: Exception) {
+                                } catch (_: Exception) {
                                     false
                                 }
                             }.forEach { pendingOp ->
@@ -238,7 +238,7 @@ class SyncPendingOperationsWorker
                                         deserializeSchedules(pendingOp.payload, pendingOp.timestamp, userId)
                                     val storedScheduleIds = storedSchedules.map { it.id }.sorted()
                                     storedScheduleIds == targetScheduleIds
-                                } catch (e: Exception) {
+                                } catch (_: Exception) {
                                     false
                                 }
                             }.forEach { pendingOp ->

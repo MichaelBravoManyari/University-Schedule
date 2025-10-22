@@ -18,5 +18,6 @@ object DaoModule {
     fun providesCourseDao(database: UniversityScheduleDatabase): CourseDao = database.courseDao()
 
     @Provides
-    fun providesPendingOperationDao(database: UniversityScheduleDatabase): PendingOperationDao = database.pendingOperationDao()
+    fun providesPendingOperationDao(database: UniversityScheduleDatabase): PendingOperationDao =
+        database.pendingOperationDao()
 }

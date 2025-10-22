@@ -37,7 +37,10 @@ class TimetableUtils
             if (!showSaturday) removeSaturdayFromDaysOfWeek(isMondayFirstDayOfWeek, daysOfMonthOfWeek)
 
             if (!showSunday) {
-                if (isMondayFirstDayOfWeek) daysOfMonthOfWeek.removeAt(daysOfMonthOfWeek.lastIndex) else daysOfMonthOfWeek.removeAt(0)
+                if (isMondayFirstDayOfWeek)
+                    daysOfMonthOfWeek.removeAt(daysOfMonthOfWeek.lastIndex)
+                else
+                    daysOfMonthOfWeek.removeAt(0)
             }
 
             return daysOfMonthOfWeek
@@ -256,7 +259,9 @@ class TimetableUtils
                 showSunday,
             ) + ((gridCellWidth / crossedSchedulesCount) * crossScheduleIndex)
 
-        private fun convertMinutesToDecimals(minutes: Long): Double = (minutes / 60) + ((minutes % 60) / 60.0)
+        private fun convertMinutesToDecimals(minutes: Long): Double =
+            (minutes / 60) + ((minutes % 60) / 60.0)
 
-        private fun convertLocalTimeToDecimals(localTime: LocalTime): Double = localTime.hour + (localTime.minute / 60.0)
+        private fun convertLocalTimeToDecimals(localTime: LocalTime): Double =
+            localTime.hour + (localTime.minute / 60.0)
     }

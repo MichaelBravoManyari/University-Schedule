@@ -93,18 +93,6 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
-data class TimetableProps(
-    val prefs: TimetableUserPreferences,
-    val changePage: (LocalDate) -> Unit,
-    val scheduleByDate: Map<LocalDate, List<ScheduleDetails>>,
-    val getDaysOfMonthOfWeek: (Boolean, Boolean, Boolean, LocalDate) -> List<LocalDate>,
-    val getDaysOfWeekOrder: (Boolean, Boolean, Boolean) -> List<Int>,
-    val onClickSchedule: (String) -> Unit,
-    val updateCurrentMonth: (LocalDate) -> Unit,
-    val selectNowDay: Boolean,
-    val updateSelectNowDay: () -> Unit,
-)
-
 @Suppress("ktlint:standard:function-naming")
 @Composable
 fun TimetableCompose(
@@ -328,7 +316,10 @@ fun TimetableList(props: TimetableProps) {
                 props.updateCurrentMonth(selectedDate)
                 if (!currentWeekDates.contains(selectedDate)) {
                     val nextHeaderPage =
-                        if (selectedDate < currentWeekDates.first()) headerPagerState.currentPage - 1 else headerPagerState.currentPage + 1
+                        if (selectedDate < currentWeekDates.first())
+                            headerPagerState.currentPage - 1
+                        else
+                            headerPagerState.currentPage + 1
                     headerPagerState.animateScrollToPage(nextHeaderPage)
                 }
             }
@@ -404,9 +395,15 @@ fun TimetableList(props: TimetableProps) {
                     ) {
                         items(scheduleList.map { it.asScheduleView() }) { schedule ->
                             val startTime =
-                                if (prefs.is12HoursFormat) formatLocalTime(schedule.startTime) else schedule.startTime.toString()
+                                if (prefs.is12HoursFormat)
+                                    formatLocalTime(schedule.startTime)
+                                else
+                                    schedule.startTime.toString()
                             val endTime =
-                                if (prefs.is12HoursFormat) formatLocalTime(schedule.endTime) else schedule.endTime.toString()
+                                if (prefs.is12HoursFormat)
+                                    formatLocalTime(schedule.endTime)
+                                else
+                                    schedule.endTime.toString()
                             ScheduleListItem(
                                 courseName = schedule.courseName,
                                 timeRange = "$startTime-$endTime",
@@ -617,7 +614,10 @@ fun SchedulesGrid(
     val hoursTextSize = dimensionResource(R.dimen.timetable_hours_text_size).value.sp
     val hoursTextColor = colorResource(R.color.timetable_default_hours_text_color)
     val hourLabels =
-        stringArrayResource(if (is12HoursFormat) R.array.hours_in_12_hour_format else R.array.hours_in_24_hour_format).toList()
+        stringArrayResource(if (is12HoursFormat)
+            R.array.hours_in_12_hour_format
+        else
+            R.array.hours_in_24_hour_format).toList()
     val hourTextXPosition = hoursCellWidthPx / 2
     val scheduleEndPadding = dimensionResource(R.dimen.timetable_schedule_end_margin)
     val scheduleBottomPadding = dimensionResource(R.dimen.timetable_schedule_bottom_margin)
@@ -1132,3 +1132,15 @@ fun WeekDayCellPreview() {
         ) {}
     }
 }
+
+data class TimetableProps(
+    val prefs: TimetableUserPreferences,
+    val changePage: (LocalDate) -> Unit,
+    val scheduleByDate: Map<LocalDate, List<ScheduleDetails>>,
+    val getDaysOfMonthOfWeek: (Boolean, Boolean, Boolean, LocalDate) -> List<LocalDate>,
+    val getDaysOfWeekOrder: (Boolean, Boolean, Boolean) -> List<Int>,
+    val onClickSchedule: (String) -> Unit,
+    val updateCurrentMonth: (LocalDate) -> Unit,
+    val selectNowDay: Boolean,
+    val updateSelectNowDay: () -> Unit,
+)
