@@ -316,10 +316,11 @@ fun TimetableList(props: TimetableProps) {
                 props.updateCurrentMonth(selectedDate)
                 if (!currentWeekDates.contains(selectedDate)) {
                     val nextHeaderPage =
-                        if (selectedDate < currentWeekDates.first())
+                        if (selectedDate < currentWeekDates.first()) {
                             headerPagerState.currentPage - 1
-                        else
+                        } else {
                             headerPagerState.currentPage + 1
+                        }
                     headerPagerState.animateScrollToPage(nextHeaderPage)
                 }
             }
@@ -395,15 +396,17 @@ fun TimetableList(props: TimetableProps) {
                     ) {
                         items(scheduleList.map { it.asScheduleView() }) { schedule ->
                             val startTime =
-                                if (prefs.is12HoursFormat)
+                                if (prefs.is12HoursFormat) {
                                     formatLocalTime(schedule.startTime)
-                                else
+                                } else {
                                     schedule.startTime.toString()
+                                }
                             val endTime =
-                                if (prefs.is12HoursFormat)
+                                if (prefs.is12HoursFormat) {
                                     formatLocalTime(schedule.endTime)
-                                else
+                                } else {
                                     schedule.endTime.toString()
+                                }
                             ScheduleListItem(
                                 courseName = schedule.courseName,
                                 timeRange = "$startTime-$endTime",
@@ -614,10 +617,13 @@ fun SchedulesGrid(
     val hoursTextSize = dimensionResource(R.dimen.timetable_hours_text_size).value.sp
     val hoursTextColor = colorResource(R.color.timetable_default_hours_text_color)
     val hourLabels =
-        stringArrayResource(if (is12HoursFormat)
-            R.array.hours_in_12_hour_format
-        else
-            R.array.hours_in_24_hour_format).toList()
+        stringArrayResource(
+            if (is12HoursFormat) {
+                R.array.hours_in_12_hour_format
+            } else {
+                R.array.hours_in_24_hour_format
+            },
+        ).toList()
     val hourTextXPosition = hoursCellWidthPx / 2
     val scheduleEndPadding = dimensionResource(R.dimen.timetable_schedule_end_margin)
     val scheduleBottomPadding = dimensionResource(R.dimen.timetable_schedule_bottom_margin)

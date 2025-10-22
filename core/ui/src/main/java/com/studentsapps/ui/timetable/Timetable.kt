@@ -682,9 +682,9 @@ class Timetable(
             schedules.groupByDayOfWeek().forEach { (dayOfWeek, schedulesForOneDayOfWeek) ->
 
                 if (
-                    (dayOfWeek != DayOfWeek.SUNDAY || showSunday)
-                    && (dayOfWeek != DayOfWeek.SATURDAY || showSaturday)
-                    ) {
+                    (dayOfWeek != DayOfWeek.SUNDAY || showSunday) &&
+                    (dayOfWeek != DayOfWeek.SATURDAY || showSaturday)
+                ) {
                     val scheduleCrossing = schedulesForOneDayOfWeek.getCrossSchedules()
                     val uniqueSchedules = schedulesForOneDayOfWeek.getUniqueSchedules()
 
@@ -953,8 +953,7 @@ class Timetable(
         }
 
     @SuppressLint("ClickableViewAccessibility")
-    override fun onTouchEvent(event: MotionEvent): Boolean =
-        gestureDetector.onTouchEvent(event) || super.onTouchEvent(event)
+    override fun onTouchEvent(event: MotionEvent): Boolean = gestureDetector.onTouchEvent(event) || super.onTouchEvent(event)
 
     override fun onSaveInstanceState(): Parcelable =
         SavedState(super.onSaveInstanceState()).apply {

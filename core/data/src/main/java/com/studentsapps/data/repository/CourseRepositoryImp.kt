@@ -204,8 +204,7 @@ class CourseRepositoryImp
                 entities.map { it.asExternalModel() }
             }
 
-        override fun getAllCourseEntity(userId: String): Flow<List<CourseEntity>> =
-            courseLocalDataSource.getAllCourse(userId)
+        override fun getAllCourseEntity(userId: String): Flow<List<CourseEntity>> = courseLocalDataSource.getAllCourse(userId)
 
         private fun serializeCourse(course: Course): String = appJson.encodeToString(course)
 

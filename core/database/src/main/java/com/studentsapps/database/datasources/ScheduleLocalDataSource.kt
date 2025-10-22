@@ -75,8 +75,7 @@ class ScheduleLocalDataSource
 
         fun getScheduleById(scheduleId: String): Flow<ScheduleEntity> = scheduleDao.getScheduleById(scheduleId)
 
-        fun getSchedulesByIds(schedulesIds: List<String>): Flow<List<ScheduleEntity>> =
-            scheduleDao.getSchedulesByIds(schedulesIds)
+        fun getSchedulesByIds(schedulesIds: List<String>): Flow<List<ScheduleEntity>> = scheduleDao.getSchedulesByIds(schedulesIds)
 
         fun getAllScheduleEntity(userId: String): Flow<List<ScheduleEntity>> = scheduleDao.getAllScheduleEntity(userId)
     }

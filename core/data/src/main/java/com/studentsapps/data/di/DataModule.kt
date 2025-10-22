@@ -33,7 +33,5 @@ interface DataModule {
 
     @Binds
     @Singleton
-    fun bindsPendingOperationRepository(
-        pendingOperationRepositoryImp: PendingOperationRepositoryImp
-    ): PendingOperationRepository
+    fun bindsPendingOperationRepository(pendingOperationRepositoryImp: PendingOperationRepositoryImp): PendingOperationRepository
 }

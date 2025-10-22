@@ -79,8 +79,10 @@ class ModalBottomSheetCourse : BaseBottomSheetDialogFragment() {
         val request =
             NavDeepLinkRequest.Builder
                 .fromUri(
-                    ("android-app://studentsapps.app/registerCourseFragment/" +
-                            "$navigatedFromTimeLoggingDestination").toUri(),
+                    (
+                        "android-app://studentsapps.app/registerCourseFragment/" +
+                            "$navigatedFromTimeLoggingDestination"
+                    ).toUri(),
                 ).build()
         navController.navigate(request = request, navOptions = navOptions)
     }

@@ -145,10 +145,12 @@ class ModalBottomSheetColor : BaseBottomSheetDialogFragment() {
                 (binding.selectHue.top + y - binding.layoutColorPalette.paddingTop).toInt()
         } else {
             layoutParams.topMargin =
-                (binding.selectHue.top
-                        + y
-                        - binding.hueCursor.measuredHeight
-                        - binding.layoutColorPalette.paddingTop).toInt()
+                (
+                    binding.selectHue.top +
+                        y -
+                        binding.hueCursor.measuredHeight -
+                        binding.layoutColorPalette.paddingTop
+                ).toInt()
         }
         binding.hueCursor.layoutParams = layoutParams
     }
@@ -159,14 +161,14 @@ class ModalBottomSheetColor : BaseBottomSheetDialogFragment() {
         val layoutParams = binding.pickerCursor.layoutParams as ConstraintLayout.LayoutParams
         layoutParams.leftMargin =
             (
-                    binding.colorPicker.left + x - floor((binding.pickerCursor.measuredWidth / 2).toDouble()) -
-                            binding.layoutColorPalette.paddingLeft
-                    ).toInt()
+                binding.colorPicker.left + x - floor((binding.pickerCursor.measuredWidth / 2).toDouble()) -
+                    binding.layoutColorPalette.paddingLeft
+            ).toInt()
         layoutParams.topMargin =
             (
-                    binding.colorPicker.top + y - floor((binding.pickerCursor.measuredHeight / 2).toDouble()) -
-                            binding.layoutColorPalette.paddingTop
-                    ).toInt()
+                binding.colorPicker.top + y - floor((binding.pickerCursor.measuredHeight / 2).toDouble()) -
+                    binding.layoutColorPalette.paddingTop
+            ).toInt()
         binding.pickerCursor.layoutParams = layoutParams
     }
 

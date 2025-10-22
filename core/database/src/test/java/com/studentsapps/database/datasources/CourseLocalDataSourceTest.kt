@@ -72,7 +72,7 @@ class CourseLocalDataSourceTest {
                     "Professor 1",
                     1234,
                     lastModified = LocalDateTime.now(),
-                    userId = ""
+                    userId = "",
                 )
             subject.updateCourse(expectedCourse)
             assertThat(subject.getCourse("1").first(), `is`(expectedCourse))
