@@ -18,6 +18,7 @@ dependencies {
     implementation(project(":core:datastore"))
     implementation(project(":core:database"))
     implementation(project(":core:network"))
+    implementation(project(":core:domain"))
     implementation(project(":core:database-test"))
     androidTestImplementation(project(":core:datastore-test"))
 
@@ -26,6 +27,7 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.hilt.work)
     implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.firestore.ktx)
     kapt(libs.androidx.hilt.compiler)
 
     androidTestImplementation(libs.junit)
@@ -36,4 +38,7 @@ dependencies {
     androidTestImplementation(libs.androidx.datastore.preferences)
 
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.firebase.auth.ktx)
+    testImplementation(libs.firebase.firestore.ktx)
+    testImplementation(libs.mockk)
 }

@@ -22,7 +22,7 @@ import javax.inject.Inject
 class SynchronizationManager
     @Inject
     constructor(
-        @ApplicationContext private val context: Context,
+        @param:ApplicationContext private val context: Context,
         private val auth: FirebaseAuth,
         private val pendingOperations: PendingOperationRepository,
         private val courseNetworkDataSource: CourseNetworkDataSource,

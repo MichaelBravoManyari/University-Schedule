@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/authFragment"
-        android:name="com.mbm.login.AuthFragment"
+        android:name="com.mbm.login.auth.AuthFragment"
         android:label="fragment_auth"
         tools:layout="@layout/fragment_auth" >
         <action
@@ -28,7 +28,7 @@
     </fragment>
     <fragment
         android:id="@+id/emailSignUpFragment"
-        android:name="com.mbm.login.EmailSignUpFragment"
+        android:name="com.mbm.login.email_signup.EmailSignUpFragment"
         android:label="EmailSignUpFragment" >
         <action
             android:id="@+id/action_emailSignUpFragment_to_authFragment"
@@ -40,7 +40,7 @@
     </fragment>
     <fragment
         android:id="@+id/emailLoginFragment"
-        android:name="com.mbm.login.EmailLoginFragment"
+        android:name="com.mbm.login.email_login.EmailLoginFragment"
         android:label="EmailLoginFragment" >
         <action
             android:id="@+id/action_emailLoginFragment_to_authFragment"
@@ -49,5 +49,8 @@
             app:exitAnim="@android:anim/fade_out"
             app:popEnterAnim="@android:anim/fade_in"
             app:popExitAnim="@android:anim/fade_out" />
+        <action
+            android:id="@+id/action_emailLoginFragment_to_emailSignUpFragment"
+            app:destination="@id/emailSignUpFragment" />
     </fragment>
 </navigation>

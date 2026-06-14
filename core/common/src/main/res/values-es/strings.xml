@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="synchronizing">Sincronizando</string>
+    <string name="app_name">Mi Horario Universitario</string>
+    <string name="network_error">Error de conexión. Verifica tu conexión a internet e inténtalo de nuevo</string>
 </resources>

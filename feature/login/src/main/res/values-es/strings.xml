@@ -2,7 +2,6 @@
 <resources>
     <string name="sign_in_with_email">Ingresar con email</string>
     <string name="sign_in_with_google">Ingresar con Google</string>
-    <string name="are_you_new_register_here">¿Eres nuevo? Registrate aquí</string>
     <string name="welcome_to_university_schedule">¡Bienvenido a Horario Universitario! Organiza tus clases y horarios fácilmente. ¡Tu planificación comienza ahora!</string>
     <string name="enter_your_email">Ingrese su correo</string>
     <string name="enter_your_password">Ingrese su contraseña</string>
@@ -20,4 +19,23 @@
     <string name="email_already_registered">Correo  ya registrado</string>
     <string name="passwords_do_not_match">Las contraseñas no coinciden</string>
     <string name="firestore_save_error">No se pudo guardar el usuario</string>
+    <string name="login_to_access_calendar">Inicia sesión para acceder a tu calendario académico</string>
+    <string name="or_also">O TAMBIÉN</string>
+    <string name="are_you_new">¿Eres nuevo?</string>
+    <string name="sign_up_here">Regístrate aquí</string>
+    <string name="invalid_credentials">Correo o contraseña incorrectos</string>
+    <string name="user_not_found">No se encontró una cuenta con este correo</string>
+    <string name="weak_password">La contraseña es demasiado débil</string>
+    <string name="email_in_use">Este correo ya está en uso</string>
+    <string name="login_cancelled">Inicio de sesión cancelado</string>
+    <string name="show_password">Mostrar contraseña</string>
+    <string name="hide_password">Ocultar contraseña</string>
+    <string name="sign_in">Iniciar sesión</string>
+    <string name="create_account">Crear Cuenta</string>
+    <string name="join_university_schedule">Únete a Mi Horario Universitario</string>
+    <string name="confirm_password">Confirmar contraseña</string>
+    <string name="register">Registrarse</string>
+    <string name="back">Volver</string>
+    <string name="already_have_account">¿Ya tienes una cuenta?</string>
+    <string name="sign_in_action">Inicia sesión</string>
 </resources>

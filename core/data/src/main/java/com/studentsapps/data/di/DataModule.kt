@@ -1,5 +1,6 @@
 package com.studentsapps.data.di
 
+import com.studentsapps.data.repository.AuthRepositoryImpl
 import com.studentsapps.data.repository.CourseRepository
 import com.studentsapps.data.repository.CourseRepositoryImp
 import com.studentsapps.data.repository.PendingOperationRepository
@@ -8,6 +9,7 @@ import com.studentsapps.data.repository.ScheduleRepository
 import com.studentsapps.data.repository.ScheduleRepositoryImp
 import com.studentsapps.data.repository.TimetableUserPreferencesRepository
 import com.studentsapps.data.repository.TimetableUserPreferencesRepositoryImp
+import com.studentsapps.domain.login.repository.AuthRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -34,4 +36,8 @@ interface DataModule {
     @Binds
     @Singleton
     fun bindsPendingOperationRepository(pendingOperationRepositoryImp: PendingOperationRepositoryImp): PendingOperationRepository
+
+    @Binds
+    @Singleton
+    fun bindsAuthRepository(authRepositoryImp: AuthRepositoryImpl): AuthRepository
 }

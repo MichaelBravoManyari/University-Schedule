@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">University Schedule</string>
     <string name="schedule">Schedule</string>
     <string name="courses">Courses</string>
     <string name="title_update_required_dialog">Update Required</string>

@@ -1,7 +1,6 @@
 <resources>
     <string name="sign_in_with_email">Sign in with Email</string>
     <string name="sign_in_with_google">Sign in with Google</string>
-    <string name="are_you_new_register_here">Are you new? Register here</string>
     <string name="welcome_to_university_schedule">Welcome to University Schedule! Easily organize your classes and schedules. Your planning starts now!</string>
     <string name="enter_your_email">Enter your email</string>
     <string name="enter_your_password">Enter your password</string>
@@ -20,4 +19,24 @@
     <string name="email_already_registered">Email already registered</string>
     <string name="passwords_do_not_match">Passwords do not match</string>
     <string name="firestore_save_error">Failed to save user</string>
+    <string name="login_to_access_calendar">Sign in to access your academic calendar</string>
+    <string name="or_also">OR</string>
+    <string name="are_you_new">New here?</string>
+    <string name="sign_up_here">Sign up here</string>
+    <string name="network_error">Connection error. Check your internet connection and try again</string>
+    <string name="invalid_credentials">Invalid email or password</string>
+    <string name="user_not_found">No account found with this email</string>
+    <string name="weak_password">The password is too weak</string>
+    <string name="email_in_use">This email is already in use</string>
+    <string name="login_cancelled">Login cancelled</string>
+    <string name="show_password">Show password</string>
+    <string name="hide_password">Hide password</string>
+    <string name="sign_in">Sign in</string>
+    <string name="create_account">Create account</string>
+    <string name="join_university_schedule">Join My University Schedule</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="register">Sign up</string>
+    <string name="back">Back</string>
+    <string name="already_have_account">Already have an account?</string>
+    <string name="sign_in_action">Sign in</string>
 </resources>

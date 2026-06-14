@@ -15,4 +15,5 @@ android {
 dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.firestore.ktx)
 }

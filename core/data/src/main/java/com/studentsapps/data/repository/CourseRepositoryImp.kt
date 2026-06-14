@@ -35,7 +35,7 @@ class CourseRepositoryImp
         private val scheduleLocalDataSource: ScheduleLocalDataSource,
         private val pendingOperationLocalDataSource: PendingOperationLocalDataSource,
         private val scheduleRepository: ScheduleRepository,
-        @ApplicationContext private val context: Context,
+        @param:ApplicationContext private val context: Context,
     ) : CourseRepository {
         override fun getCourse(courseId: String): Flow<Course> =
             courseLocalDataSource
