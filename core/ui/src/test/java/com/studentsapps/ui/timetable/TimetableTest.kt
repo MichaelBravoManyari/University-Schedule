@@ -63,6 +63,8 @@ import org.robolectric.annotation.Config
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
+import java.time.format.TextStyle
+import java.util.Locale
 
 @Config(application = HiltTestApplication::class)
 @HiltAndroidTest
@@ -480,7 +482,9 @@ class TimetableTest {
 
     @Test
     fun testSelectedWeekMonthDisplay() {
-        val expectedMonth = "September"
+        val date = LocalDate.now().plusWeeks(1)
+        val expectedMonth = date.month.getDisplayName(TextStyle.FULL, Locale.getDefault())
+            .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
         mockUtilsGetCurrentDate()
         val timetable = createTimetable()
         onView(withContentDescription(timetableContentDescription))
