@@ -8,7 +8,6 @@ import org.junit.Test
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
-
 import java.time.format.TextStyle
 import java.util.Locale
 
@@ -516,8 +515,10 @@ class TimetableUtilsTest {
     @Test
     fun getMonth_randomDate() {
         val date = LocalDate.of(2023, 7, 18)
-        val expectedMonth = date.month.getDisplayName(TextStyle.FULL, Locale.getDefault())
-            .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+        val expectedMonth =
+            date.month
+                .getDisplayName(TextStyle.FULL, Locale.getDefault())
+                .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
         val realMonth = utils.getMonth(date)
         assertThat(realMonth, `is`(expectedMonth))
     }

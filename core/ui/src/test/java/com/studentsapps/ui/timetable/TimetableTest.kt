@@ -483,9 +483,11 @@ class TimetableTest {
     @Test
     fun testSelectedWeekMonthDisplay() {
         val date = LocalDate.now().plusWeeks(1)
-        val expectedMonth = date.month.getDisplayName(TextStyle.FULL, Locale.getDefault())
-            .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
-        mockUtilsGetCurrentDate()
+        val expectedMonth =
+            date.month
+                .getDisplayName(TextStyle.FULL, Locale.getDefault())
+                .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+        mockUtilsGetCurrentDate(LocalDate.now())
         val timetable = createTimetable()
         onView(withContentDescription(timetableContentDescription))
             .perform(swipeLeft())
