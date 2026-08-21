@@ -50,7 +50,6 @@ private fun Project.configureKotlin(javaVersion: Int) {
     tasks.withType<KotlinCompile>().configureEach {
         compilerOptions {
             jvmTarget.set(JvmTarget.fromTarget(javaVersion.toString()))
-            languageVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9)
         }
     }
     tasks.withType<Test> {

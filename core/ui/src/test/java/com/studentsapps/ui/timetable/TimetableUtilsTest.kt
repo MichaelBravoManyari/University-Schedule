@@ -513,7 +513,7 @@ class TimetableUtilsTest {
     @Test
     fun getMonth_randomDate() {
         val date = LocalDate.of(2023, 7, 18)
-        val expectedMonth = "July"
+        val expectedMonth = "Julio"
         val realMonth = utils.getMonth(date)
         assertThat(realMonth, `is`(expectedMonth))
     }
