@@ -38,7 +38,7 @@ android {
 
     defaultConfig {
         applicationId = "com.studentsapps.universityschedule"
-        versionCode = 4
+        versionCode = 5
         versionName = "1.0"
 
         // App ID (para el manifest)

@@ -43,7 +43,7 @@ jobs:
         uses: chkfung/android-version-actions@v1.2.2
         with:
           gradlePath: app/build.gradle.kts
-          versionCode: 4
+          versionCode: 5
           versionName: 1.0
 
       - name: Assemble Release Bundle
